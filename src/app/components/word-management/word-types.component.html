@@ -1,0 +1,28 @@
+<div class="flex-container">
+  <div class="flex-col flex-col--50">
+    <mat-card class="margin-bottom">
+      <mat-card-title>Word Types</mat-card-title>
+      <mat-card-content>
+        <mat-list>
+          <mat-list-item *ngFor="let wordTypeEntity of wordTypeEntities">
+            <button mat-button (click)="editWordTypeEntity(wordTypeEntity)">
+              {{wordTypeEntity.title}}
+              <mat-icon>create</mat-icon>
+            </button>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button (click)="createWordTypeEntity()">
+          New ...
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+  <div class="flex-col flex-col--50">
+    <word-type-edit *ngIf="editedWordTypeEntity" [wordTypeEntity]="editedWordTypeEntity" (wordTypeSaved)="wordTypeEntitySaved($event)"
+      (wordTypeCancelled)="wordTypeEditCancelled()" (wordTypeDeleted)="wordTypeEntityDeleted()">
+    </word-type-edit>
+  </div>
+</div>
+

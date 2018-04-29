@@ -1,0 +1,18 @@
+{
+  "app": {
+    "title": "VocaTrain"
+  },
+  "nav": {
+    "words": {
+      "title": "Vokabeln"
+    },
+    "word-types": {
+      "title": "Vokabelarten"
+    }
+  },
+  "actions": {
+    "delete": "Löschen",
+    "cancel": "Abbrechen",
+    "save": "Speichern"
+  }
+}

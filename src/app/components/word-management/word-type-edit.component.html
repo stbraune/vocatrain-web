@@ -1,0 +1,24 @@
+<mat-card class="panel margin-bottom">
+  <mat-card-title>Edit word type</mat-card-title>
+  <mat-card-content class="form">
+    <mat-form-field>
+      <input matInput placeholder="Title" [(ngModel)]="wordTypeEntity.title">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Keys" (keypress)="onWordTypeKeysKeyPress($event)" [(ngModel)]="editWordTypeKey">
+    </mat-form-field>
+    <mat-chip-list>
+      <mat-chip *ngFor="let wordTypeKey of wordTypeEntity.keys">
+        {{wordTypeKey}}
+        <button mat-icon-button (click)="deleteWordTypeKey(wordTypeKey)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-chip>
+    </mat-chip-list>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button (click)="onDelete()">{{'actions.delete' | translate}}</button>
+    <button mat-button (click)="onCancel()">{{'actions.cancel' | translate}}</button>
+    <button mat-button (click)="onSave()">{{'actions.save' | translate}}</button>
+  </mat-card-actions>
+</mat-card>

@@ -1,0 +1,24 @@
+<mat-card class="panel-edit-word">
+  <mat-card-title>Edit word</mat-card-title>
+  <mat-card-content class="form">
+    <mat-form-field>
+      <mat-select placeholder="Type" [(ngModel)]="wordEntity.type">
+        <mat-option *ngFor="let wordTypeEntity of wordTypeEntities" [value]="wordTypeEntity">{{wordTypeEntity.title}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <ng-container *ngIf="wordEntity.type">
+      <div class="word-type-key" *ngFor="let key of wordEntity.type.keys">
+        <mat-form-field *ngFor="let lang of supportedLanguages" class="word-type-key__field word-type-key__field--meta">
+          <input matInput placeholder="{{key}} ({{lang}})" [value]="text(key, lang)" (change)="textChanged(key, lang, $event)">
+        </mat-form-field>
+        <mat-form-field class="word-type-key__field">
+          <input matInput placeholder="{{key}} (meta)" [value]="meta(key)" (change)="metaChanged(key, $event)">
+        </mat-form-field>
+      </div>
+    </ng-container>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button mat-button (click)="onSave()">Save</button>
+  </mat-card-actions>
+</mat-card>

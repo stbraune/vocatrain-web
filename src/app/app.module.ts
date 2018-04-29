@@ -1,18 +1,84 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterModule } from '@angular/router';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 
+import {
+  MatButtonModule,
+  MatCardModule,
+  MatChipsModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatInputModule,
+  MatSelectModule,
+  MatToolbarModule,
+  MatListModule,
+  MatSnackBarModule,
+} from '@angular/material';
+
+import {
+  DatabaseService, WordTypeEntityService, WordEntityService
+} from './services';
 
 import { AppComponent } from './app.component';
+import {
+  WordsComponent,
+  WordTypeEditComponent,
+  WordEditComponent,
+  WordTypesComponent
+} from './components';
 
+import { AppRoutes } from './app.routes';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoaderFactory } from './translate-http-loader-factory';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    WordsComponent,
+    WordTypesComponent,
+    WordTypeEditComponent,
+    WordEditComponent
   ],
   imports: [
-    BrowserModule
+    RouterModule.forRoot(AppRoutes, {
+      useHash: true
+    }),
+    HttpClientModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useExisting: TranslateHttpLoader
+      }
+    }),
+    BrowserModule,
+    BrowserAnimationsModule,
+    FormsModule,
+    MatButtonModule,
+    MatCardModule,
+    MatChipsModule,
+    MatFormFieldModule,
+    MatListModule,
+    MatIconModule,
+    MatInputModule,
+    MatSelectModule,
+    MatSnackBarModule,
+    MatToolbarModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: TranslateHttpLoader,
+      useFactory: TranslateHttpLoaderFactory,
+      deps: [HttpClient]
+    },
+    DatabaseService,
+    WordTypeEntityService,
+    WordEntityService
+  ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

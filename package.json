@@ -12,7 +12,7 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^5.2.0",
+    "@angular/animations": "^5.2.10",
     "@angular/cdk": "^5.2.5",
     "@angular/common": "^5.2.0",
     "@angular/compiler": "^5.2.0",
@@ -23,13 +23,18 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
+    "@ngx-translate/core": "^8.0.0",
+    "@ngx-translate/http-loader": "^2.0.1",
     "core-js": "^2.4.1",
+    "hammerjs": "^2.0.8",
     "pouchdb-adapter-http": "^6.4.3",
     "pouchdb-adapter-idb": "^6.4.3",
     "pouchdb-core": "^6.4.3",
+    "pouchdb-find": "^6.4.3",
     "pouchdb-mapreduce": "^6.4.3",
     "pouchdb-replication": "^6.4.3",
     "rxjs": "^5.5.6",
+    "uuid": "^3.2.1",
     "zone.js": "^0.8.19"
   },
   "devDependencies": {

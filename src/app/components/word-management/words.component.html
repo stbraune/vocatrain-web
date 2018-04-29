@@ -1,0 +1,8 @@
+<word-edit
+  *ngIf="editedWordEntity"
+  [wordTypeEntities]="wordTypeEntities"
+  [supportedLanguages]="['de','bg']"
+  [wordEntity]="editedWordEntity"
+  (wordSaved)="wordEntitySaved($event)"
+  (wordCancelled)="wordEntityCancelled()">
+</word-edit>

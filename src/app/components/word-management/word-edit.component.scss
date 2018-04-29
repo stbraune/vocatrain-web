@@ -1,0 +1,16 @@
+.panel {
+  .form {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.word-type-key {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  &__field {
+    flex-grow: 0.3;
+  }
+}

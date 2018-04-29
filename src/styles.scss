@@ -1,0 +1,109 @@
+/* You can add global styles to this file, and also import other style files */
+// @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+// @import '~@angular/material/prebuilt-themes/indigo-pink.css';
+// @import '~@angular/material/prebuilt-themes/pink-bluegrey.css';
+@import '~@angular/material/prebuilt-themes/purple-green.css';
+
+// Import all the tools needed to customize the theme and extract parts of it
+@import '~@angular/material/theming';
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat-core();
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://www.google.com/design/spec/style/color.html
+$candy-app-primary: mat-palette($mat-light-green, 800);
+$candy-app-accent:  mat-palette($mat-pink, A200, A100, A400);
+
+// The warn palette is optional (defaults to red).
+$candy-app-warn:    mat-palette($mat-red);
+
+// Create the theme object (a Sass map containing all of the palettes).
+$candy-app-theme: mat-dark-theme($candy-app-primary, $candy-app-accent, $candy-app-warn);
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($candy-app-theme);
+
+// Define a mixin that accepts a theme and outputs the color styles for the component.
+// Extract whichever individual palettes you need from the theme.
+$primary: map-get($candy-app-theme, primary);
+$accent: map-get($candy-app-theme, accent);
+
+// Use mat-color to extract individual colors from a palette as necessary.
+// .candy-carousel {
+//   background-color: mat-color($primary);
+//   border-color: mat-color($accent, A400);
+// }
+
+body {
+  margin: 0;
+}
+
+.app-navbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  background-color: mat-color($primary);
+}
+
+.margin-bottom {
+  margin-bottom: 2rem;
+}
+
+.flex-container {
+  display: flex;
+  margin: 0 -0.5rem;
+
+  .flex-col {
+    margin: 0 0.5rem;
+  }
+
+  .flex-col--grow {
+    flex-grow: 1;
+  }
+}
+
+@media(max-width: 599px) {
+  .flex-container {
+    display: flex;
+    flex-direction: column;
+    margin: 0 -0.5rem;
+  
+    .flex-col {
+      margin: 0 0.5rem;
+    }
+  
+    .flex-col--grow {
+      flex-grow: 1;
+    }
+  
+    .flex-col--50 {
+      flex-basis: 100%;
+    }
+  }
+}
+
+@media(min-width: 600px) {
+  .flex-container {
+    display: flex;
+    margin: 0 -0.5rem;
+
+    .flex-col {
+      margin: 0 0.5rem;
+    }
+
+    .flex-col--grow {
+      flex-grow: 1;
+    }
+
+    .flex-col--50 {
+      flex-basis: 50%;
+    }
+  }
+}
