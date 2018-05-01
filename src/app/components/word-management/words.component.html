@@ -1,8 +1,54 @@
-<word-edit
-  *ngIf="editedWordEntity"
-  [wordTypeEntities]="wordTypeEntities"
-  [supportedLanguages]="['de','bg']"
-  [wordEntity]="editedWordEntity"
-  (wordSaved)="wordEntitySaved($event)"
-  (wordCancelled)="wordEntityCancelled()">
-</word-edit>
+<div class="flex">
+  <div class="flex-col flex-col--50">
+    <mat-card class="margin--bottom">
+      <mat-card-title>{{'words.title' | translate}}</mat-card-title>
+      <mat-card-content>
+        <ul class="ul--nostyle">
+          <li *ngFor="let wordEntity of wordEntities">
+            <button mat-button (click)="editWordEntity(wordEntity)" class="stretch align--left">
+              <div class="flex flex--align-center">
+                <div class="flex-col flex-col--grow">
+                  <ng-container *ngFor="let text of wordEntity.texts">
+                    <div class="flex">
+                      <ng-container *ngFor="let lang of supportedLanguages">
+                        <div class="flex-col flex-col--40 flex-col--grow">
+                          {{text.words[lang]}} ({{lang}})
+                        </div>
+                      </ng-container>
+                      <div class="flex-col flex-col--20 align--center">
+                        <chips [mode]="'read'" [(chips)]="text.tags"></chips>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+                <div class="flex-col flex-col--15">
+                  {{wordEntity.type.title}}
+                </div>
+                <div class="flex-col flex--col--5">
+                  <mat-icon>create</mat-icon>
+                </div>
+              </div>
+            </button>
+          </li>
+        </ul>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button (click)="createWordEntity()" class="stretch">
+          <mat-icon>add</mat-icon>
+          {{'actions.create' | translate}}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+  <div class="flex-col flex-col--50">
+    <word-edit
+      *ngIf="editedWordEntity"
+      [wordTypeEntities]="wordTypeEntities"
+      [supportedLanguages]="supportedLanguages"
+      [wordEntity]="editedWordEntity"
+      (wordSaved)="wordEntitySaved($event)"
+      (wordDeleted)="wordEntityDeleted()"
+      (wordCancelled)="wordEntityCancelled()">
+    </word-edit>
+  </div>
+</div>

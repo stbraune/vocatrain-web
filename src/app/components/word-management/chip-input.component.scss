@@ -22,6 +22,10 @@
       padding-bottom: 0;
     }
 
+    ::ng-deep .mat-form-field-infix {
+      width: initial;
+    }
+
     ::ng-deep .mat-input-underline {
       bottom: 0;
     }

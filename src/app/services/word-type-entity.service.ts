@@ -21,8 +21,8 @@ export class WordTypeEntityService {
     return this.db.getEntities();
   }
 
-  public postWordTypeEntity(wordTypeEntity: WordTypeEntity): Observable<WordTypeEntity> {
-    return this.db.postEntity(wordTypeEntity, wordTypeEntity.title);
+  public putWordEntity(wordTypeEntity: WordTypeEntity): Observable<WordTypeEntity> {
+    return this.db.putEntity(wordTypeEntity, wordTypeEntity.title);
   }
 
   public deleteWordTypeEntity(wordTypeEntity: WordTypeEntity): Observable<boolean> {

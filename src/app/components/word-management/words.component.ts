@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { WordTypeEntityService } from '../../services';
+import { Component, OnInit, Input } from '@angular/core';
+import { WordTypeEntityService, WordEntityService } from '../../services';
 import { WordTypeEntity, WordEntity } from '../../model';
 
 @Component({
@@ -8,9 +8,8 @@ import { WordTypeEntity, WordEntity } from '../../model';
   styleUrls: ['./words.component.scss']
 })
 export class WordsComponent implements OnInit {
+  public wordEntities: WordEntity[] = [];
   public wordTypeEntities: WordTypeEntity[] = [];
-
-  public editedWordTypeEntity: WordTypeEntity;
 
   public emptyWordEntity: WordEntity = {
     type: undefined,
@@ -23,30 +22,63 @@ export class WordsComponent implements OnInit {
     ]
   };
 
-  public editedWordEntity: WordEntity = JSON.parse(JSON.stringify(this.emptyWordEntity));
+  public editedWordEntity: WordEntity = this.newWordEntity();
+
+  @Input()
+  public supportedLanguages = ['de', 'bg'];
 
   public constructor(
-    private wordTypeEntityService: WordTypeEntityService
+    private wordTypeEntityService: WordTypeEntityService,
+    private wordEntityService: WordEntityService
   ) {
   }
 
   public ngOnInit(): void {
     this.loadWordTypeEntities();
+    this.loadWordEntities();
+    this.createWordEntity();
   }
 
   private loadWordTypeEntities() {
-    this.editedWordTypeEntity = undefined;
     this.wordTypeEntityService.getWordTypeEntities().subscribe((wordTypeEntities) => {
       this.wordTypeEntities = wordTypeEntities;
     });
   }
 
+  private loadWordEntities() {
+    this.editedWordEntity = undefined;
+    this.wordEntityService.getWordEntities().subscribe((wordEntities) => {
+      this.wordEntities = wordEntities;
+    });
+  }
+
+  public createWordEntity() {
+    this.editedWordEntity = this.newWordEntity();
+  }
+
+  public editWordEntity(wordEntity: WordEntity) {
+    this.editedWordEntity = this.cloneWordEntity(wordEntity);
+  }
+
   public wordEntitySaved(wordEntity: WordEntity) {
     console.log('persisted', wordEntity);
-    this.editedWordEntity = JSON.parse(JSON.stringify(this.emptyWordEntity));
+    this.loadWordEntities();
+    this.editedWordEntity = this.newWordEntity();
   }
 
   public wordEntityCancelled() {
-    this.editedWordEntity = JSON.parse(JSON.stringify(this.emptyWordEntity));
+    this.editedWordEntity = this.newWordEntity();
+  }
+
+  public wordEntityDeleted() {
+    this.loadWordEntities();
+  }
+
+  private newWordEntity() {
+    return this.cloneWordEntity(this.emptyWordEntity);
+  }
+
+  private cloneWordEntity(wordEntity: WordEntity) {
+    return JSON.parse(JSON.stringify(wordEntity));
   }
 }

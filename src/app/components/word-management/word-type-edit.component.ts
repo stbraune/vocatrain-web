@@ -62,7 +62,7 @@ export class WordTypeEditComponent {
 
 
   public onSave() {
-    this.wordTypeEntityService.postWordTypeEntity(this.wordTypeEntity).subscribe((wordTypeEntity) => {
+    this.wordTypeEntityService.putWordEntity(this.wordTypeEntity).subscribe((wordTypeEntity) => {
       this.editWordTypeTag = '';
       this.wordTypeSaved.emit(wordTypeEntity);
       this.snackBar.open('Saved!', null, { duration: 3000 });

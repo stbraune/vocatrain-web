@@ -12,7 +12,14 @@ export class ChipsComponent {
   @Output()
   public chipsChange = new EventEmitter<string[]>();
 
+  @Input()
+  public mode: 'read' | 'update' = 'update';
+
   public deleteChip(chip: string) {
+    if (this.mode !== 'update') {
+      return;
+    }
+
     const index = this.chips.indexOf(chip);
     if (index !== -1) {
       this.chips.splice(index, 1);

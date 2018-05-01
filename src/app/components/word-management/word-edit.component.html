@@ -2,25 +2,29 @@
   <mat-card-title>{{'words.edit-word.title' | translate}}</mat-card-title>
   <mat-card-content class="form">
     <mat-form-field>
-      <mat-select placeholder="Type" [(ngModel)]="wordEntity.type">
-        <mat-option *ngFor="let wordTypeEntity of wordTypeEntities" [value]="wordTypeEntity">{{wordTypeEntity.title}}</mat-option>
+      <mat-select #typeSelect placeholder="Type" [(ngModel)]="wordEntity.type">
+        <mat-option
+          *ngFor="let wordTypeEntity of wordTypeEntities"
+          [value]="wordTypeEntity">
+          {{wordTypeEntity.title}}
+        </mat-option>
       </mat-select>
     </mat-form-field>
 
     <ng-container *ngIf="wordEntity.type">
       <div class="flex flex--align-center">
-        <h4 class="margin-right">
+        <h4 class="margin--right">
           {{'words.edit-word.available-tags' | translate}}
         </h4>
         <ul class="ul--nostyle ul--horizontal">
-          <li *ngFor="let tag of wordEntity.type.tags" class="margin-right">
+          <li *ngFor="let tag of wordEntity.type.tags" class="margin--right">
             #{{tag}}
           </li>
         </ul>
       </div>
       <ng-container *ngFor="let text of wordEntity.texts; let w=index">
         <div class="flex flex--wrap">
-          <div class="flex-col">
+          <div class="flex-col flex-col--5">
             <button mat-icon-button (click)="onDeleteText(text)">
               <mat-icon>delete</mat-icon>
             </button>
@@ -30,14 +34,16 @@
             <div #chipInputWrapper
               [attr.data-row]="w"
               [attr.data-col]="l"
-              class="flex-col flex-col--grow">
+              class="flex-col flex-col--25">
               <chip-input
                 [(value)]="text.words[lang]"
                 [(chips)]="text.tags"
                 [allowedChips]="wordEntity.type.tags"
                 [hideChips]="true"
                 [placeholder]="lang"
-                (cursorPressed)="navigate(chipInputWrapper, $event)">
+                (cursorPressed)="navigate(chipInputWrapper, $event)"
+                (backspacePressed)="onBackspacePressed(chipInputWrapper, text)"
+                (enterPressed)="onEnterPressed(chipInputWrapper, text)">
               </chip-input>
             </div>
           </ng-container>
@@ -45,18 +51,19 @@
           <div #chipInputWrapper
             [attr.data-row]="w"
             [attr.data-col]="supportedLanguages.length"
-            class="flex-col flex-col--grow">
+            class="flex-col flex-col--15 flex-col--grow">
             <chip-input
               [(value)]="text.meta"
               [(chips)]="text.tags"
               [allowedChips]="wordEntity.type.tags"
               [hideChips]="true"
               [placeholder]="'words.edit-word.meta' | translate"
-              (cursorPressed)="navigate(chipInputWrapper, $event)">
+              (cursorPressed)="navigate(chipInputWrapper, $event)"
+              (enterPressed)="onEnterPressed(chipInputWrapper, text)">
             </chip-input>
           </div>
 
-          <div class="flex-col margin-bottom">
+          <div class="flex-col flex-col--15 align--center margin--bottom">
             <chips [(chips)]="text.tags"></chips>
           </div>
         </div>

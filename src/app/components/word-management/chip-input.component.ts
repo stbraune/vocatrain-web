@@ -33,6 +33,12 @@ export class ChipInputComponent {
   @Output()
   public cursorPressed = new EventEmitter<'up' | 'right' | 'down' | 'left'>();
 
+  @Output()
+  public backspacePressed = new EventEmitter<void>();
+
+  @Output()
+  public enterPressed = new EventEmitter<void>();
+
   @ViewChild('input')
   public inputElement: ElementRef;
 
@@ -93,8 +99,13 @@ export class ChipInputComponent {
     if ($event.which === 8) {
       // backspace
       if (target.selectionStart === 0 && target.selectionEnd === 0) {
-        this.chips.pop();
-        this.emitChipsChange();
+        if (this.chips.length > 0) {
+          this.chips.pop();
+          this.emitChipsChange();
+        } else {
+          this.backspacePressed.emit();
+          $event.preventDefault();
+        }
       }
 
       const result = this.parseChips(this.value);
@@ -117,6 +128,9 @@ export class ChipInputComponent {
 
         this.value = result.value;
         this.emitValueChange();
+        $event.preventDefault();
+      } else if ($event.which === 13) {
+        this.enterPressed.emit();
         $event.preventDefault();
       }
     }

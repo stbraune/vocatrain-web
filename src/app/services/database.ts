@@ -67,9 +67,10 @@ export class Database<T extends Entity> {
     });
   }
 
-  public putEntity(item: T): Observable<T> {
+  public putEntity(item: T, id?: string): Observable<T> {
     const now = new Date();
     const transient = item.transient;
+    item._id = item._id || `${this._name}_${id || now.toJSON()}`;
     item.transient = undefined;
     item.updatedAt = now;
     item.createdAt = item.createdAt || item.updatedAt;
