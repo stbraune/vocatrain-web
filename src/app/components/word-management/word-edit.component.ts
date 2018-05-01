@@ -61,6 +61,23 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
       if (this.wordEntity.type) {
         this.wordEntity.type = this.wordTypeEntities.find((x) => x._id === this.wordEntity.type._id);
       }
+
+      this.wordEntity.texts = this.wordEntity.texts || [];
+      this.wordEntity.texts.forEach((text) => {
+        this.supportedLanguages.forEach((lang) => {
+          if (typeof text.words[lang] === 'string') {
+            text.words[lang] = {
+              value: <any>text.words[lang],
+              level: {}
+            };
+          }
+
+          text.words[lang] = text.words[lang] || {
+            value: '',
+            level: {}
+          };
+        });
+      });
     }
   }
 
@@ -86,7 +103,12 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
     this.wordEntity.texts.push({
       meta: '',
       tags: [],
-      words: {}
+      words: Object.assign({}, ...this.supportedLanguages.map((lang) => ({
+        [lang]: {
+          value: '',
+          level: {}
+        }
+      })))
     });
   }
 
@@ -179,7 +201,7 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   private isEmpty(text: Text) {
     return text.meta === ''
       && (!text.tags || text.tags.length === 0)
-      && (Object.keys(text.words).length === 0 || Object.keys(text.words).every((k) => text.words[k] === ''));
+      && (Object.keys(text.words).length === 0 || Object.keys(text.words).every((k) => text.words[k].value === ''));
   }
 
   public onDelete() {

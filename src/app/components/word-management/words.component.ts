@@ -2,6 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import { WordTypeEntityService, WordEntityService } from '../../services';
 import { WordTypeEntity, WordEntity } from '../../model';
 
+import { environment } from '../../../environments/environment';
+
 @Component({
   selector: 'words',
   templateUrl: './words.component.html',
@@ -25,7 +27,7 @@ export class WordsComponent implements OnInit {
   public editedWordEntity: WordEntity = this.newWordEntity();
 
   @Input()
-  public supportedLanguages = ['de', 'bg'];
+  public supportedLanguages = environment.languages;
 
   public constructor(
     private wordTypeEntityService: WordTypeEntityService,

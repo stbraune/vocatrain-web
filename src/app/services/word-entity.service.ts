@@ -17,6 +17,10 @@ export class WordEntityService {
     this.db = this.databaseService.openDatabase('word');
   }
 
+  public getDatabase(): Database<WordEntity> {
+    return this.db;
+  }
+
   public getWordEntities(): Observable<WordEntity[]> {
     return this.db.getEntities();
   }
