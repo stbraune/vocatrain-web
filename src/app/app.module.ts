@@ -29,7 +29,9 @@ import {
   WordEditComponent,
   WordTypesComponent,
   ChipInputComponent,
-  ChipsComponent
+  ChipsComponent,
+  GuessComponent,
+  GuessService
 } from './components';
 
 import { AppRoutes } from './app.routes';
@@ -45,7 +47,8 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
     WordsComponent,
     WordTypesComponent,
     WordTypeEditComponent,
-    WordEditComponent
+    WordEditComponent,
+    GuessComponent
   ],
   imports: [
     RouterModule.forRoot(AppRoutes, {
@@ -80,7 +83,8 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
     },
     DatabaseService,
     WordTypeEntityService,
-    WordEntityService
+    WordEntityService,
+    GuessService
   ],
   bootstrap: [AppComponent]
 })

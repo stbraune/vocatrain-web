@@ -3,6 +3,9 @@
     "title": "VocaTrain"
   },
   "nav": {
+    "guess": {
+      "title": "Raten"
+    },
     "words": {
       "title": "Vokabeln"
     },

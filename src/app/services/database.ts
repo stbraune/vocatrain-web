@@ -25,6 +25,10 @@ export class Database<T extends Entity> {
     return this._database;
   }
 
+  public getName() {
+    return this._name;
+  }
+
   public getEntities(options?: any): Observable<T[]> {
     const defaultEndkey = options && options.descending ? '' : '\uffff';
     const defaultStartkey = options && options.descending ? '\uffff' : '';
@@ -104,7 +108,7 @@ export class Database<T extends Entity> {
     return this._serialize ? this._serialize(item) : item;
   }
 
-  public queryEntities(queryId: string, viewId, key, map: (item: T) => void): Observable<any> {
+  public queryEntities(queryId: string, viewId, key, map: string | ((item: T) => void)): Observable<any> {
     return this.getQuery(queryId, viewId, map).switchMap((result: any) => {
       return this.runQuery(queryId, viewId, {
         key,
@@ -113,16 +117,25 @@ export class Database<T extends Entity> {
     });
   }
 
-  public getQuery(queryId: string, viewId: string, map: (item: T) => void): Observable<any> {
+  public getQuery(queryId: string, viewId: string, map: string | ((item: T) => void)): Observable<any> {
     const id = `_design/${queryId}`;
+    const mapfn = typeof map === 'string' ? map : map.toString();
     return Observable.fromPromise(this._database.get(id))
+      .switchMap((result: any) => {
+        if (result.views[viewId].map !== mapfn) {
+          result.views[viewId].map = mapfn;
+          return this._database.put(result);
+        }
+
+        return Observable.of(result);
+      })
       .catch((error) => {
         if (error.status === 404) {
           return Observable.fromPromise(this._database.put({
             _id: id,
             views: {
               [viewId]: {
-                map: map.toString()
+                map: typeof map === 'string' ? map : map.toString()
               }
             }
           }));
@@ -133,8 +146,12 @@ export class Database<T extends Entity> {
   }
 
   public runQuery(queryId: string, viewId: string, options: any): Observable<T[]> {
-    return Observable.fromPromise(this._database.query(queryId + '/' + viewId, options)).map((result: any) => {
+    return this.runQueryRaw(queryId, viewId, options).map((result: any) => {
       return result.rows.map((row) => row.doc).map((item) => this.deserializeEntity(item));
     });
+  }
+
+  public runQueryRaw(queryId: string, viewId: string, options: any): Observable<T[]> {
+    return Observable.fromPromise(this._database.query(queryId + '/' + viewId, options));
   }
 }

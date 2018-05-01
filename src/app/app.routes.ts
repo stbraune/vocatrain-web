@@ -1,12 +1,16 @@
 import { Routes } from '@angular/router';
 
-import { WordsComponent, WordTypesComponent } from './components';
+import { WordsComponent, WordTypesComponent, GuessComponent } from './components';
 
 export const AppRoutes: Routes = [
   {
     path: '',
-    redirectTo: 'words',
+    redirectTo: 'guess',
     pathMatch: 'full'
+  },
+  {
+    path: 'guess',
+    component: GuessComponent
   },
   {
     path: 'words',

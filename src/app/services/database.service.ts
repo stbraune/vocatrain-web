@@ -20,6 +20,8 @@ PouchDB
 
 @Injectable()
 export class DatabaseService {
+  private _local: any;
+  private _remote: any;
   private _database: any;
 
   public constructor() {
@@ -38,9 +40,23 @@ export class DatabaseService {
       return this._database;
     }
 
-    return this._database = this.initializeDatabase(new PouchDB('vocatrain', {
+    this._local = new PouchDB('vocatrain', {
       adapter: 'idb'
-    }));
+    });
+    this._remote = new PouchDB('http://localhost:5984/vocatrain');
+
+    this._local.replicate.to(this._remote, { live: true })
+      .on('change', function(change) {
+        console.log('change', change);
+      })
+      .on('complete', function () {
+        console.log('replication finished');
+      })
+      .on('error', function (err) {
+        console.error('oops', err);
+      });
+
+    return this._database = this.initializeDatabase(this._local);
   }
 
   private initializeDatabase(database: any): Observable<any> {
