@@ -12,10 +12,18 @@ export class WordsComponent implements OnInit {
 
   public editedWordTypeEntity: WordTypeEntity;
 
-  public editedWordEntity: WordEntity = {
+  public emptyWordEntity: WordEntity = {
     type: undefined,
-    texts: {}
+    texts: [
+      {
+        meta: '',
+        tags: [],
+        words: {}
+      }
+    ]
   };
+
+  public editedWordEntity: WordEntity = JSON.parse(JSON.stringify(this.emptyWordEntity));
 
   public constructor(
     private wordTypeEntityService: WordTypeEntityService
@@ -35,16 +43,10 @@ export class WordsComponent implements OnInit {
 
   public wordEntitySaved(wordEntity: WordEntity) {
     console.log('persisted', wordEntity);
-    this.editedWordEntity = {
-      type: undefined,
-      texts: {}
-    };
+    this.editedWordEntity = JSON.parse(JSON.stringify(this.emptyWordEntity));
   }
 
   public wordEntityCancelled() {
-    this.editedWordEntity = {
-      type: undefined,
-      texts: {}
-    };
+    this.editedWordEntity = JSON.parse(JSON.stringify(this.emptyWordEntity));
   }
 }

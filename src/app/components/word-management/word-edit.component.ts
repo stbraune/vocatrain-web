@@ -1,7 +1,9 @@
-import { Component, Input, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, SimpleChanges, OnChanges, ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { WordTypeEntityService, WordEntityService } from '../../services';
 import { WordTypeEntity, WordEntity } from '../../model';
 import { MatSnackBar } from '@angular/material';
+import { Text } from '../../model/text';
+import { ChipInputComponent } from './chip-input.component';
 
 @Component({
   selector: 'word-edit',
@@ -10,19 +12,25 @@ import { MatSnackBar } from '@angular/material';
 })
 export class WordEditComponent {
   @Input()
-  public wordTypeEntities: WordTypeEntity[] = []
+  public wordTypeEntities: WordTypeEntity[] = [];
 
   @Input()
   public wordEntity: WordEntity;
 
   @Input()
-  public supportedLanguages: string[] = []
+  public supportedLanguages: string[] = [];
 
   @Output()
   public wordCancelled = new EventEmitter<void>();
 
   @Output()
+  public wordDeleted = new EventEmitter<void>();
+
+  @Output()
   public wordSaved = new EventEmitter<WordEntity>();
+
+  @ViewChildren(ChipInputComponent)
+  public chipInputComponents: QueryList<ChipInputComponent>;
 
   public constructor(
     private wordEntityService: WordEntityService,
@@ -30,24 +38,68 @@ export class WordEditComponent {
   ) {
   }
 
-  public meta(key: string) {
-    return this.wordEntity && this.wordEntity.texts && this.wordEntity.texts[key] && this.wordEntity.texts[key].meta || '';
+  public onDeleteText(text: Text) {
+    const index = this.wordEntity.texts.indexOf(text);
+    if (index !== -1) {
+      this.wordEntity.texts.splice(index, 1);
+    }
   }
 
-  public text(key: string, lang: string) {
-    return this.wordEntity && this.wordEntity.texts && this.wordEntity.texts[key] && this.wordEntity.texts[key][lang] || '';
+  public onAddText() {
+    this.wordEntity.texts.push({
+      meta: '',
+      tags: [],
+      words: {}
+    });
   }
 
-  public metaChanged(key: string, $event: Event) {
-    this.wordEntity.texts = this.wordEntity.texts || {};
-    this.wordEntity.texts[key] = this.wordEntity.texts[key] || {};
-    this.wordEntity.texts[key].meta = $event.target['value'];
+  public navigate(source: HTMLElement, direction: 'up' | 'right' | 'down' | 'left') {
+    let row = parseInt(source.dataset.row, 10);
+    let col = parseInt(source.dataset.col, 10);
+
+    const countCols = this.supportedLanguages.length + 1;
+    const countRows = Math.ceil(this.chipInputComponents.length / countCols);
+
+    switch (direction) {
+      case 'up':
+        row = Math.max(row - 1, 0);
+        break;
+      case 'down':
+        row = Math.min(row + 1, countRows - 1);
+        break;
+      case 'left':
+        if (col - 1 < 0 && row > 0) {
+          col = countCols - 1;
+          row = Math.max(row - 1, 0);
+        } else {
+          col = Math.max(col - 1, 0);
+        }
+        break;
+      case 'right':
+        if (col + 1 > countCols - 1 && row < countRows - 1) {
+          col = 0;
+          row = Math.min(row + 1, countRows - 1);
+        } else {
+          col = Math.min(col + 1, countCols - 1);
+        }
+        break;
+      default:
+        // do nothing
+        break;
+    }
+
+    this.chipInputComponents.toArray()[row * countCols + col].focus();
   }
 
-  public textChanged(key: string, lang: string, $event: Event) {
-    this.wordEntity.texts = this.wordEntity.texts || {};
-    this.wordEntity.texts[key] = this.wordEntity.texts[key] || {};
-    this.wordEntity.texts[key][lang] = $event.target['value'];
+  public onDelete() {
+    if (this.wordEntity._id) {
+      this.wordEntityService.deleteWordEntity(this.wordEntity).subscribe((result) => {
+        this.snackBar.open('Entry deleted', null, { duration: 3000 });
+        this.wordDeleted.emit();
+      }, (error) => {
+        this.snackBar.open('Error!', 'Ok', { panelClass: 'error' });
+      });
+    }
   }
 
   public onCancel() {

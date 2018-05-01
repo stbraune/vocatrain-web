@@ -10,9 +10,22 @@
       "title": "Vokabelarten"
     }
   },
+  "words": {
+    "title": "Vokabeln",
+    "edit-word": {
+      "title": "Vokabel bearbeiten",
+      "available-tags": "Verfügbare Tags",
+      "meta": "Hilfe"
+    }
+  },
+  "word-types": {
+    "title": "Vokabelarten"
+  },
   "actions": {
     "delete": "Löschen",
     "cancel": "Abbrechen",
-    "save": "Speichern"
+    "save": "Speichern",
+    "add": "Hinzufügen ...",
+    "create": "Neu ..."
   }
 }

@@ -1,0 +1,29 @@
+.chip-input {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 1.25em;
+
+  &__chip {
+    margin: 0 8px 0 0;
+    background-color: #616161;
+    color: white;
+    transition: box-shadow 280ms cubic-bezier(.4,0,.2,1);
+    display: inline-flex;
+    padding: 0px 12px;
+    border-radius: 24px;
+    align-items: center;
+    cursor: default;
+  }
+
+  &__input {
+    flex-grow: 1;
+    
+    ::ng-deep .mat-form-field-wrapper {
+      padding-bottom: 0;
+    }
+
+    ::ng-deep .mat-input-underline {
+      bottom: 0;
+    }
+  }
+}

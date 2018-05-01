@@ -12,11 +12,6 @@ export class WordTypesComponent implements OnInit {
 
   public editedWordTypeEntity: WordTypeEntity;
 
-  public editedWordEntity: WordEntity = {
-    type: undefined,
-    texts: {}
-  };
-
   public constructor(
     private wordTypeEntityService: WordTypeEntityService
   ) {
@@ -36,7 +31,7 @@ export class WordTypesComponent implements OnInit {
   public createWordTypeEntity() {
     this.editedWordTypeEntity = {
       title: '',
-      keys: []
+      tags: []
     };
   }
 

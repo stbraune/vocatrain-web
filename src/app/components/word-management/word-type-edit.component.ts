@@ -12,7 +12,7 @@ export class WordTypeEditComponent {
   @Input()
   public wordTypeEntity: WordTypeEntity;
 
-  public editWordTypeKey = '';
+  public editWordTypeTag = '';
 
   @Output()
   public wordTypeCancelled = new EventEmitter<void>();
@@ -31,17 +31,17 @@ export class WordTypeEditComponent {
 
   public onWordTypeKeysKeyPress($event: KeyboardEvent) {
     if ($event.charCode === 13) {
-      if (this.editWordTypeKey.trim() !== '') {
-        this.wordTypeEntity.keys.push(this.editWordTypeKey);
-        this.editWordTypeKey = '';
+      if (this.editWordTypeTag.trim() !== '') {
+        this.wordTypeEntity.tags.push(this.editWordTypeTag);
+        this.editWordTypeTag = '';
       }
     }
   }
 
   public deleteWordTypeKey(wordTypeKey: string) {
-    const index = this.wordTypeEntity.keys.indexOf(wordTypeKey);
+    const index = this.wordTypeEntity.tags.indexOf(wordTypeKey);
     if (index !== -1) {
-      this.wordTypeEntity.keys.splice(index, 1);
+      this.wordTypeEntity.tags.splice(index, 1);
     }
   }
 
@@ -63,7 +63,7 @@ export class WordTypeEditComponent {
 
   public onSave() {
     this.wordTypeEntityService.postWordTypeEntity(this.wordTypeEntity).subscribe((wordTypeEntity) => {
-      this.editWordTypeKey = '';
+      this.editWordTypeTag = '';
       this.wordTypeSaved.emit(wordTypeEntity);
       this.snackBar.open('Saved!', null, { duration: 3000 });
     }, (error) => {
