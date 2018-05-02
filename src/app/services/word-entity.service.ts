@@ -7,6 +7,8 @@ import { Database } from './database';
 
 import { WordEntity } from '../model';
 
+import uuidv4 from 'uuid/v4';
+
 @Injectable()
 export class WordEntityService {
   private db: Database<WordEntity>;
@@ -26,7 +28,7 @@ export class WordEntityService {
   }
 
   public putWordEntity(wordEntity: WordEntity): Observable<WordEntity> {
-    return this.db.putEntity(wordEntity, wordEntity._id);
+    return this.db.putEntity(wordEntity, uuidv4());
   }
 
   public deleteWordEntity(wordEntity: WordEntity): Observable<boolean> {
