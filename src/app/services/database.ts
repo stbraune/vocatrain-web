@@ -122,7 +122,8 @@ export class Database<T extends Entity> {
     const mapfn = typeof map === 'string' ? map : map.toString();
     return Observable.fromPromise(this._database.get(id))
       .switchMap((result: any) => {
-        if (result.views[viewId].map !== mapfn) {
+        if (!result.views[viewId] || result.views[viewId].map !== mapfn) {
+          result.views[viewId] = result.views[viewId] || {};
           result.views[viewId].map = mapfn;
           return this._database.put(result);
         }
