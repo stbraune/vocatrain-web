@@ -68,13 +68,13 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
           if (typeof text.words[lang] === 'string') {
             text.words[lang] = {
               value: <any>text.words[lang],
-              level: {}
+              games: {}
             };
           }
 
           text.words[lang] = text.words[lang] || {
             value: '',
-            level: {}
+            games: {}
           };
         });
       });
@@ -105,8 +105,7 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
       tags: [],
       words: Object.assign({}, ...this.supportedLanguages.map((lang) => ({
         [lang]: {
-          value: '',
-          level: {}
+          value: ''
         }
       })))
     });

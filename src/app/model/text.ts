@@ -4,8 +4,11 @@ export interface Text {
   words: {
     [lang: string]: {
       value: string,
-      level?: {
-        [mode: string]: number
+      games?: {
+        [mode: string]: {
+          level: number,
+          date: Date
+        }
       }
     }
   };
