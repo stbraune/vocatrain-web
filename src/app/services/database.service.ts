@@ -45,7 +45,7 @@ export class DatabaseService {
     });
     this._remote = new PouchDB('http://localhost:5984/vocatrain');
 
-    this._local.replicate.to(this._remote, { live: true })
+    this._local.sync(this._remote, { live: true })
       .on('change', function(change) {
         console.log('change', change);
       })
