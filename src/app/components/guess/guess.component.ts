@@ -16,7 +16,7 @@ export class GuessComponent implements OnInit {
 
   public ngOnInit(): void {
     console.log(this.guessService);
-    this.guessService.findGuessWords().subscribe((result) => {
+    this.guessService.findGuessWords(new Date(), 'de', 'bg').subscribe((result) => {
       console.log(result);
     });
   }
