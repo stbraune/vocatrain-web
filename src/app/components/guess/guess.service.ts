@@ -5,6 +5,9 @@ import { WordEntityService, Database } from '../../services';
 import { WordEntity } from '../../model';
 import { environment } from '../../../environments/environment';
 
+import { SearchOptions } from './search-options';
+import { SearchResult } from './search-result';
+
 declare const emit: (key: any) => void;
 
 @Injectable()
@@ -17,29 +20,7 @@ export class GuessService {
     this.db = wordEntityService.getDatabase();
   }
 
-  public findGuessWords(options: {
-    reoccurBefore?: Date,
-    sourceLanguage: string,
-    targetLanguage: string,
-    searchLanguages?: string[],
-    searchMinLevel?: number,
-    searchMaxLevel?: number,
-    mod?: number,
-    limit?: number
-  }): Observable<Array<{
-    key: {
-      searchLanguages: string[],
-      reoccurAt: Date,
-      answerHash: number,
-      answerLevel: number,
-      answerLanguage: string,
-      answer: string,
-      questionLanguage: string,
-      question: string,
-      textIndex: number
-    },
-    doc: WordEntity
-  }>> {
+  public findGuessWords(options: SearchOptions): Observable<SearchResult[]> {
     options.reoccurBefore = options.reoccurBefore || new Date();
     options.mod = options.mod || 6;
     options.searchLanguages = options.searchLanguages || [options.sourceLanguage, options.targetLanguage];
@@ -174,15 +155,11 @@ export class GuessService {
         include_docs: true,
         startkey: {
           searchLanguages: options.searchLanguages,
-          searchMinLevel: options.searchMinLevel !== undefined && options.searchMaxLevel !== undefined
-            ? (options.searchMinLevel || 0)
-            : undefined,
+          searchMinLevel: options.searchLevelEnabled ? (options.searchLevelMinimum || 0) : undefined,
         },
         endkey: {
           searchLanguages: options.searchLanguages,
-          searchMinLevel: options.searchMinLevel !== undefined && options.searchMaxLevel !== undefined
-            ? (options.searchMaxLevel || {})
-            : undefined,
+          searchMinLevel: options.searchLevelEnabled ? (options.searchLevelMaximum || {}) : undefined,
           reoccurAt: options.reoccurBefore
         },
         limit: options.limit

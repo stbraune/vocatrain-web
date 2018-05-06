@@ -33,7 +33,8 @@ import {
   ChipInputComponent,
   ChipsComponent,
   GuessComponent,
-  GuessService
+  GuessService,
+  SearchOptionsComponent
 } from './components';
 
 import { AppRoutes } from './app.routes';
@@ -50,6 +51,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
     WordTypesComponent,
     WordTypeEditComponent,
     WordEditComponent,
+    SearchOptionsComponent,
     GuessComponent
   ],
   imports: [
