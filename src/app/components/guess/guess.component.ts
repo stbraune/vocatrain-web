@@ -39,10 +39,7 @@ export class GuessComponent implements OnInit {
   public finished = false;
   public finishReason: 'no-more-words' | 'reached-amount' | 'reached-minutes';
 
-  public lang = '';
-
   public constructor(
-    private translateService: TranslateService,
     private wordEntityService: WordEntityService,
     private guessService: GuessService,
     private snackBar: MatSnackBar
@@ -53,17 +50,12 @@ export class GuessComponent implements OnInit {
     window.addEventListener('keydown', (event: KeyboardEvent) => {
       this.onKeyDown(event);
     }, false);
-
-    this.lang = this.translateService.currentLang;
-    console.log('lang', this.lang);
-    this.translateService.onLangChange.subscribe((lang) => {
-      this.lang = lang;
-    });
   }
 
   public startGuessing() {
     this.started = true;
     this.startedAt = new Date();
+    this.duration = '0:00';
     this.totalWords = 0;
 
     if (this.durationInterval) {
