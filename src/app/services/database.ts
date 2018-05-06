@@ -152,7 +152,7 @@ export class Database<T extends Entity> {
     });
   }
 
-  public runQueryRaw(queryId: string, viewId: string, options: any): Observable<T[]> {
+  public runQueryRaw(queryId: string, viewId: string, options: any): Observable<any> {
     return Observable.fromPromise(this._database.query(queryId + '/' + viewId, options));
   }
 }

@@ -81,7 +81,13 @@ body {
 
 .flex {
   display: flex;
-  margin: 0 -0.5rem;
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+
+  &--no-margin {
+    margin-left: 0;
+    margin-right: 0;
+  }
 
   &--wrap {
     flex-wrap: wrap;
@@ -92,7 +98,8 @@ body {
   }
 
   .flex-col {
-    margin: 0 0.5rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
 
     &--grow {
       flex-grow: 1;
@@ -113,11 +120,8 @@ body {
 @media(max-width: 599px) {
   .flex {
     flex-direction: column;
-    margin: 0 -0.5rem;
   
     .flex-col {
-      margin: 0 0.5rem;
-
       &--50 { flex-basis: 100%; }
     }
   }

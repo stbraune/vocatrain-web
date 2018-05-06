@@ -1,4 +1,4 @@
-<nav class="app-navbar margin--bottom mat-elevation-z8">
+<nav class="app-navbar margin--bottom mat-elevation-z8 flex flex--no-margin">
   <a mat-button routerLink="/">
     <mat-icon>filter_9_plus</mat-icon>
     {{'app.title' | translate}}
@@ -12,6 +12,13 @@
   <a mat-button routerLink="/word-types">
     {{'nav.word-types.title' | translate}}
   </a>
+
+  <div class="align--right flex-col flex-col--grow">
+    <button mat-button (click)="toggleSynchronization()">
+      <mat-icon *ngIf="!isSyncing()">cloud_off</mat-icon>
+      <mat-icon *ngIf="isSyncing()">cloud</mat-icon>
+    </button>
+  </div>
 </nav>
 
 <section class="body">
