@@ -8,8 +8,10 @@ export interface SearchResult {
     answerLevel: number,
     answerLanguage: string,
     answer: string,
+    answerAt: Date,
     questionLanguage: string,
     question: string,
+    meta: string,
     textIndex: number
   };
   doc: WordEntity;

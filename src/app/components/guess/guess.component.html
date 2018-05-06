@@ -1,20 +1,117 @@
-<mat-card>
+<mat-card *ngIf="!started" class="margin--bottom">
   <mat-card-title>
     Guess 'em!
   </mat-card-title>
   <mat-card-content>
-    <search-options
-      [supportedLanguages]="supportedLanguages"
-      [(searchOptions)]="searchOptions">
+    <search-options [supportedLanguages]="supportedLanguages" [(searchOptions)]="searchOptions">
     </search-options>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-button (click)="searchWords()">
+    <button mat-button (click)="startGuessing()">
       Go go!
     </button>
   </mat-card-actions>
 </mat-card>
 
-<pre>
-  {{words | json}}
-</pre>
+<mat-card *ngIf="finished">
+  <mat-card-title>
+    Finished!
+  </mat-card-title>
+  <mat-card-content>
+    <div *ngIf="finishReason === 'no-more-words'">
+      Keine weiteren Vokabeln vorhanden!
+    </div>
+    <div *ngIf="finishReason === 'reached-amount'">
+      Anzahl erreicht!
+    </div>
+    <div *ngIf="finishReason === 'reached-minutes'">
+      Zeit vorüber!
+    </div>
+    <div>
+      <strong>Benötigte Dauer:</strong> {{duration}}
+    </div>
+    <div>
+      <strong>Anzahl Vokabeln:</strong> {{totalWords}}
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card *ngIf="started">
+  <mat-card-content>
+    <ng-container *ngIf="currentWord">
+      <div class="flex margin--bottom">
+        <div class="flex-col flex-col--grow">
+          Dauer: {{duration}} - Vokabeln: {{totalWords}}
+        </div>
+        <div class="flex-col flex flex--align-center">
+          <div class="key margin--right">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+          </div>
+          <span class="margin--right">
+            Aufdecken
+          </span>
+          <div class="key margin--right">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+          </div>
+          <span class="margin--right">
+            Zudecken
+          </span>
+          <div class="key margin--right">
+            <mat-icon>keyboard_arrow_left</mat-icon>
+          </div>
+          <span class="margin--right">
+            Richtig
+          </span>
+          <div class="key margin--right">
+            <mat-icon>keyboard_arrow_right</mat-icon>
+          </div>
+          <span class="margin--right">
+            Falsch
+          </span>
+        </div>
+      </div>
+      <div class="flex margin--bottom">
+        <div class="flex-col flex-col--grow">
+          <strong>Zuletzt wiederholt:</strong> {{currentWord.key.answerAt | date:'d.MM.yy H:mm'}}
+        </div>
+        <div class="flex-col flex-col--grow align--right">
+          <strong>Aktuelle Stufe:</strong> {{currentWord.key.answerLevel}}
+        </div>
+      </div>
+      <div class="flex">
+        <div class="flex-col flex-col--50">
+          <mat-card>
+            <mat-card-title>
+              {{currentWord.key.question}}
+            </mat-card-title>
+            <mat-card-content>
+              <div>
+                <strong>Sprache:</strong> {{currentWord.key.questionLanguage}}
+              </div>
+              <div *ngIf="currentWord.key.meta">
+                <strong>Hilfe:</strong> {{currentWord.key.meta}}
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div class="flex-col flex-col--50">
+          <mat-card *ngIf="currentWordState >= 1">
+            <mat-card-title>
+              {{currentWord.key.answer}}
+            </mat-card-title>
+            <mat-card-content>
+              <div>
+                <strong>Sprache:</strong> {{currentWord.key.answerLanguage}}
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </ng-container>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button (click)="stopGuessing()">
+      Stop it!
+    </button>
+  </mat-card-actions>
+</mat-card>

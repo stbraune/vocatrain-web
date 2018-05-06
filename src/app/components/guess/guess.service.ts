@@ -108,16 +108,22 @@ export class GuessService {
 
                 const requiredLanguage = getRequiredLanguage(answerLevel, mod, sourceLanguage, targetLanguage);
                 const requiredDistance = getRequiredDistance(answerLevel, mod);
-                const reoccurAt = new Date(normalizeDate(answerThen).getTime() + convertMillis(requiredDistance));
+                var reoccurAt = new Date(normalizeDate(answerThen).getTime() + convertMillis(requiredDistance));
+                const reoccurAtSame = reoccurAt.getTime() === normalizeDate(answerThen).getTime();
+                if (reoccurAtSame) {
+                  reoccurAt = new Date(answerThen.getTime() + (300 + Math.floor(Math.random() * 900) * 1000));
+                }
 
                 const indexKey = {
                   reoccurAt: reoccurAt,
                   answerHash: calculateHash(answerWord.value),
                   answerLevel: answerLevel,
                   answerLanguage: answerLanguage,
+                  answerAt: answerThen,
                   answer: answerWord.value,
                   questionLanguage: questionLanguage,
                   question: questionWord.value,
+                  meta: text.meta,
                   textIndex: textIndex
                 };
                 if (requiredLanguage === answerLanguage) {
@@ -166,5 +172,31 @@ export class GuessService {
       };
       return this.db.runQueryRaw('words', viewId, couchOptions).map((result) => result.rows);
     });
+  }
+
+  public guessRight(word: SearchResult) {
+    const translatedWord = word.doc.texts[word.key.textIndex].words[word.key.answerLanguage];
+    translatedWord.games = translatedWord.games || {};
+    translatedWord.games['guess'] = translatedWord.games['guess'] || {
+      date: new Date(),
+      level: 0
+    };
+
+    translatedWord.games['guess'].level++;
+    translatedWord.games['guess'].date = new Date();
+    return this.db.putEntity(word.doc);
+  }
+
+  public guessWrong(word: SearchResult) {
+    const translatedWord = word.doc.texts[word.key.textIndex].words[word.key.answerLanguage];
+    translatedWord.games = translatedWord.games || {};
+    translatedWord.games['guess'] = translatedWord.games['guess'] || {
+      date: new Date(),
+      level: 0
+    };
+
+    translatedWord.games['guess'].level = 0;
+    translatedWord.games['guess'].date = new Date();
+    return this.db.putEntity(word.doc);
   }
 }

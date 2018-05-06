@@ -26,12 +26,14 @@ export class AppComponent implements OnInit {
 
     this.databaseService.synchronizationSubject.subscribe((event) => {
       if (event.type === 'error') {
+        console.error(event);
         this.snackBar.open('Sync failed. Going offline', undefined, { duration: 3000 });
         this.databaseService.disableSyncing();
       } else {
         this.snackBar.open('Synced!', undefined, { duration: 250 });
       }
     }, (error) => {
+      console.error(error);
       this.snackBar.open('Sync broken!', 'Ok');
       this.databaseService.disableSyncing();
     });

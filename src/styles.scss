@@ -79,6 +79,12 @@ body {
   }
 }
 
+.key {
+  display: inline-flex;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+}
+
 .flex {
   display: flex;
   margin-left: -0.5rem;
