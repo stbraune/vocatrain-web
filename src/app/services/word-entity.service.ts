@@ -7,7 +7,7 @@ import { Database } from './database';
 
 import { WordEntity } from '../model';
 
-import uuidv4 from 'uuid/v4';
+import * as uuidv4 from 'uuid/v4';
 
 @Injectable()
 export class WordEntityService {

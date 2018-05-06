@@ -40,7 +40,7 @@
                 [(chips)]="text.tags"
                 [allowedChips]="wordEntity.type.tags"
                 [hideChips]="true"
-                [placeholder]="lang"
+                [placeholder]="lang | translate"
                 (cursorPressed)="navigate(chipInputWrapper, $event)"
                 (backspacePressed)="onBackspacePressed(chipInputWrapper, text)"
                 (enterPressed)="onEnterPressed(chipInputWrapper, text)">

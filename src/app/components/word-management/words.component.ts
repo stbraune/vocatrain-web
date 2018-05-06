@@ -24,7 +24,7 @@ export class WordsComponent implements OnInit {
     ]
   };
 
-  public editedWordEntity: WordEntity = this.newWordEntity();
+  public editedWordEntity: WordEntity;
 
   @Input()
   public supportedLanguages = environment.languages;
@@ -51,6 +51,7 @@ export class WordsComponent implements OnInit {
     this.editedWordEntity = undefined;
     this.wordEntityService.getWordEntities().subscribe((wordEntities) => {
       this.wordEntities = wordEntities;
+      this.createWordEntity();
     });
   }
 
@@ -77,7 +78,9 @@ export class WordsComponent implements OnInit {
   }
 
   private newWordEntity() {
-    return this.cloneWordEntity(this.emptyWordEntity);
+    const newWordEntity = this.cloneWordEntity(this.emptyWordEntity);
+    newWordEntity.type = this.wordTypeEntities.length > 0 && this.wordTypeEntities[0];
+    return newWordEntity;
   }
 
   private cloneWordEntity(wordEntity: WordEntity) {
