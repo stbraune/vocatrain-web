@@ -53,6 +53,12 @@ body {
   background-color: mat-color($primary);
 }
 
+.display {
+  &--inline { display: inline; }
+  &--inline-block { display: inline-block; }
+  &--block { display: block; }
+}
+
 .margin {
   &--right { margin-right: 1rem; }
   &--bottom  { margin-bottom: 2rem; }

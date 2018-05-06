@@ -18,93 +18,119 @@
     Finished!
   </mat-card-title>
   <mat-card-content>
-    <div *ngIf="finishReason === 'no-more-words'">
+    <p *ngIf="finishReason === 'no-more-words'">
       Keine weiteren Vokabeln vorhanden!
-    </div>
-    <div *ngIf="finishReason === 'reached-amount'">
+    </p>
+    <p *ngIf="finishReason === 'reached-amount'">
       Anzahl erreicht!
-    </div>
-    <div *ngIf="finishReason === 'reached-minutes'">
+    </p>
+    <p *ngIf="finishReason === 'reached-minutes'">
       Zeit vorüber!
-    </div>
-    <div>
+    </p>
+    <p>
       <strong>Benötigte Dauer:</strong> {{duration}}
-    </div>
-    <div>
+    </p>
+    <p>
       <strong>Anzahl Vokabeln:</strong> {{totalWords}}
-    </div>
+    </p>
   </mat-card-content>
 </mat-card>
 
 <mat-card *ngIf="started">
   <mat-card-content>
+    <div class="flex margin--bottom">
+      <div class="flex-col flex-col--grow">
+        Dauer: {{duration}} - Vokabeln: {{totalWords}}
+      </div>
+      <div class="flex-col flex flex--align-center">
+        <div class="key margin--right">
+          <mat-icon>keyboard_arrow_up</mat-icon>
+        </div>
+        <span class="margin--right">
+          Aufdecken
+        </span>
+        <div class="key margin--right">
+          <mat-icon>keyboard_arrow_down</mat-icon>
+        </div>
+        <span class="margin--right">
+          Zudecken
+        </span>
+        <div class="key margin--right">
+          <mat-icon>keyboard_arrow_left</mat-icon>
+        </div>
+        <span class="margin--right">
+          Richtig
+        </span>
+        <div class="key margin--right">
+          <mat-icon>keyboard_arrow_right</mat-icon>
+        </div>
+        <span class="margin--right">
+          Falsch
+        </span>
+      </div>
+    </div>
     <ng-container *ngIf="currentWord">
       <div class="flex margin--bottom">
         <div class="flex-col flex-col--grow">
-          Dauer: {{duration}} - Vokabeln: {{totalWords}}
-        </div>
-        <div class="flex-col flex flex--align-center">
-          <div class="key margin--right">
-            <mat-icon>keyboard_arrow_up</mat-icon>
-          </div>
-          <span class="margin--right">
-            Aufdecken
+          <strong>Zuletzt wiederholt:</strong>
+          <span *ngIf="currentWord.key.answerAt.getTime() === 0; else answerAtOk">
+            Nie
           </span>
-          <div class="key margin--right">
-            <mat-icon>keyboard_arrow_down</mat-icon>
-          </div>
-          <span class="margin--right">
-            Zudecken
-          </span>
-          <div class="key margin--right">
-            <mat-icon>keyboard_arrow_left</mat-icon>
-          </div>
-          <span class="margin--right">
-            Richtig
-          </span>
-          <div class="key margin--right">
-            <mat-icon>keyboard_arrow_right</mat-icon>
-          </div>
-          <span class="margin--right">
-            Falsch
-          </span>
-        </div>
-      </div>
-      <div class="flex margin--bottom">
-        <div class="flex-col flex-col--grow">
-          <strong>Zuletzt wiederholt:</strong> {{currentWord.key.answerAt | date:'d.MM.yy H:mm'}}
+          <ng-template #answerAtOk>
+            <span>
+              {{currentWord.key.answerAt | date:'d.MM.yy H:mm'}}
+            </span>
+          </ng-template>
         </div>
         <div class="flex-col flex-col--grow align--right">
           <strong>Aktuelle Stufe:</strong> {{currentWord.key.answerLevel}}
         </div>
       </div>
       <div class="flex">
-        <div class="flex-col flex-col--50">
-          <mat-card>
-            <mat-card-title>
-              {{currentWord.key.question}}
-            </mat-card-title>
-            <mat-card-content>
-              <div>
-                <strong>Sprache:</strong> {{currentWord.key.questionLanguage}}
-              </div>
-              <div *ngIf="currentWord.key.meta">
-                <strong>Hilfe:</strong> {{currentWord.key.meta}}
-              </div>
-            </mat-card-content>
-          </mat-card>
-        </div>
-        <div class="flex-col flex-col--50">
-          <mat-card *ngIf="currentWordState >= 1">
-            <mat-card-title>
-              {{currentWord.key.answer}}
-            </mat-card-title>
-            <mat-card-content>
-              <div>
-                <strong>Sprache:</strong> {{currentWord.key.answerLanguage}}
-              </div>
-            </mat-card-content>
-          </mat-card>
+        <mat-card class="align--center flex-col flex-col--50">
+          <mat-card-title>
+            {{currentWord.key.question}}
+          </mat-card-title>
+          <mat-card-content>
+            <p>
+              <strong>Sprache:</strong> {{currentWord.key.questionLanguage}}
+            </p>
+            <p *ngIf="currentWord.key.tags.length > 0">
+              <strong>Tags:</strong>
+              <chips [chips]="currentWord.key.tags" mode="read"></chips>
+            </p>
+            <p *ngIf="currentWord.key.meta">
+              <strong>Hilfe:</strong> {{currentWord.key.meta}}
+            </p>
+          </mat-card-content>
+        </mat-card>
+        <mat-card class="align--center flex-col flex-col--50">
+          <mat-card-title *ngIf="currentWordState >= 1">
+            {{currentWord.key.answer}}
+          </mat-card-title>
+          <mat-card-content *ngIf="currentWordState >= 1">
+            <p>
+              <strong>Sprache:</strong> {{currentWord.key.answerLanguage}}
+            </p>
+            <p *ngIf="currentWord.key.tags.length > 0">
+              <strong>Tags:</strong>
+              <chips [chips]="currentWord.key.tags" mode="read"></chips>
+            </p>
+          </mat-card-content>
+          <mat-card-content *ngIf="currentWordState < 1" class="align--center">
+            <div class="display--inline-block">
+              <mat-spinner>
+              </mat-spinner>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="!currentWord">
+      <div class="align--center">
+        <div class="display--inline-block">
+          <mat-spinner>
+          </mat-spinner>
         </div>
       </div>
     </ng-container>

@@ -123,6 +123,7 @@ export class GuessService {
                   answer: answerWord.value,
                   questionLanguage: questionLanguage,
                   question: questionWord.value,
+                  tags: text.tags,
                   meta: text.meta,
                   textIndex: textIndex
                 };

@@ -53,6 +53,7 @@ export class GuessComponent implements OnInit {
   }
 
   public startGuessing() {
+    this.finished = false;
     this.started = true;
     this.startedAt = new Date();
     this.duration = '0:00';
@@ -211,6 +212,7 @@ export class GuessComponent implements OnInit {
       if (searchResults.length === 1) {
         this.currentWordState = 0;
         this.currentWord = searchResults[0];
+        this.currentWord.key.answerAt = new Date(this.currentWord.key.answerAt);
       } else {
         this.finishGuessing('no-more-words');
       }

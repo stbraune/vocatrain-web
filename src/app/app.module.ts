@@ -18,6 +18,7 @@ import {
   MatSnackBarModule,
   MatRadioModule,
   MatCheckboxModule,
+  MatProgressSpinnerModule,
 } from '@angular/material';
 
 import {
@@ -76,6 +77,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
     MatListModule,
     MatIconModule,
     MatInputModule,
+    MatProgressSpinnerModule,
     MatRadioModule,
     MatSelectModule,
     MatSnackBarModule,

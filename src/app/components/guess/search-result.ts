@@ -11,6 +11,7 @@ export interface SearchResult {
     answerAt: Date,
     questionLanguage: string,
     question: string,
+    tags: string[],
     meta: string,
     textIndex: number
   };
