@@ -16,6 +16,8 @@ import {
   MatToolbarModule,
   MatListModule,
   MatSnackBarModule,
+  MatRadioModule,
+  MatCheckboxModule,
 } from '@angular/material';
 
 import {
@@ -66,11 +68,13 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
     FormsModule,
     MatButtonModule,
     MatCardModule,
+    MatCheckboxModule,
     MatChipsModule,
     MatFormFieldModule,
     MatListModule,
     MatIconModule,
     MatInputModule,
+    MatRadioModule,
     MatSelectModule,
     MatSnackBarModule,
     MatToolbarModule

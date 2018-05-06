@@ -1,0 +1,72 @@
+<mat-card class="panel">
+  <mat-card-title>
+    Guess 'em!
+  </mat-card-title>
+  <mat-card-content class="form">
+    <mat-radio-group [(ngModel)]="guessMode" class="margin--bottom flex">
+      <mat-radio-button class="flex-col flex-col--grow" value="0">
+        <span class="margin--right">
+          Zeit
+        </span>
+        <mat-form-field>
+          <input matInput type="number" placeholder="Minuten" [(ngModel)]="minutes">
+        </mat-form-field>
+      </mat-radio-button>
+      <mat-radio-button class="flex-col flex-col--grow align--right" value="1">
+        <span class="margin--right">
+          Woerter
+        </span>
+        <mat-form-field>
+          <input matInput type="number" placeholder="Anzahl" [(ngModel)]="count">
+        </mat-form-field>
+      </mat-radio-button>
+    </mat-radio-group>
+    
+    <div class="flex">
+      <mat-form-field class="flex-col flex-col--grow">
+        <mat-select #typeSelect placeholder="Ausgangssprache" [(ngModel)]="sourceLanguage">
+          <mat-option
+            *ngFor="let supportedLanguage of supportedLanguages"
+            [value]="supportedLanguage">
+            {{supportedLanguage}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+  
+      <button mat-button (click)="toggleLanguageDirection()" class="flex-col flex-col--grow">
+        <mat-icon *ngIf="languageDirection === 'both' || languageDirection === 'tts'">keyboard_arrow_left</mat-icon>
+        <mat-icon *ngIf="languageDirection === 'both' || languageDirection === 'stt'">keyboard_arrow_right</mat-icon>
+      </button>
+        
+      <mat-form-field class="flex-col flex-col--grow">
+        <mat-select #typeSelect placeholder="Zielsprache" [(ngModel)]="targetLanguage">
+          <mat-option
+            *ngFor="let supportedLanguage of supportedLanguages"
+            [value]="supportedLanguage">
+            {{supportedLanguage}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="flex">
+      <mat-checkbox class="flex-col" [(ngModel)]="levelFilterEnabled"></mat-checkbox>
+      <mat-form-field class="flex-col flex-col--grow">
+        <input matInput type="number" placeholder="Minimum Level" [(ngModel)]="minimumLevel">
+      </mat-form-field>
+  
+      <mat-form-field class="flex-col flex-col--grow">
+        <input matInput type="number" placeholder="Maximum Level" [(ngModel)]="maximumLevel">
+      </mat-form-field>
+    </div>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button (click)="searchWords()">
+      Go go!
+    </button>
+  </mat-card-actions>
+</mat-card>
+
+<pre>
+  {{words | json}}
+</pre>

@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+
 import { WordEntityService, Database } from '../../services';
 import { WordEntity } from '../../model';
 import { environment } from '../../../environments/environment';
@@ -15,14 +17,40 @@ export class GuessService {
     this.db = wordEntityService.getDatabase();
   }
 
-  public findGuessWords(reoccurBefore: Date, sourceLanguage: string, targetLanguage: string, mod = 6) {
-    const langs = JSON.stringify([sourceLanguage, targetLanguage]);
-    const viewId = `guess-words-${sourceLanguage}-${targetLanguage}-${mod}`;
+  public findGuessWords(options: {
+    reoccurBefore?: Date,
+    sourceLanguage: string,
+    targetLanguage: string,
+    searchLanguages?: string[],
+    searchMinLevel?: number,
+    searchMaxLevel?: number,
+    mod?: number,
+    limit?: number
+  }): Observable<Array<{
+    key: {
+      searchLanguages: string[],
+      reoccurAt: Date,
+      answerHash: number,
+      answerLevel: number,
+      answerLanguage: string,
+      answer: string,
+      questionLanguage: string,
+      question: string,
+      textIndex: number
+    },
+    doc: WordEntity
+  }>> {
+    options.reoccurBefore = options.reoccurBefore || new Date();
+    options.mod = options.mod || 6;
+    options.searchLanguages = options.searchLanguages || [options.sourceLanguage, options.targetLanguage];
+
+    const langs = JSON.stringify([options.sourceLanguage, options.targetLanguage]);
+    const viewId = `guess-words-${options.sourceLanguage}-${options.targetLanguage}-${options.mod}`;
     return this.db.getQuery('words', viewId,
       `function (doc) {
-        const sourceLanguage = '${sourceLanguage}';
-        const targetLanguage = '${targetLanguage}';
-        const mod = ${mod};
+        const sourceLanguage = '${options.sourceLanguage}';
+        const targetLanguage = '${options.targetLanguage}';
+        const mod = ${options.mod};
 
         function normalizeDate(d) {
           return new Date(d.getTime() - (((d.getUTCHours() * 60) + d.getUTCMinutes()) * 60 + d.getUTCSeconds()) * 1000);
@@ -59,6 +87,28 @@ export class GuessService {
           return level % (mod * 2) < mod ? sourceLanguage : targetLanguage;
         }
 
+        function assign(target, varArgs) { // .length of function is 2
+          'use strict';
+          if (target == null) { // TypeError if undefined or null
+            throw new TypeError('Cannot convert undefined or null to object');
+          }
+
+          var to = Object(target);
+          for (var index = 1; index < arguments.length; index++) {
+            var nextSource = arguments[index];
+
+            if (nextSource != null) { // Skip over if undefined or null
+              for (var nextKey in nextSource) {
+                // Avoid bugs when hasOwnProperty is shadowed
+                if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+                  to[nextKey] = nextSource[nextKey];
+                }
+              }
+            }
+          }
+          return to;
+        }
+
         if (doc._id.substr(0, 'word_'.length) === 'word_') {
           doc.texts.forEach(function (text, textIndex) {
             [sourceLanguage, targetLanguage]
@@ -79,30 +129,65 @@ export class GuessService {
                 const requiredDistance = getRequiredDistance(answerLevel, mod);
                 const reoccurAt = new Date(normalizeDate(answerThen).getTime() + convertMillis(requiredDistance));
 
+                const indexKey = {
+                  reoccurAt: reoccurAt,
+                  answerHash: calculateHash(answerWord.value),
+                  answerLevel: answerLevel,
+                  answerLanguage: answerLanguage,
+                  answer: answerWord.value,
+                  questionLanguage: questionLanguage,
+                  question: questionWord.value,
+                  textIndex: textIndex
+                };
                 if (requiredLanguage === answerLanguage) {
-                  emit({
-                    reoccurAt: reoccurAt,
-                    answerHash: calculateHash(answerWord.value),
-                    answerLevel: answerLevel,
-                    answerLanguage: answerLanguage,
-                    answer: answerWord.value,
-                    questionLanguage: questionLanguage,
-                    question: questionWord.value,
-                    textIndex: textIndex
-                  });
+                  // for searching words in both directions, level dependent
+                  emit(assign({
+                    searchLanguages: [sourceLanguage, targetLanguage],
+                    searchMinLevel: answerLevel
+                  }, indexKey));
+                  emit(assign({
+                    searchLanguages: [targetLanguage, sourceLanguage],
+                    searchMinLevel: answerLevel
+                  }, indexKey));
+                  emit(assign({
+                    searchLanguages: [sourceLanguage, targetLanguage]
+                  }, indexKey));
+                  emit(assign({
+                    searchLanguages: [targetLanguage, sourceLanguage]
+                  }, indexKey));
                 }
+
+                // for searching directly for guessing words in target language, independent of current level
+                emit(assign({
+                  searchLanguages: [answerLanguage],
+                  searchMinLevel: answerLevel
+                }, indexKey));
+                emit(assign({
+                  searchLanguages: [answerLanguage]
+                }, indexKey));
               });
           });
         }
       }`
     ).switchMap((x) => {
-      console.log(x);
-      return this.db.runQueryRaw('words', viewId, {
+      const couchOptions = {
         include_docs: true,
+        startkey: {
+          searchLanguages: options.searchLanguages,
+          searchMinLevel: options.searchMinLevel !== undefined && options.searchMaxLevel !== undefined
+            ? (options.searchMinLevel || 0)
+            : undefined,
+        },
         endkey: {
-          reoccurAt: reoccurBefore
-        }
-      });
+          searchLanguages: options.searchLanguages,
+          searchMinLevel: options.searchMinLevel !== undefined && options.searchMaxLevel !== undefined
+            ? (options.searchMaxLevel || {})
+            : undefined,
+          reoccurAt: options.reoccurBefore
+        },
+        limit: options.limit
+      };
+      return this.db.runQueryRaw('words', viewId, couchOptions).map((result) => result.rows);
     });
   }
 }
