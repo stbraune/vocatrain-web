@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import * as XRegExp from 'xregexp/xregexp-all';
 
 @Component({
   selector: 'chip-input',
@@ -90,16 +91,12 @@ export class ChipInputComponent {
         $event.preventDefault();
       }
     }
-  }
 
-  public onKeyUp($event: KeyboardEvent) {
-    const target = <HTMLInputElement>$event.target;
-
-    this.chips = this.chips || [];
     if ($event.which === 8) {
       // backspace
       if (target.selectionStart === 0 && target.selectionEnd === 0) {
         if (this.chips.length > 0) {
+          console.log($event, target);
           this.chips.pop();
           this.emitChipsChange();
         } else {
@@ -118,6 +115,12 @@ export class ChipInputComponent {
         $event.preventDefault();
       }
     }
+  }
+
+  public onKeyUp($event: KeyboardEvent) {
+    const target = <HTMLInputElement>$event.target;
+
+    this.chips = this.chips || [];
 
     if ($event.which === 13 || $event.which === 32) {
       // enter, space
@@ -141,7 +144,13 @@ export class ChipInputComponent {
       return { value, success: false, chips: [] };
     }
 
-    const matches = value.match(new RegExp(`[${this.signs}][\\w-]+`, 'g'));
+    const matches = [];
+    const regex = XRegExp(`([${this.signs}][\\pL-]+)\\s*`, 'g');
+    const sanitized = XRegExp.replace(value, regex, (match) => {
+      matches.push(match);
+      return ``;
+    });
+
     if (matches) {
       const chips = matches.map((match) => match.substr(1))
         .map((match) => match.trim())
@@ -153,8 +162,7 @@ export class ChipInputComponent {
       }
 
       return {
-        value: chips.reduce((val, chip) => val.replace(new RegExp(`[${this.signs}]${chip}\\b`, 'g'), ''), value)
-          .replace(/\s+/g, ' ').trim(),
+        value: sanitized.replace(/\s+/g, ' ').trim(),
         chips: chips,
         success: true
       };
