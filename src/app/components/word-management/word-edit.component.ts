@@ -11,12 +11,16 @@ import {
   AfterViewInit,
   OnInit
 } from '@angular/core';
+import { MatSnackBar, MatSelect } from '@angular/material';
+
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/observable/forkJoin';
+
 import { WordTypeEntityService, WordEntityService } from '../../services';
 import { WordTypeEntity, WordEntity } from '../../model';
-import { MatSnackBar, MatSelect } from '@angular/material';
 import { Text } from '../../model/text';
 import { ChipInputComponent } from './chip-input.component';
-import { Subject } from 'rxjs/Subject';
 
 @Component({
   selector: 'word-edit',
@@ -40,7 +44,7 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   public wordDeleted = new EventEmitter<void>();
 
   @Output()
-  public wordSaved = new EventEmitter<WordEntity>();
+  public wordsSaved = new EventEmitter<WordEntity[]>();
 
   @ViewChild('typeSelect')
   public typeSelect: MatSelect;
@@ -220,17 +224,30 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   }
 
   public onSave() {
-    this.wordEntityService.putWordEntity(this.wordEntity).subscribe((wordEntity) => {
-      this.typeSelect.focus();
-      this.wordSaved.emit(wordEntity);
-      this.snackBar.open('Saved!', null, {
-        duration: 3000
+    const splittedWordEntities = this.wordEntity.texts.map((text) => Object.assign({}, this.wordEntity, {
+      _id: undefined,
+      _rev: undefined,
+      texts: [text]
+    }));
+
+    if (this.wordEntity._id && splittedWordEntities.length > 0) {
+      splittedWordEntities[0]._id = this.wordEntity._id;
+      splittedWordEntities[0]._rev = this.wordEntity._rev;
+    }
+
+    Observable.forkJoin(splittedWordEntities.map((wordEntity) => this.wordEntityService.putWordEntity(wordEntity)))
+      .subscribe((wordEntities) => {
+        // this.typeSelect.focus();
+        this.wordsSaved.emit(wordEntities);
+        this.snackBar.open('Saved!', null, {
+          duration: 3000
+        });
+        this.chipInputComponents.toArray()[0].focus();
+      }, (error) => {
+        console.error(error);
+        this.snackBar.open('Error!', 'Ok', {
+          panelClass: 'error'
+        });
       });
-    }, (error) => {
-      console.error(error);
-      this.snackBar.open('Error!', 'Ok', {
-        panelClass: 'error'
-      });
-    });
   }
 }

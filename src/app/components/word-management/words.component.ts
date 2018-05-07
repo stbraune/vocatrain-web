@@ -63,8 +63,8 @@ export class WordsComponent implements OnInit {
     this.editedWordEntity = this.cloneWordEntity(wordEntity);
   }
 
-  public wordEntitySaved(wordEntity: WordEntity) {
-    console.log('persisted', wordEntity);
+  public wordEntitiesSaved(wordEntities: WordEntity[]) {
+    console.log('persisted', wordEntities);
     this.loadWordEntities();
     this.editedWordEntity = this.newWordEntity();
   }
