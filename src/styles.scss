@@ -68,6 +68,18 @@ body {
   width: 100%;
 }
 
+.overflow {
+  &--hidden { overflow: hidden; }
+}
+
+.word-wrap {
+  &--break-word { word-wrap: break-word; }
+}
+
+.white-space {
+  &--normal { white-space: normal; }
+}
+
 .align {
   &--left { text-align: left !important; }
   &--center { text-align: center; }
@@ -117,6 +129,10 @@ body {
   .flex-col {
     margin-left: 0.5rem;
     margin-right: 0.5rem;
+
+    &--1 {
+      flex: 1;
+    }
 
     &--grow {
       flex-grow: 1;

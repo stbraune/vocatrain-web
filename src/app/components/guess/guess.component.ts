@@ -34,7 +34,7 @@ export class GuessComponent implements OnInit {
   public currentWord: SearchResult;
   public currentWordState = -1;
   public duration = '0:00';
-  public durationInterval: NodeJS.Timer;
+  public durationInterval;
   public totalWords = 0;
   public finished = false;
   public finishReason: 'no-more-words' | 'reached-amount' | 'reached-minutes';

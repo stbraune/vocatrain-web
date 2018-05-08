@@ -1,7 +1,9 @@
 .chips {
-  
   &__chip {
-    margin: 0 8px 0 0;
+    &:not(:first-child) {
+      margin: 0 0 0 8px;
+    }
+
     background-color: #616161;
     color: white;
     transition: box-shadow 280ms cubic-bezier(.4,0,.2,1);

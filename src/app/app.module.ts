@@ -19,6 +19,7 @@ import {
   MatRadioModule,
   MatCheckboxModule,
   MatProgressSpinnerModule,
+  MatTableModule,
 } from '@angular/material';
 
 import {
@@ -81,6 +82,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
     MatRadioModule,
     MatSelectModule,
     MatSnackBarModule,
+    MatTableModule,
     MatToolbarModule
   ],
   providers: [
