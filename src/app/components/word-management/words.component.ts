@@ -63,7 +63,7 @@ export class WordsComponent implements OnInit {
   public createWordEntity() {
     const dialogRef = this.dialog.open(WordAddDialogComponent);
     dialogRef.afterClosed().subscribe((result) => {
-      if (result.success) {
+      if (result && result.success) {
         this.saveWordEntity(result.wordEntity);
       }
     }, (error) => {
