@@ -20,8 +20,8 @@
         </li>
       </ul>
     </div>
-    <ng-container *ngFor="let text of editedWordEntity.texts; let w=index">
-      <div class="flex flex--wrap flex--align-center">
+    <div class="max-height-scroll--40">
+      <div *ngFor="let text of editedWordEntity.texts; let w=index" class="flex flex--wrap flex--no-margin flex--align-center">
         <div class="flex-col">
           <button mat-icon-button (click)="onDeleteText(text)">
             <mat-icon>delete</mat-icon>
@@ -65,7 +65,7 @@
           <chips [(chips)]="text.tags"></chips>
         </div>
       </div>
-    </ng-container>
+    </div>
 
     <button mat-button (click)="onAddText()">
       <mat-icon>add</mat-icon>

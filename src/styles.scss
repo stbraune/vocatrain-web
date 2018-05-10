@@ -88,6 +88,13 @@ body {
   &--normal { white-space: normal; }
 }
 
+.max-height-scroll {
+  &--40 { max-height: 40vh; overflow-x: auto; overflow-y: auto; }
+  &--50 { max-height: 50vh; overflow-x: auto; overflow-y: auto; }
+  &--60 { max-height: 60vh; overflow-x: auto; overflow-y: auto; }
+  &--70 { max-height: 70vh; overflow-x: auto; overflow-y: auto; }
+}
+
 .align {
   &--left { text-align: left !important; }
   &--center { text-align: center; }
