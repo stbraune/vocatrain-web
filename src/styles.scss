@@ -70,6 +70,10 @@ h3 {
   &--bottom  { margin-bottom: 2rem; }
 }
 
+.cursor {
+  &--pointer { cursor: pointer; }
+}
+
 .padding, .mat-button.padding {
   &--horiz-0 {
     padding-left: 0;

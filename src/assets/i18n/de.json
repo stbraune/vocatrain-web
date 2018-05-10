@@ -18,6 +18,7 @@
   },
   "words": {
     "title": "Vokabeln",
+    "tags": "Tags",
     "edit-word": {
       "title": "Vokabel bearbeiten",
       "available-tags": "Verfügbare Tags",

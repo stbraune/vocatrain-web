@@ -5,7 +5,11 @@
 }
 
 .header-row {
-  padding: 6px 0;
+  padding: 0 24px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .flex-cell-15 {

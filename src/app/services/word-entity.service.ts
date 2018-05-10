@@ -27,12 +27,71 @@ export class WordEntityService {
     return this.db.getPrefix();
   }
 
-  public getWordEntities(startkey: string, limit: number): Observable<WordEntity[]> {
-    return this.db.getEntities({
-      startkey: startkey || this.getPrefix(),
-      limit: limit,
-      raw: true
-    });
+  public getWordEntities(options: {
+    startkey: string,
+    limit: number,
+    sort?: string,
+    descending?: boolean
+  }): Observable<{
+    total_rows: number,
+    offset: number,
+    rows: Array<{
+      doc: WordEntity,
+      id: string,
+      key: string,
+      value: any
+    }>
+    // WordEntity[]
+  }> {
+    console.log(options);
+    // if (options.sort) {
+      return this.db.getQuery(`words-index`, `by-${options.sort}`, `function(doc) {
+        if (doc._id.substr(0, 'word_'.length) === 'word_') {
+          const sort = '${options.sort}';
+          if (doc[sort]) {
+            emit(doc[sort]);
+          }
+
+          doc.texts.forEach(function (text) {
+            if (typeof text[sort] === 'string') {
+              emit(text[sort]);
+            }
+
+            if (Array.isArray(text[sort])) {
+              text[sort].forEach(function (value) {
+                emit(value);
+              });
+            }
+
+            if (text.words && text.words[sort]) {
+              emit(text.words[sort].value);
+            }
+          });
+        }
+      }`).switchMap((result: any) => {
+        const x = {
+          startkey: options && options.descending ? `${this.getPrefix()}\uffff` : options.startkey || `${this.getPrefix()}`,
+          endkey: options && options.descending ? options.startkey || `${this.getPrefix()}` : `${this.getPrefix()}\uffff`,
+          limit: options.limit,
+          descending: options && options.descending,
+          include_docs: true
+        };
+        console.log(x);
+        return this.db.runQueryRaw(`words-index`, `by-${options.sort}`, {
+          startkey: options && options.descending ? `\uffff` : options.startkey || ``,
+          endkey: options && options.descending ? options.startkey || `` : `\uffff`,
+          limit: options.limit,
+          descending: options && options.descending,
+          include_docs: true
+        });
+      });
+    // }
+
+    // return this.db.getEntities({
+    //   startkey: options.startkey || this.getPrefix(),
+    //   limit: options.limit,
+    //   raw: true
+    // });
   }
 
   public putWordEntity(wordEntity: WordEntity): Observable<WordEntity> {

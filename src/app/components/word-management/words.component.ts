@@ -17,8 +17,8 @@ import { WordAddDialogComponent } from './word-add-dialog.component';
 })
 export class WordsComponent implements OnInit {
   public wordEntities: WordEntity[] = [];
-  public wordEntitiesPerPage = 15;
-  public wordEntitiesMore: WordEntity;
+  public wordEntitiesPerPage = 50;
+  public wordEntitiesNextKey: string;
   public wordTypeEntities: WordTypeEntity[] = [];
 
   public emptyWordEntity: WordEntity = {
@@ -30,6 +30,14 @@ export class WordsComponent implements OnInit {
         words: {}
       }
     ]
+  };
+
+  public sorting: {
+    property: string,
+    descending: boolean
+  } = {
+    property: 'createdAt',
+    descending: true
   };
 
   @Input()
@@ -56,20 +64,40 @@ export class WordsComponent implements OnInit {
     });
   }
 
+  public reloadWordEntities() {
+    this.wordEntitiesNextKey = undefined;
+    this.wordEntities.splice(0);
+    this.loadWordEntities();
+  }
+
   public loadWordEntities() {
-    this.wordEntityService.getWordEntities(this.wordEntitiesMore && this.wordEntitiesMore._id, this.wordEntitiesPerPage + 1)
-      .subscribe((wordEntities) => {
-        console.log(wordEntities);
-        if (wordEntities.length === this.wordEntitiesPerPage + 1) {
-          this.wordEntities.push(...wordEntities.slice(0, this.wordEntitiesPerPage - 1));
-          this.wordEntitiesMore = wordEntities[this.wordEntitiesPerPage];
-        } else {
-          this.wordEntities.push(...wordEntities);
-          this.wordEntitiesMore = undefined;
-        }
-      }, (error) => {
-        console.error(error);
-      });
+    this.wordEntityService.getWordEntities({
+      startkey: this.wordEntitiesNextKey,
+      limit: this.wordEntitiesPerPage + 1,
+      sort: this.sorting.property,
+      descending: this.sorting.descending
+    }).subscribe((result) => {
+      console.log(result);
+      if (result.rows.length === this.wordEntitiesPerPage + 1) {
+        this.wordEntities.push(...result.rows.slice(0, this.wordEntitiesPerPage - 1).map((row) => row.doc));
+        this.wordEntitiesNextKey = result.rows[this.wordEntitiesPerPage].key;
+      } else {
+        this.wordEntities.push(...result.rows.map((row) => row.doc));
+        this.wordEntitiesNextKey = undefined;
+      }
+    }, (error) => {
+      console.error(error);
+    });
+  }
+
+  public sortBy(property: string) {
+    if (this.sorting.property === property) {
+      this.sorting.descending = !this.sorting.descending;
+    } else {
+      this.sorting.property = property;
+      this.sorting.descending = false;
+    }
+    this.reloadWordEntities();
   }
 
   public createWordEntity() {

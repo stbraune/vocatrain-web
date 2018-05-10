@@ -11,6 +11,22 @@
 </h3>
 
 <ul class="ul--nostyle">
+  <li class="header-row">
+    <div class="flex flex--align-center stretch">
+      <ng-container *ngFor="let lang of supportedLanguages">
+        <div class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal flex flex--no-margin flex--align-center cursor--pointer" (click)="sortBy(lang)">
+          <span>{{lang | translate}}</span>
+          <mat-icon *ngIf="sorting.property === lang && !sorting.descending">arrow_upward</mat-icon>
+          <mat-icon *ngIf="sorting.property === lang && sorting.descending">arrow_downward</mat-icon>
+        </div>
+      </ng-container>
+      <div class="flex-col flex-col--15 align--center overflow--hidden word-wrap--break-word white-space--normal flex flex--no-margin flex--align-center cursor--pointer" (click)="sortBy('tags')">
+        <span>{{'words.tags' | translate}}</span>
+        <mat-icon *ngIf="sorting.property === 'tags' && !sorting.descending">arrow_upward</mat-icon>
+        <mat-icon *ngIf="sorting.property === 'tags' && sorting.descending">arrow_downward</mat-icon>
+      </div>
+    </div>
+  </li>
   <li *ngFor="let wordEntity of wordEntities">
     <mat-expansion-panel>
       <mat-expansion-panel-header>
@@ -53,7 +69,7 @@
       </ng-template>
     </mat-expansion-panel>
   </li>
-  <li *ngIf="wordEntitiesMore" class="margin--top">
+  <li *ngIf="wordEntitiesNextKey" class="margin--top">
     <button mat-button class="stretch" (click)="loadWordEntities()">
       <mat-icon>refresh</mat-icon>
       {{'actions.more' | translate}}
