@@ -10,7 +10,7 @@
   </mat-form-field>
 
   <ng-container *ngIf="editedWordEntity.type">
-    <div class="flex flex--align-center flex--wrap">
+    <div class="flex flex--no-margin flex--align-center flex--wrap">
       <h4 class="margin--right">
         {{'words.edit-word.available-tags' | translate}}
       </h4>
@@ -21,8 +21,8 @@
       </ul>
     </div>
     <ng-container *ngFor="let text of editedWordEntity.texts; let w=index">
-      <div class="flex flex--wrap">
-        <div class="flex-col flex-col--5">
+      <div class="flex flex--wrap flex--align-center">
+        <div class="flex-col">
           <button mat-icon-button (click)="onDeleteText(text)">
             <mat-icon>delete</mat-icon>
           </button>
@@ -32,7 +32,7 @@
           <div #chipInputWrapper
             [attr.data-row]="w"
             [attr.data-col]="l"
-            class="flex-col flex-col--25">
+            class="flex-col flex-col--1">
             <chip-input
               [(value)]="text.words[lang].value"
               [(chips)]="text.tags"
@@ -49,7 +49,7 @@
         <div #chipInputWrapper
           [attr.data-row]="w"
           [attr.data-col]="supportedLanguages.length"
-          class="flex-col flex-col--15 flex-col--grow">
+          class="flex-col flex-col--1 flex-col--grow">
           <chip-input
             [(value)]="text.meta"
             [(chips)]="text.tags"
