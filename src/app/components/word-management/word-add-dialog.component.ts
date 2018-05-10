@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { WordEntity, WordTypeEntity } from '../../model';
 import { SettingsService } from '../../settings';
 import { WordTypeEntityService } from '../../services';
 import { MatDialogRef } from '@angular/material';
+import { WordEditComponent } from './word-edit.component';
 
 @Component({
   selector: 'word-add-dialog',
@@ -13,6 +14,17 @@ export class WordAddDialogComponent implements OnInit {
   public wordTypeEntities: WordTypeEntity[] = [];
   public supportedLanguages: string[] = [];
   public newWordEntity: WordEntity;
+
+  private _wordEditComponent: WordEditComponent;
+
+  @ViewChild('wordEdit')
+  public set wordEditComponent(value: WordEditComponent) {
+    this._wordEditComponent = value;
+  }
+
+  public get wordEditComponent() {
+    return this._wordEditComponent;
+  }
 
   public constructor(
     private dialogRef: MatDialogRef<WordAddDialogComponent>,
@@ -48,10 +60,10 @@ export class WordAddDialogComponent implements OnInit {
     });
   }
 
-  public onSave(wordEntity: WordEntity) {
+  public onSave(wordEntity?: WordEntity) {
     this.dialogRef.close({
       success: true,
-      wordEntity: wordEntity
+      wordEntity: wordEntity || (this.wordEditComponent && this.wordEditComponent.editedWordEntity)
     });
   }
 }

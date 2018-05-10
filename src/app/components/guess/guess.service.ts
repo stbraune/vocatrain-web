@@ -99,12 +99,18 @@ export class GuessService {
               .forEach(function (langAndWord) {
                 const answerLanguage = langAndWord.language;
                 const answerWord = langAndWord.word;
+                if (!answerWord) {
+                  return;
+                }
 
                 const questionLanguage = answerLanguage === sourceLanguage ? targetLanguage : sourceLanguage;
                 const questionWord = text.words[questionLanguage];
+                if (!questionWord) {
+                  return;
+                }
 
-                const answerLevel = (answerWord.games && answerWord.games['guess'].level) || 0;
-                const answerThen = new Date((answerWord.games && answerWord.games['guess'].date) || 0);
+                const answerLevel = (answerWord.games && answerWord.games['guess'] && answerWord.games['guess'].level) || 0;
+                const answerThen = new Date((answerWord.games && answerWord.games['guess'] && answerWord.games['guess'].date) || 0);
 
                 const requiredLanguage = getRequiredLanguage(answerLevel, mod, sourceLanguage, targetLanguage);
                 const requiredDistance = getRequiredDistance(answerLevel, mod);
