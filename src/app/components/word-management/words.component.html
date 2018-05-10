@@ -18,7 +18,7 @@
           <ng-container *ngFor="let text of wordEntity.texts">
             <ng-container *ngFor="let lang of supportedLanguages">
               <div class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal">
-                {{text.words[lang].value}}
+                {{text.words[lang] && text.words[lang].value}}
               </div>
             </ng-container>
             <div class="flex-col flex-col--15 align--center overflow--hidden word-wrap--break-word white-space--normal">
