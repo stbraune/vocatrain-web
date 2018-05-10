@@ -46,6 +46,10 @@ body {
   font-family: Roboto,Helvetica Neue Light,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;
 }
 
+h3 {
+  line-height: 36px;
+}
+
 .app-navbar {
   display: flex;
   flex-wrap: wrap;
@@ -105,6 +109,7 @@ body {
   &--nostyle {
     list-style: none;
     padding-left: 0;
+    margin-top: 0;
   }
 
   &--horizontal {
@@ -127,11 +132,6 @@ body {
   display: flex;
   margin-left: -0.5rem;
   margin-right: -0.5rem;
-
-  &--no-margin {
-    margin-left: 0;
-    margin-right: 0;
-  }
 
   &--wrap {
     flex-wrap: wrap;
@@ -166,6 +166,16 @@ body {
     &--35 { flex-basis: 35%; }
     &--40 { flex-basis: 40%; }
     &--50 { flex-basis: 50%; }
+  }
+
+  &--no-margin {
+    margin-left: 0;
+    margin-right: 0;
+
+    .flex-col {
+      margin-left: 0;
+      margin-right: 0;
+    }
   }
 }
 
