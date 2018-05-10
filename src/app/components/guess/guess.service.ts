@@ -26,13 +26,13 @@ export class GuessService {
       return Observable.throw(`Source language and target language is the same, that's too easy, bro.`);
     }
 
-    if (options.searchLanguages.some((language) => [options.sourceLanguage, options.targetLanguage].indexOf(language) === -1)) {
-      return Observable.throw(`Can't search for other languages than source language and/or target language`);
-    }
-
     options.reoccurBefore = options.reoccurBefore || new Date();
     options.mod = options.mod || 6;
     options.searchLanguages = options.searchLanguages || [options.sourceLanguage, options.targetLanguage];
+
+    if (options.searchLanguages.some((language) => [options.sourceLanguage, options.targetLanguage].indexOf(language) === -1)) {
+      return Observable.throw(`Can't search for other languages than source language and/or target language`);
+    }
 
     const langs = JSON.stringify([options.sourceLanguage, options.targetLanguage]);
     const viewId = `guess-words-${options.sourceLanguage}-${options.targetLanguage}-${options.mod}`;
