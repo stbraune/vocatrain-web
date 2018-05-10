@@ -53,4 +53,10 @@
       </ng-template>
     </mat-expansion-panel>
   </li>
+  <li *ngIf="wordEntitiesMore" class="margin--top">
+    <button mat-button class="stretch" (click)="loadWordEntities()">
+      <mat-icon>refresh</mat-icon>
+      {{'actions.more' | translate}}
+    </button>
+  </li>
 </ul>

@@ -23,8 +23,16 @@ export class WordEntityService {
     return this.db;
   }
 
-  public getWordEntities(): Observable<WordEntity[]> {
-    return this.db.getEntities();
+  public getPrefix(): string {
+    return this.db.getPrefix();
+  }
+
+  public getWordEntities(startkey: string, limit: number): Observable<WordEntity[]> {
+    return this.db.getEntities({
+      startkey: startkey || this.getPrefix(),
+      limit: limit,
+      raw: true
+    });
   }
 
   public putWordEntity(wordEntity: WordEntity): Observable<WordEntity> {

@@ -32,7 +32,8 @@
     "cancel": "Abbrechen",
     "save": "Speichern",
     "add": "Hinzufügen ...",
-    "create": "Neu ..."
+    "create": "Neu ...",
+    "more": "Mehr ..."
   },
   "search-options": {
     "mode": {

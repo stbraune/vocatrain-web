@@ -17,6 +17,8 @@ import { WordAddDialogComponent } from './word-add-dialog.component';
 })
 export class WordsComponent implements OnInit {
   public wordEntities: WordEntity[] = [];
+  public wordEntitiesPerPage = 15;
+  public wordEntitiesMore: WordEntity;
   public wordTypeEntities: WordTypeEntity[] = [];
 
   public emptyWordEntity: WordEntity = {
@@ -54,10 +56,20 @@ export class WordsComponent implements OnInit {
     });
   }
 
-  private loadWordEntities() {
-    this.wordEntityService.getWordEntities().subscribe((wordEntities) => {
-      this.wordEntities = wordEntities;
-    });
+  public loadWordEntities() {
+    this.wordEntityService.getWordEntities(this.wordEntitiesMore && this.wordEntitiesMore._id, this.wordEntitiesPerPage + 1)
+      .subscribe((wordEntities) => {
+        console.log(wordEntities);
+        if (wordEntities.length === this.wordEntitiesPerPage + 1) {
+          this.wordEntities.push(...wordEntities.slice(0, this.wordEntitiesPerPage - 1));
+          this.wordEntitiesMore = wordEntities[this.wordEntitiesPerPage];
+        } else {
+          this.wordEntities.push(...wordEntities);
+          this.wordEntitiesMore = undefined;
+        }
+      }, (error) => {
+        console.error(error);
+      });
   }
 
   public createWordEntity() {

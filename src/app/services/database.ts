@@ -29,13 +29,17 @@ export class Database<T extends Entity> {
     return this._name;
   }
 
+  public getPrefix(): string {
+    return `${this._name}_`;
+  }
+
   public getEntities(options?: any): Observable<T[]> {
     const defaultEndkey = options && options.descending ? '' : '\uffff';
     const defaultStartkey = options && options.descending ? '\uffff' : '';
     return Observable.fromPromise(this._database.allDocs({
       include_docs: true,
-      startkey: `${this._name}_${options && options.startkey ? options.startkey : defaultStartkey}`,
-      endkey: `${this._name}_${options && options.endkey ? options.endkey : defaultEndkey}`,
+      startkey: `${options && options.raw ? '' : this.getPrefix()}${options && options.startkey ? options.startkey : defaultStartkey}`,
+      endkey: `${options && options.raw ? '' : this.getPrefix()}${options && options.endkey ? options.endkey : defaultEndkey}`,
       descending: options && options.descending,
       limit: options && options.limit
     })).map((documents: any) => {
