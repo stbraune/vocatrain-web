@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/throw';
 
 import { WordEntityService, Database } from '../../services';
 import { WordEntity } from '../../model';
@@ -21,6 +22,14 @@ export class GuessService {
   }
 
   public findGuessWords(options: SearchOptions): Observable<SearchResult[]> {
+    if (options.sourceLanguage === options.targetLanguage) {
+      return Observable.throw(`Source language and target language is the same, that's too easy, bro.`);
+    }
+
+    if (options.searchLanguages.some((language) => [options.sourceLanguage, options.targetLanguage].indexOf(language) === -1)) {
+      return Observable.throw(`Can't search for other languages than source language and/or target language`);
+    }
+
     options.reoccurBefore = options.reoccurBefore || new Date();
     options.mod = options.mod || 6;
     options.searchLanguages = options.searchLanguages || [options.sourceLanguage, options.targetLanguage];
