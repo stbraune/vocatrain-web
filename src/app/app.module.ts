@@ -5,6 +5,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoaderFactory } from './translate-http-loader-factory';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+
 import {
   MatButtonModule,
   MatCardModule,
@@ -20,6 +24,8 @@ import {
   MatCheckboxModule,
   MatProgressSpinnerModule,
   MatTableModule,
+  MatExpansionModule,
+  MatDialogModule,
 } from '@angular/material';
 
 import {
@@ -40,9 +46,8 @@ import {
 } from './components';
 
 import { AppRoutes } from './app.routes';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
-import { TranslateHttpLoaderFactory } from './translate-http-loader-factory';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { SettingsModule } from './settings';
+import { WordAddDialogComponent } from './components/word-management/word-add-dialog.component';
 
 @NgModule({
   declarations: [
@@ -51,10 +56,11 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
     ChipInputComponent,
     WordsComponent,
     WordTypesComponent,
+    WordAddDialogComponent,
     WordTypeEditComponent,
     WordEditComponent,
     SearchOptionsComponent,
-    GuessComponent
+    GuessComponent,
   ],
   imports: [
     RouterModule.forRoot(AppRoutes, {
@@ -74,6 +80,8 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
     MatCardModule,
     MatCheckboxModule,
     MatChipsModule,
+    MatDialogModule,
+    MatExpansionModule,
     MatFormFieldModule,
     MatListModule,
     MatIconModule,
@@ -83,7 +91,8 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
     MatSelectModule,
     MatSnackBarModule,
     MatTableModule,
-    MatToolbarModule
+    MatToolbarModule,
+    SettingsModule.forRoot()
   ],
   providers: [
     {
@@ -95,6 +104,9 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
     WordTypeEntityService,
     WordEntityService,
     GuessService
+  ],
+  entryComponents: [
+    WordAddDialogComponent
   ],
   bootstrap: [AppComponent]
 })

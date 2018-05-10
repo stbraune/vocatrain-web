@@ -1,0 +1,44 @@
+<h3>
+  {{'settings.title' | translate}}
+</h3>
+<mat-card>
+  <mat-card-title>
+    {{'settings.languages' | translate}}
+  </mat-card-title>
+  <mat-card-content>
+    <ul class="ul--nostyle">
+      <li *ngFor="let language of languages">
+        <div class="flex flex--align-center">
+          <div class="flex-col flex-col--1 overflow--hiden word-wrap--break-word white-space--normal">
+            {{language | translate}} ({{language}})
+          </div>
+          <div class="flex-col">
+            <button mat-icon-button (click)="deleteLanguage($event, language)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="flex flex--align-center">
+          <div class="flex-col flex-col--1 flex flex--column flex--no-margin">
+            <mat-form-field>
+              <input matInput [(ngModel)]="language" (keyup)="onLanguageKeyUp($event)">
+            </mat-form-field>
+          </div>
+          <div class="flex-col">
+            <button mat-icon-button (click)="addLanguage($event)">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </mat-card-content>
+  <mat-card-actions class="align--right">
+    <button mat-button (click)="onSave()">
+      <mat-icon>done</mat-icon>
+      {{'actions.save' | translate}}
+    </button>
+  </mat-card-actions>
+</mat-card>

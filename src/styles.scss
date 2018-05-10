@@ -43,6 +43,7 @@ $accent: map-get($candy-app-theme, accent);
 body {
   margin: 0;
   zoom: 1.2;
+  font-family: Roboto,Helvetica Neue Light,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;
 }
 
 .app-navbar {
@@ -62,6 +63,13 @@ body {
 .margin {
   &--right { margin-right: 1rem; }
   &--bottom  { margin-bottom: 2rem; }
+}
+
+.padding, .mat-button.padding {
+  &--horiz-0 {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
 .stretch {
@@ -120,6 +128,10 @@ body {
 
   &--wrap {
     flex-wrap: wrap;
+  }
+
+  &--column {
+    flex-direction: column;
   }
 
   &--align-center {

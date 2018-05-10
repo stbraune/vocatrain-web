@@ -6,9 +6,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { WordEntityService } from '../../services';
 import { GuessService } from './guess.service';
 
-import { environment } from '../../../environments/environment';
 import { SearchOptions } from './search-options';
 import { SearchResult } from './search-result';
+import { SettingsService } from '../../settings';
 
 @Component({
   selector: 'guess',
@@ -16,7 +16,7 @@ import { SearchResult } from './search-result';
   styleUrls: ['./guess.component.scss']
 })
 export class GuessComponent implements OnInit {
-  public supportedLanguages: string[] = environment.languages;
+  public supportedLanguages: string[] = [];
 
   public searchOptions: SearchOptions = {
     mode: 'by-time',
@@ -40,6 +40,7 @@ export class GuessComponent implements OnInit {
   public finishReason: 'no-more-words' | 'reached-amount' | 'reached-minutes';
 
   public constructor(
+    private settingsService: SettingsService,
     private wordEntityService: WordEntityService,
     private guessService: GuessService,
     private snackBar: MatSnackBar
@@ -47,6 +48,10 @@ export class GuessComponent implements OnInit {
   }
 
   public ngOnInit(): void {
+    this.supportedLanguages = this.settingsService.getLanguages();
+    this.searchOptions.sourceLanguage = this.supportedLanguages.length > 0 && this.supportedLanguages[0];
+    this.searchOptions.targetLanguage = this.supportedLanguages.length > 0 && this.supportedLanguages[1];
+
     window.addEventListener('keydown', (event: KeyboardEvent) => {
       this.onKeyDown(event);
     }, false);

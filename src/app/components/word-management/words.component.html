@@ -1,67 +1,56 @@
-<div class="flex">
-  <div class="flex-col flex-col--50">
-    <mat-card class="margin--bottom">
-      <mat-card-title>{{'words.title' | translate}}</mat-card-title>
-      <mat-card-content>
-        <ul class="ul--nostyle">
-          <li class="header-row">
-            <div class="flex flex--align-center">
-              <ng-container *ngFor="let lang of supportedLanguages">
-                <div class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal">
-                  {{lang | translate}}
-                </div>
-              </ng-container>
-              <div class="flex-col flex-col--15 align--center overflow--hidden word-wrap--break-word white-space--normal">
-                Tags
-              </div>
-              <div class="flex-col flex-col--15 align--center overflow--hidden word-wrap--break-word white-space--normal">
-                Type
-              </div>
-              <div class="flex-col flex-col--5 align--center overflow--hidden word-wrap--break-word white-space--normal">
-              </div>
-            </div>
-          </li>
-          <li *ngFor="let wordEntity of wordEntities">
-            <button mat-button (click)="editWordEntity(wordEntity)" class="stretch align--left word-button">
-              <div class="flex flex--align-center">
-                <ng-container *ngFor="let text of wordEntity.texts">
-                  <ng-container *ngFor="let lang of supportedLanguages">
-                    <div class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal">
-                      {{text.words[lang].value}}
-                    </div>
-                  </ng-container>
-                  <div class="flex-col flex-col--15 align--center overflow--hidden word-wrap--break-word white-space--normal">
-                    <chips [mode]="'read'" [(chips)]="text.tags"></chips>
-                  </div>
-                </ng-container>
-                <div class="flex-col flex-col--15 overflow--hidden word-wrap--break-word align--center white-space--normal">
-                  {{wordEntity.type.title}}
-                </div>
-                <div class="flex-col flex-col--5 overflow--hidden word-wrap--break-word align--center white-space--normal">
-                  <mat-icon>create</mat-icon>
-                </div>
-              </div>
-            </button>
-          </li>
-        </ul>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-button (click)="createWordEntity()" class="stretch">
-          <mat-icon>add</mat-icon>
-          {{'actions.create' | translate}}
-        </button>
-      </mat-card-actions>
-    </mat-card>
-  </div>
-  <div class="flex-col flex-col--50">
-    <word-edit
-      *ngIf="editedWordEntity"
-      [wordTypeEntities]="wordTypeEntities"
-      [supportedLanguages]="supportedLanguages"
-      [wordEntity]="editedWordEntity"
-      (wordsSaved)="wordEntitiesSaved($event)"
-      (wordDeleted)="wordEntityDeleted()"
-      (wordCancelled)="wordEntityCancelled()">
-    </word-edit>
+<div class="flex flex--no-margin flex--align-center">
+  <h3 class="flex-col flex-col--1">
+    {{'words.title' | translate}}
+  </h3>
+  <div class="flex-col">
+    <button mat-button (click)="createWordEntity()" class="stretch">
+      <mat-icon>add</mat-icon>
+      {{'actions.create' | translate}}
+    </button>
   </div>
 </div>
+
+<ul class="ul--nostyle">
+  <li *ngFor="let wordEntity of wordEntities">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <div class="flex flex--align-center stretch">
+          <ng-container *ngFor="let text of wordEntity.texts">
+            <ng-container *ngFor="let lang of supportedLanguages">
+              <div class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal">
+                {{text.words[lang].value}}
+              </div>
+            </ng-container>
+            <div class="flex-col flex-col--15 align--center overflow--hidden word-wrap--break-word white-space--normal">
+              <chips [mode]="'read'" [(chips)]="text.tags"></chips>
+            </div>
+          </ng-container>
+        </div>
+      </mat-expansion-panel-header>
+
+      <ng-template matExpansionPanelContent>
+        <word-edit #wordEdit
+          [wordTypeEntities]="wordTypeEntities"
+          [supportedLanguages]="supportedLanguages"
+          [wordEntity]="wordEntity"
+          (wordSaved)="saveWordEntity($event)">
+        </word-edit>
+        
+        <div class="flex">
+          <div class="flex-col flex-col--grow">
+            <button mat-button (click)="deleteWordEntity(wordEntity)">
+              <mat-icon>delete</mat-icon>
+              {{'actions.delete' | translate}}
+            </button>
+          </div>
+          <div class="flex-col">
+            <button mat-button (click)="saveWordEntity(wordEdit.editedWordEntity)">
+              <mat-icon>done</mat-icon>
+              {{'actions.save' | translate}}
+            </button>
+          </div>
+        </div>
+      </ng-template>
+    </mat-expansion-panel>
+  </li>
+</ul>

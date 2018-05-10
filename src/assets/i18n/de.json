@@ -11,6 +11,9 @@
     },
     "word-types": {
       "title": "Vokabelarten"
+    },
+    "settings": {
+      "title": "Einstellungen"
     }
   },
   "words": {
@@ -41,7 +44,18 @@
     "source-language": "Ausgangssprache",
     "target-language": "Zielsprache"
   },
+  "settings": {
+    "title": "Einstellungen",
+    "languages": "Verwendete Sprachen",
+    "language-placeholder": "Sprache hinzufügen"
+  },
   "de": "Deutsch",
+  "en": "Englisch",
+  "es": "Spanisch",
+  "fr": "Französisch",
+  "it": "Italienisch",
+  "no": "Norwegisch",
+  "sv": "Schwedisch",
   "bg": "Bulgarisch",
   "ru": "Russisch"
 }

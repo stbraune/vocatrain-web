@@ -1,2 +1,2 @@
-export * from './word-management';
 export * from './guess';
+export * from './word-management';

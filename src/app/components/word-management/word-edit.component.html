@@ -1,98 +1,75 @@
-<mat-card class="panel">
-  <mat-card-title>{{'words.edit-word.title' | translate}}</mat-card-title>
-  <mat-card-content class="form">
-    <mat-form-field>
-      <mat-select #typeSelect placeholder="Type" [(ngModel)]="wordEntity.type">
-        <mat-option
-          *ngFor="let wordTypeEntity of wordTypeEntities"
-          [value]="wordTypeEntity">
-          {{wordTypeEntity.title}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+<div class="flex flex--no-margin flex--column">
+  <mat-form-field>
+    <mat-select #typeSelect placeholder="Type" [(ngModel)]="editedWordEntity.type">
+      <mat-option
+        *ngFor="let wordTypeEntity of wordTypeEntities"
+        [value]="wordTypeEntity">
+        {{wordTypeEntity.title}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
 
-    <ng-container *ngIf="wordEntity.type">
-      <div class="flex flex--align-center flex--wrap">
-        <h4 class="margin--right">
-          {{'words.edit-word.available-tags' | translate}}
-        </h4>
-        <ul class="ul--nostyle ul--horizontal-wrap">
-          <li *ngFor="let tag of wordEntity.type.tags" class="margin--right">
-            #{{tag}}
-          </li>
-        </ul>
-      </div>
-      <ng-container *ngFor="let text of wordEntity.texts; let w=index">
-        <div class="flex flex--wrap">
-          <div class="flex-col flex-col--5">
-            <button mat-icon-button (click)="onDeleteText(text)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-          
-          <ng-container *ngFor="let lang of supportedLanguages; let l=index">
-            <div #chipInputWrapper
-              [attr.data-row]="w"
-              [attr.data-col]="l"
-              class="flex-col flex-col--25">
-              <chip-input
-                [(value)]="text.words[lang].value"
-                [(chips)]="text.tags"
-                [allowedChips]="wordEntity.type.tags"
-                [hideChips]="true"
-                [placeholder]="lang | translate"
-                (cursorPressed)="navigate(chipInputWrapper, $event)"
-                (backspacePressed)="onBackspacePressed(chipInputWrapper, text)"
-                (enterPressed)="onEnterPressed(chipInputWrapper, text)">
-              </chip-input>
-            </div>
-          </ng-container>
-
+  <ng-container *ngIf="editedWordEntity.type">
+    <div class="flex flex--align-center flex--wrap">
+      <h4 class="margin--right">
+        {{'words.edit-word.available-tags' | translate}}
+      </h4>
+      <ul class="ul--nostyle ul--horizontal-wrap margin--bottom">
+        <li *ngFor="let tag of editedWordEntity.type.tags" class="margin--right">
+          #{{tag}}
+        </li>
+      </ul>
+    </div>
+    <ng-container *ngFor="let text of editedWordEntity.texts; let w=index">
+      <div class="flex flex--wrap">
+        <div class="flex-col flex-col--5">
+          <button mat-icon-button (click)="onDeleteText(text)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+        
+        <ng-container *ngFor="let lang of supportedLanguages; let l=index">
           <div #chipInputWrapper
             [attr.data-row]="w"
-            [attr.data-col]="supportedLanguages.length"
-            class="flex-col flex-col--15 flex-col--grow">
+            [attr.data-col]="l"
+            class="flex-col flex-col--25">
             <chip-input
-              [(value)]="text.meta"
+              [(value)]="text.words[lang].value"
               [(chips)]="text.tags"
-              [allowedChips]="wordEntity.type.tags"
+              [allowedChips]="editedWordEntity.type.tags"
               [hideChips]="true"
-              [placeholder]="'words.edit-word.meta' | translate"
+              [placeholder]="lang | translate"
               (cursorPressed)="navigate(chipInputWrapper, $event)"
+              (backspacePressed)="onBackspacePressed(chipInputWrapper, text)"
               (enterPressed)="onEnterPressed(chipInputWrapper, text)">
             </chip-input>
           </div>
+        </ng-container>
 
-          <div class="flex-col flex-col--15 align--center margin--bottom">
-            <chips [(chips)]="text.tags"></chips>
-          </div>
+        <div #chipInputWrapper
+          [attr.data-row]="w"
+          [attr.data-col]="supportedLanguages.length"
+          class="flex-col flex-col--15 flex-col--grow">
+          <chip-input
+            [(value)]="text.meta"
+            [(chips)]="text.tags"
+            [allowedChips]="editedWordEntity.type.tags"
+            [hideChips]="true"
+            [placeholder]="'words.edit-word.meta' | translate"
+            (cursorPressed)="navigate(chipInputWrapper, $event)"
+            (enterPressed)="onEnterPressed(chipInputWrapper, text)">
+          </chip-input>
         </div>
-      </ng-container>
 
-      <button mat-button (click)="onAddText()">
-        <mat-icon>add</mat-icon>
-        {{'actions.add' | translate}}
-      </button>
+        <div class="flex-col flex-col--15 align--center margin--bottom">
+          <chips [(chips)]="text.tags"></chips>
+        </div>
+      </div>
     </ng-container>
-  </mat-card-content>
-  <mat-card-actions>
-    <div class="flex">
-      <div class="flex-col flex-col--grow">
-        <button *ngIf="wordEntity._id" mat-button (click)="onDelete()">
-          <mat-icon>delete</mat-icon>
-          {{'actions.delete' | translate}}
-        </button>
-      </div>
-      <div class="flex-col">
-        <button mat-button (click)="onCancel()">
-          <mat-icon>cancel</mat-icon>
-          {{'actions.cancel' | translate}}
-        </button>
-        <button mat-button (click)="onSave()">
-          <mat-icon>done</mat-icon>
-          {{'actions.save' | translate}}
-        </button>
-      </div>
-    </div>
-  </mat-card-actions>
-</mat-card>
+
+    <button mat-button (click)="onAddText()">
+      <mat-icon>add</mat-icon>
+      {{'actions.add' | translate}}
+    </button>
+  </ng-container>
+</div>

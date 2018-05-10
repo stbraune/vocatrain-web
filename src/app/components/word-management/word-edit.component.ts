@@ -34,6 +34,8 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   @Input()
   public wordEntity: WordEntity;
 
+  public editedWordEntity: WordEntity;
+
   @Input()
   public supportedLanguages: string[] = [];
 
@@ -44,7 +46,7 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   public wordDeleted = new EventEmitter<void>();
 
   @Output()
-  public wordsSaved = new EventEmitter<WordEntity[]>();
+  public wordSaved = new EventEmitter<WordEntity>();
 
   @ViewChild('typeSelect')
   public typeSelect: MatSelect;
@@ -62,12 +64,13 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
 
   public ngOnChanges(changes: SimpleChanges) {
     if (changes.wordEntity) {
-      if (this.wordEntity.type) {
-        this.wordEntity.type = this.wordTypeEntities.find((x) => x._id === this.wordEntity.type._id);
+      this.editedWordEntity = JSON.parse(JSON.stringify(this.wordEntity));
+      if (this.editedWordEntity.type) {
+        this.editedWordEntity.type = this.wordTypeEntities.find((x) => x._id === this.editedWordEntity.type._id);
       }
 
-      this.wordEntity.texts = this.wordEntity.texts || [];
-      this.wordEntity.texts.forEach((text) => {
+      this.editedWordEntity.texts = this.editedWordEntity.texts || [];
+      this.editedWordEntity.texts.forEach((text) => {
         this.supportedLanguages.forEach((lang) => {
           if (typeof text.words[lang] === 'string') {
             text.words[lang] = {
@@ -97,14 +100,14 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   }
 
   public onDeleteText(text: Text) {
-    const index = this.wordEntity.texts.indexOf(text);
+    const index = this.editedWordEntity.texts.indexOf(text);
     if (index !== -1) {
-      this.wordEntity.texts.splice(index, 1);
+      this.editedWordEntity.texts.splice(index, 1);
     }
   }
 
   public onAddText() {
-    this.wordEntity.texts.push({
+    this.editedWordEntity.texts.push({
       meta: '',
       tags: [],
       words: Object.assign({}, ...this.supportedLanguages.map((lang) => ({
@@ -168,10 +171,10 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
     const row = parseInt(source.dataset.row, 10);
     const col = parseInt(source.dataset.col, 10);
     if (this.isEmpty(text)) {
-      const index = this.wordEntity.texts.indexOf(text);
+      const index = this.editedWordEntity.texts.indexOf(text);
       if (index !== -1) {
         this.deferredNavigate = { row: row, col: 0, dir: 'left' };
-        this.wordEntity.texts.splice(index, 1);
+        this.editedWordEntity.texts.splice(index, 1);
       }
     }
   }
@@ -183,9 +186,9 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
 
     if (this.isEmpty(text)) {
       // text is totally empty, remove it and save the word
-      const index = this.wordEntity.texts.indexOf(text);
+      const index = this.editedWordEntity.texts.indexOf(text);
       if (index !== -1) {
-        this.wordEntity.texts.splice(index, 1);
+        this.editedWordEntity.texts.splice(index, 1);
       }
       this.onSave();
     } else {
@@ -207,47 +210,7 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
       && (Object.keys(text.words).length === 0 || Object.keys(text.words).every((k) => text.words[k].value === ''));
   }
 
-  public onDelete() {
-    if (this.wordEntity._id) {
-      this.wordEntityService.deleteWordEntity(this.wordEntity).subscribe((result) => {
-        this.snackBar.open('Entry deleted', null, { duration: 3000 });
-        this.wordDeleted.emit();
-      }, (error) => {
-        console.error(error);
-        this.snackBar.open('Error!', 'Ok', { panelClass: 'error' });
-      });
-    }
-  }
-
-  public onCancel() {
-    this.wordCancelled.emit();
-  }
-
   public onSave() {
-    const splittedWordEntities = this.wordEntity.texts.map((text) => Object.assign({}, this.wordEntity, {
-      _id: undefined,
-      _rev: undefined,
-      texts: [text]
-    }));
-
-    if (this.wordEntity._id && splittedWordEntities.length > 0) {
-      splittedWordEntities[0]._id = this.wordEntity._id;
-      splittedWordEntities[0]._rev = this.wordEntity._rev;
-    }
-
-    Observable.forkJoin(splittedWordEntities.map((wordEntity) => this.wordEntityService.putWordEntity(wordEntity)))
-      .subscribe((wordEntities) => {
-        // this.typeSelect.focus();
-        this.wordsSaved.emit(wordEntities);
-        this.snackBar.open('Saved!', null, {
-          duration: 3000
-        });
-        this.chipInputComponents.toArray()[0].focus();
-      }, (error) => {
-        console.error(error);
-        this.snackBar.open('Error!', 'Ok', {
-          panelClass: 'error'
-        });
-      });
+    this.wordSaved.emit(this.editedWordEntity);
   }
 }
