@@ -55,17 +55,16 @@ export class WordEntityService {
 
         doc.texts.forEach(function (text) {
           if (typeof text[sort] === 'string') {
-            emit(text[sort]);
+            emit([text[sort], doc._id]);
           }
 
           if (Array.isArray(text[sort])) {
-            text[sort].forEach(function (value) {
-              emit(value);
-            });
+            text[sort].sort();
+            emit([text[sort], doc._id]);
           }
 
           if (text.words && text.words[sort]) {
-            emit(text.words[sort].value);
+            emit([text.words[sort].value, doc._id]);
           }
         });
       }
