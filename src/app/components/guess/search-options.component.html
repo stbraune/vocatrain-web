@@ -1,26 +1,28 @@
 <div class="panel">
   <div class="form">
-    <mat-radio-group [(ngModel)]="searchOptions.mode" (ngModelChange)="onPropertyChanged()" class="margin--bottom flex">
-      <mat-radio-button class="flex-col flex-col--grow" value="by-time">
-        <span class="margin--right">
-          {{'search-options.mode.time' | translate}}
-        </span>
-        <mat-form-field>
-          <input matInput type="number" placeholder="{{'search-options.mode.minutes' | translate}}" [(ngModel)]="searchOptions.minutes" (ngModelChange)="onPropertyChanged()">
-        </mat-form-field>
+    <mat-radio-group [(ngModel)]="searchOptions.mode" (ngModelChange)="onPropertyChanged()" class="flex flex--align-center">
+      <mat-radio-button #radioModeTime class="flex-col" value="by-time">
       </mat-radio-button>
-      <mat-radio-button class="flex-col flex-col--grow align--right" value="by-amount">
-        <span class="margin--right">
-          {{'search-options.mode.words' | translate}}
-        </span>
-        <mat-form-field>
-          <input matInput type="number" placeholder="{{'search-options.mode.amount' | translate}}" [(ngModel)]="searchOptions.amount" (ngModelChange)="onPropertyChanged()">
-        </mat-form-field>
+      <mat-form-field class="flex-col--1 margin--right">
+        <input matInput type="number"
+          placeholder="{{'search-options.mode.time' | translate}}"
+          [(ngModel)]="searchOptions.minutes"
+          (ngModelChange)="onPropertyChanged()"
+          (focus)="radioModeTime.checked = true">
+      </mat-form-field>
+      <mat-radio-button #radioModeWords class="flex-col align--right" value="by-amount">
       </mat-radio-button>
+      <mat-form-field class="flex-col--1 margin--right">
+        <input matInput type="number"
+          placeholder="{{'search-options.mode.words' | translate}}"
+          [(ngModel)]="searchOptions.amount"
+          (ngModelChange)="onPropertyChanged()"
+          (focus)="radioModeWords.checked = true">
+      </mat-form-field>
     </mat-radio-group>
     
     <div class="flex">
-      <mat-form-field class="flex-col flex-col--grow">
+      <mat-form-field class="flex-col flex-col--1">
         <mat-select #typeSelect placeholder="{{'search-options.source-language' | translate}}" [(ngModel)]="searchOptions.sourceLanguage" (ngModelChange)="onPropertyChanged()">
           <mat-option
             *ngFor="let supportedLanguage of supportedLanguages"
@@ -30,12 +32,12 @@
         </mat-select>
       </mat-form-field>
   
-      <button mat-button (click)="toggleLanguageDirection()" class="flex-col flex-col--grow">
+      <button mat-button (click)="toggleLanguageDirection()" class="flex-col">
         <mat-icon *ngIf="languageDirection === 'both' || languageDirection === 'tts'">keyboard_arrow_left</mat-icon>
         <mat-icon *ngIf="languageDirection === 'both' || languageDirection === 'stt'">keyboard_arrow_right</mat-icon>
       </button>
         
-      <mat-form-field class="flex-col flex-col--grow">
+      <mat-form-field class="flex-col flex-col--1">
         <mat-select #typeSelect placeholder="{{'search-options.target-language' | translate}}" [(ngModel)]="searchOptions.targetLanguage" (ngModelChange)="onPropertyChanged()">
           <mat-option
             *ngFor="let supportedLanguage of supportedLanguages"
@@ -46,14 +48,20 @@
       </mat-form-field>
     </div>
 
-    <div class="flex">
+    <div class="flex flex--align-center">
       <mat-checkbox class="flex-col" [(ngModel)]="searchOptions.searchLevelEnabled" (ngModelChange)="onPropertyChanged()"></mat-checkbox>
-      <mat-form-field class="flex-col flex-col--grow">
-        <input matInput type="number" placeholder="Minimum Level" [(ngModel)]="searchOptions.searchLevelMinimum" (ngModelChange)="onPropertyChanged()">
+      <mat-form-field class="flex-col flex-col--1">
+        <input matInput type="number"
+          [placeholder]="'search-options.min-level' | translate"
+          [(ngModel)]="searchOptions.searchLevelMinimum"
+          (ngModelChange)="onPropertyChanged()">
       </mat-form-field>
   
-      <mat-form-field class="flex-col flex-col--grow">
-        <input matInput type="number" placeholder="Maximum Level" [(ngModel)]="searchOptions.searchLevelMaximum" (ngModelChange)="onPropertyChanged()">
+      <mat-form-field class="flex-col flex-col--1">
+        <input matInput type="number"
+          [placeholder]="'search-options.max-level' | translate"
+          [(ngModel)]="searchOptions.searchLevelMaximum"
+          (ngModelChange)="onPropertyChanged()">
       </mat-form-field>
     </div>
   </div>

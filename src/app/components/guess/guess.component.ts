@@ -212,9 +212,8 @@ export class GuessComponent implements OnInit {
   public nextWord() {
     this.currentWordState = -1;
     this.currentWord = undefined;
-    this.guessService.findGuessWords(Object.assign({ limit: 1 }, this.searchOptions)).subscribe((searchResults) => {
-      console.log(searchResults);
-      if (searchResults.length === 1) {
+    this.guessService.findGuessWords(Object.assign({}, this.searchOptions, { limit: 1 })).subscribe((searchResults) => {
+      if (searchResults.length > 0) {
         this.currentWordState = 0;
         this.currentWord = searchResults[0];
         this.currentWord.key.answerAt = new Date(this.currentWord.key.answerAt);

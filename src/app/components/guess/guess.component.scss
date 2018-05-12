@@ -1,6 +1,7 @@
-.panel {
-  .form {
-    display: flex;
-    flex-direction: column;
-  }
+.word-card {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }

@@ -28,13 +28,28 @@
   "word-types": {
     "title": "Vokabelarten"
   },
-  "actions": {
-    "delete": "Löschen",
-    "cancel": "Abbrechen",
-    "save": "Speichern",
-    "add": "Hinzufügen ...",
-    "create": "Neu ...",
-    "more": "Mehr ..."
+  "guess": {
+    "title": "Raten",
+    "start": "Starten!",
+    "finished": "Fertig!",
+    "no-more-words": "Keine weiteren Vokabeln vorhanden!",
+    "reached-amount": "Die Anzahl erforderlicher Vokabeln wurde erreicht.",
+    "reached-minutes": "Die Zeit ist abgelaufen.",
+    "required-duration": "Benötigte Dauer",
+    "total-words": "Geschaffte Vokabeln",
+    "duration": "Dauer",
+    "words": "Vokabeln",
+    "uncover": "Aufdecken",
+    "cover": "Zudecken",
+    "right": "Richtig",
+    "wrong": "Falsch",
+    "last-repeat": "Letzte Wiederholung",
+    "never": "Nie",
+    "current-level": "Aktuelle Stufe",
+    "language": "Sprache",
+    "tags": "Tags",
+    "meta": "Hilfe",
+    "stop": "Aufhören"
   },
   "search-options": {
     "mode": {
@@ -44,12 +59,22 @@
       "amount": "Anzahl"
     },
     "source-language": "Ausgangssprache",
-    "target-language": "Zielsprache"
+    "target-language": "Zielsprache",
+    "min-level": "Mindeststufe",
+    "max-level": "Maximalstufe"
   },
   "settings": {
     "title": "Einstellungen",
     "languages": "Verwendete Sprachen",
     "language-placeholder": "Sprache hinzufügen"
+  },
+  "actions": {
+    "delete": "Löschen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "add": "Hinzufügen ...",
+    "create": "Neu ...",
+    "more": "Mehr ..."
   },
   "de": "Deutsch",
   "en": "Englisch",

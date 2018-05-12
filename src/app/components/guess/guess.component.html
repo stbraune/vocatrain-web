@@ -1,37 +1,40 @@
+<h3>
+  {{'guess.title' | translate}}
+</h3>
+
 <mat-card *ngIf="!started" class="margin--bottom">
-  <mat-card-title>
-    Guess 'em!
-  </mat-card-title>
   <mat-card-content>
     <search-options [supportedLanguages]="supportedLanguages" [(searchOptions)]="searchOptions">
     </search-options>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-button (click)="startGuessing()">
-      Go go!
+    <button class="stretch" mat-button (click)="startGuessing()">
+      {{'guess.start' | translate}}
     </button>
   </mat-card-actions>
 </mat-card>
 
 <mat-card *ngIf="finished">
   <mat-card-title>
-    Finished!
+    {{'guess.finished' | translate}}
   </mat-card-title>
   <mat-card-content>
     <p *ngIf="finishReason === 'no-more-words'">
-      Keine weiteren Vokabeln vorhanden!
+      {{'guess.no-more-words' | translate}}
     </p>
     <p *ngIf="finishReason === 'reached-amount'">
-      Anzahl erreicht!
+      {{'guess.reached-amount' | translate}}
     </p>
     <p *ngIf="finishReason === 'reached-minutes'">
-      Zeit vorüber!
+      {{'guess.reached-minutes' | translate}}
     </p>
     <p>
-      <strong>Benötigte Dauer:</strong> {{duration}}
+      <strong>{{'guess.required-duration' | translate}}:</strong>
+      {{duration}}
     </p>
     <p>
-      <strong>Anzahl Vokabeln:</strong> {{totalWords}}
+      <strong>{{'guess.total-words' | translate}}:</strong>
+      {{totalWords}}
     </p>
   </mat-card-content>
 </mat-card>
@@ -40,104 +43,109 @@
   <mat-card-content>
     <div class="flex margin--bottom">
       <div class="flex-col flex-col--grow">
-        Dauer: {{duration}} - Vokabeln: {{totalWords}}
+        {{'guess.duration' | translate}}: {{duration}} - {{'guess.words' | translate}}: {{totalWords}}
       </div>
       <div class="flex-col flex flex--align-center">
-        <div class="key margin--right">
+        <div class="key margin--left">
           <mat-icon>keyboard_arrow_up</mat-icon>
         </div>
-        <span class="margin--right">
-          Aufdecken
+        <span class="margin--left">
+          {{'guess.uncover' | translate}}
         </span>
-        <div class="key margin--right">
+        <div class="key margin--left">
           <mat-icon>keyboard_arrow_down</mat-icon>
         </div>
-        <span class="margin--right">
-          Zudecken
+        <span class="margin--left">
+          {{'guess.cover' | translate}}
         </span>
-        <div class="key margin--right">
+        <div class="key margin--left">
           <mat-icon>keyboard_arrow_left</mat-icon>
         </div>
-        <span class="margin--right">
-          Falsch
+        <span class="margin--left">
+          {{'guess.wrong' | translate}}
         </span>
-        <div class="key margin--right">
+        <div class="key margin--left">
           <mat-icon>keyboard_arrow_right</mat-icon>
         </div>
-        <span class="margin--right">
-          Richtig
+        <span class="margin--left">
+          {{'guess.right' | translate}}
         </span>
       </div>
     </div>
-    <ng-container *ngIf="currentWord">
-      <div class="flex margin--bottom">
-        <div class="flex-col flex-col--grow">
-          <strong>Zuletzt wiederholt:</strong>
-          <span *ngIf="currentWord.key.answerAt.getTime() === 0; else answerAtOk">
-            Nie
+    <div class="flex margin--bottom">
+      <div class="flex-col flex-col--grow">
+        <strong>{{'guess.last-repeat' | translate}}:</strong>
+        <span *ngIf="!currentWord || currentWord.key.answerAt.getTime() === 0; else answerAtOk">
+          {{'guess.never' | translate}}
+        </span>
+        <ng-template #answerAtOk>
+          <span>
+            {{currentWord.key.answerAt | date:'dd.MM.yy H:mm'}}
           </span>
-          <ng-template #answerAtOk>
-            <span>
-              {{currentWord.key.answerAt | date:'d.MM.yy H:mm'}}
-            </span>
-          </ng-template>
-        </div>
-        <div class="flex-col flex-col--grow align--right">
-          <strong>Aktuelle Stufe:</strong> {{currentWord.key.answerLevel}}
-        </div>
+        </ng-template>
       </div>
-      <div class="flex">
-        <mat-card class="align--center flex-col flex-col--50">
-          <mat-card-title>
-            {{currentWord.key.question}}
-          </mat-card-title>
-          <mat-card-content>
-            <p>
-              <strong>Sprache:</strong> {{currentWord.key.questionLanguage}}
-            </p>
-            <p *ngIf="currentWord.key.tags.length > 0">
-              <strong>Tags:</strong>
-              <chips [chips]="currentWord.key.tags" mode="read"></chips>
-            </p>
-            <p *ngIf="currentWord.key.meta">
-              <strong>Hilfe:</strong> {{currentWord.key.meta}}
-            </p>
-          </mat-card-content>
-        </mat-card>
-        <mat-card class="align--center flex-col flex-col--50">
-          <mat-card-title *ngIf="currentWordState >= 1">
-            {{currentWord.key.answer}}
-          </mat-card-title>
-          <mat-card-content *ngIf="currentWordState >= 1">
-            <p>
-              <strong>Sprache:</strong> {{currentWord.key.answerLanguage}}
-            </p>
-            <p *ngIf="currentWord.key.tags.length > 0">
-              <strong>Tags:</strong>
-              <chips [chips]="currentWord.key.tags" mode="read"></chips>
-            </p>
-          </mat-card-content>
-          <mat-card-content *ngIf="currentWordState < 1" class="align--center">
-            <div class="display--inline-block">
-              <mat-spinner>
-              </mat-spinner>
-            </div>
-          </mat-card-content>
-        </mat-card>
+      <div class="flex-col flex-col--grow align--right">
+        <strong>{{'guess.current-level' | translate}}:</strong>
+        <span *ngIf="currentWord; else answerLevelUnknown">
+          {{currentWord.key.answerLevel}}
+        </span>
+        <ng-template #answerLevelUnknown>
+          ?
+        </ng-template>
       </div>
-    </ng-container>
-    <ng-container *ngIf="!currentWord">
-      <div class="align--center">
-        <div class="display--inline-block">
-          <mat-spinner>
-          </mat-spinner>
-        </div>
-      </div>
-    </ng-container>
+    </div>
+    <div class="flex">
+      <mat-card class="align--center flex-col flex-col--50 word-card">
+        <mat-card-title *ngIf="currentWord">
+          {{currentWord.key.question}}
+        </mat-card-title>
+        <mat-card-content *ngIf="currentWord">
+          <p>
+            <strong>{{'guess.language' | translate}}:</strong>
+            {{currentWord.key.questionLanguage}}
+          </p>
+          <p *ngIf="currentWord.key.tags.length > 0">
+            <strong>{{'guess.tags' | translate}}:</strong>
+            <chips [chips]="currentWord.key.tags" mode="read"></chips>
+          </p>
+          <p *ngIf="currentWord.key.meta">
+            <strong>{{'guess.meta' | translate}}:</strong>
+            {{currentWord.key.meta}}
+          </p>
+        </mat-card-content>
+        <mat-card-content *ngIf="!currentWord" class="align--center">
+          <div class="display--inline-block">
+            <mat-spinner>
+            </mat-spinner>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="align--center flex-col flex-col--50 word-card">
+        <mat-card-title *ngIf="currentWord && currentWordState >= 1">
+          {{currentWord.key.answer}}
+        </mat-card-title>
+        <mat-card-content *ngIf="currentWord && currentWordState >= 1">
+          <p>
+            <strong>{{'guess.language' | translate}}:</strong>
+            {{currentWord.key.answerLanguage}}
+          </p>
+          <p *ngIf="currentWord.key.tags.length > 0">
+            <strong>{{'guess.tags' | translate}}:</strong>
+            <chips [chips]="currentWord.key.tags" mode="read"></chips>
+          </p>
+        </mat-card-content>
+        <mat-card-content *ngIf="!currentWord || currentWordState < 1" class="align--center">
+          <div class="display--inline-block">
+            <mat-spinner>
+            </mat-spinner>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-button (click)="stopGuessing()">
-      Stop it!
+    <button mat-button (click)="stopGuessing()" class="stretch">
+      {{'guess.stop' | translate}}
     </button>
   </mat-card-actions>
 </mat-card>
