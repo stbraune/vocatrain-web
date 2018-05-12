@@ -49,6 +49,10 @@ export class WordEntityService {
           emit(doc[sort]);
         }
 
+        if (sort === 'creation') {
+          emit([doc.createdAt, doc._id]);
+        }
+
         doc.texts.forEach(function (text) {
           if (typeof text[sort] === 'string') {
             emit(text[sort]);

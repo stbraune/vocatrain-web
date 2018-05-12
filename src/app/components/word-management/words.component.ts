@@ -36,7 +36,7 @@ export class WordsComponent implements OnInit {
     property: string,
     descending: boolean
   } = {
-    property: '_id',
+    property: 'creation',
     descending: true
   };
 
