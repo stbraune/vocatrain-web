@@ -22,8 +22,7 @@ export class GuessComponent implements OnInit {
     mode: 'by-time',
     minutes: 15,
     amount: 75,
-    sourceLanguage: this.supportedLanguages.length > 0 && this.supportedLanguages[0],
-    targetLanguage: this.supportedLanguages.length > 0 && this.supportedLanguages[1],
+    searchLanguagesDirection: 'both',
     searchLevelEnabled: false,
     searchLevelMinimum: 0,
     searchLevelMaximum: 100
@@ -50,7 +49,11 @@ export class GuessComponent implements OnInit {
   public ngOnInit(): void {
     this.supportedLanguages = this.settingsService.getLanguages();
     this.searchOptions.sourceLanguage = this.supportedLanguages.length > 0 && this.supportedLanguages[0];
-    this.searchOptions.targetLanguage = this.supportedLanguages.length > 0 && this.supportedLanguages[1];
+    this.searchOptions.targetLanguage = this.supportedLanguages.length > 1 && this.supportedLanguages[1];
+    this.searchOptions.searchLanguages = [
+      this.supportedLanguages.length > 0 && this.supportedLanguages[0],
+      this.supportedLanguages.length > 1 && this.supportedLanguages[1]
+    ];
 
     window.addEventListener('keydown', (event: KeyboardEvent) => {
       this.onKeyDown(event);
@@ -222,7 +225,8 @@ export class GuessComponent implements OnInit {
       }
     }, (err) => {
       console.error(err);
-      this.snackBar.open('Oops!', 'Ok');
+      // this.snackBar.open('Oops!', 'Ok');
+      this.finishGuessing('no-more-words');
     });
   }
 }

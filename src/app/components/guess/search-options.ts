@@ -4,9 +4,10 @@ export interface SearchOptions {
   amount?: number;
   reoccurAfter?: Date;
   reoccurBefore?: Date;
-  answerHash?: number,
-  sourceLanguage: string;
-  targetLanguage: string;
+  answerHash?: number;
+  sourceLanguage?: string;
+  targetLanguage?: string;
+  searchLanguagesDirection?: 'stt' | 'tts' | 'both';
   searchLanguages?: string[];
   searchLevelEnabled: boolean;
   searchLevelMinimum?: number;

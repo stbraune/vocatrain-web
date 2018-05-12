@@ -33,8 +33,8 @@
       </mat-form-field>
   
       <button mat-button (click)="toggleLanguageDirection()" class="flex-col">
-        <mat-icon *ngIf="languageDirection === 'both' || languageDirection === 'tts'">keyboard_arrow_left</mat-icon>
-        <mat-icon *ngIf="languageDirection === 'both' || languageDirection === 'stt'">keyboard_arrow_right</mat-icon>
+        <mat-icon *ngIf="searchOptions.searchLanguagesDirection === 'both' || searchOptions.searchLanguagesDirection === 'tts'">keyboard_arrow_left</mat-icon>
+        <mat-icon *ngIf="searchOptions.searchLanguagesDirection === 'both' || searchOptions.searchLanguagesDirection === 'stt'">keyboard_arrow_right</mat-icon>
       </button>
         
       <mat-form-field class="flex-col flex-col--1">

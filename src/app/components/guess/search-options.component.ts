@@ -21,7 +21,12 @@ export class SearchOptionsComponent implements OnInit {
     minutes: 15,
     amount: 75,
     sourceLanguage: this.supportedLanguages.length > 0 && this.supportedLanguages[0],
-    targetLanguage: this.supportedLanguages.length > 0 && this.supportedLanguages[1],
+    targetLanguage: this.supportedLanguages.length > 1 && this.supportedLanguages[1],
+    searchLanguagesDirection: 'both',
+    searchLanguages: [
+      this.supportedLanguages.length > 0 && this.supportedLanguages[0],
+      this.supportedLanguages.length > 1 && this.supportedLanguages[1]
+    ],
     searchLevelEnabled: false,
     searchLevelMinimum: 0,
     searchLevelMaximum: 100
@@ -30,8 +35,6 @@ export class SearchOptionsComponent implements OnInit {
   @Output()
   public searchOptionsChange = new EventEmitter<SearchOptions>();
 
-  public languageDirection: 'stt' | 'tts' | 'both' = 'both';
-
   public constructor() {
   }
 
@@ -39,24 +42,24 @@ export class SearchOptionsComponent implements OnInit {
   }
 
   public toggleLanguageDirection() {
-    switch (this.languageDirection) {
+    switch (this.searchOptions.searchLanguagesDirection) {
       case 'stt':
-        this.languageDirection = 'both';
+        this.searchOptions.searchLanguagesDirection = 'both';
         this.searchOptions.searchLanguages = [this.searchOptions.sourceLanguage, this.searchOptions.targetLanguage];
         this.onPropertyChanged();
         break;
       case 'both':
-        this.languageDirection = 'tts';
+        this.searchOptions.searchLanguagesDirection = 'tts';
         this.searchOptions.searchLanguages = [this.searchOptions.sourceLanguage];
         this.onPropertyChanged();
         break;
       case 'tts':
-        this.languageDirection = 'stt';
+        this.searchOptions.searchLanguagesDirection = 'stt';
         this.searchOptions.searchLanguages = [this.searchOptions.targetLanguage];
         this.onPropertyChanged();
         break;
       default:
-        throw new Error(`Unsupported language direction ${this.languageDirection}`);
+        throw new Error(`Unsupported language direction ${this.searchOptions.searchLanguagesDirection}`);
     }
   }
 
