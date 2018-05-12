@@ -71,15 +71,12 @@ export class WordsComponent implements OnInit {
   }
 
   public loadWordEntities() {
-    const options = {
+    this.wordEntityService.getWordEntities({
       startkey: this.wordEntitiesNextKey,
       limit: this.wordEntitiesPerPage + 1,
       sort: this.sorting.property,
       descending: this.sorting.descending
-    };
-    console.log('q', options);
-    this.wordEntityService.getWordEntities(options).subscribe((result) => {
-      console.log('r', result);
+    }).subscribe((result) => {
       if (result.rows.length === this.wordEntitiesPerPage + 1) {
         this.wordEntities.push(...result.rows.slice(0, this.wordEntitiesPerPage - 1).map((row) => row.doc));
         this.wordEntitiesNextKey = result.rows[this.wordEntitiesPerPage].key;
