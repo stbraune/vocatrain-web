@@ -2,7 +2,9 @@ export interface SearchOptions {
   mode?: 'by-time' | 'by-amount';
   minutes?: number;
   amount?: number;
+  reoccurAfter?: Date;
   reoccurBefore?: Date;
+  answerHash?: number,
   sourceLanguage: string;
   targetLanguage: string;
   searchLanguages?: string[];

@@ -22,6 +22,27 @@ export class GuessService {
   }
 
   public findGuessWords(options: SearchOptions): Observable<SearchResult[]> {
+    return this.findGuessWordsInternal(Object.assign({}, options, {
+      limit: options.searchLevelEnabled ? 100 : 1
+    })).switchMap((words) => {
+      if (words.length === 0) {
+        return Observable.of(words);
+      }
+
+      const word = options.searchLevelEnabled
+        ? words.find((w) => options.searchLevelMinimum <= w.key.answerLevel && w.key.answerLevel <= options.searchLevelMaximum)
+        : words[0];
+      if (word) {
+        return Observable.of([word]);
+      }
+
+      return this.findGuessWords(Object.assign({}, options, {
+        reoccurAfter: words[words.length - 1].key.reoccurAt + '1'
+      }));
+    });
+  }
+
+  private findGuessWordsInternal(options: SearchOptions): Observable<SearchResult[]> {
     if (options.sourceLanguage === options.targetLanguage) {
       return Observable.throw(`Source language and target language is the same, that's too easy, bro.`);
     }
@@ -145,14 +166,6 @@ export class GuessService {
                 if (requiredLanguage === answerLanguage) {
                   // for searching words in both directions, level dependent
                   emit(assign({
-                    searchLanguages: [sourceLanguage, targetLanguage],
-                    searchMinLevel: answerLevel
-                  }, indexKey));
-                  emit(assign({
-                    searchLanguages: [targetLanguage, sourceLanguage],
-                    searchMinLevel: answerLevel
-                  }, indexKey));
-                  emit(assign({
                     searchLanguages: [sourceLanguage, targetLanguage]
                   }, indexKey));
                   emit(assign({
@@ -161,10 +174,6 @@ export class GuessService {
                 }
 
                 // for searching directly for guessing words in target language, independent of current level
-                emit(assign({
-                  searchLanguages: [answerLanguage],
-                  searchMinLevel: answerLevel
-                }, indexKey));
                 emit(assign({
                   searchLanguages: [answerLanguage]
                 }, indexKey));
@@ -177,12 +186,17 @@ export class GuessService {
         include_docs: true,
         startkey: {
           searchLanguages: options.searchLanguages,
-          searchMinLevel: options.searchLevelEnabled ? (options.searchLevelMinimum || 0) : undefined,
+          reoccurAt: typeof options.reoccurAfter === 'object'
+            ? options.reoccurAfter.toISOString()
+            : typeof options.reoccurAfter === 'string' ? options.reoccurAfter : '',
+          answerHash: options.answerHash || 0,
         },
         endkey: {
           searchLanguages: options.searchLanguages,
-          searchMinLevel: options.searchLevelEnabled ? (options.searchLevelMaximum || {}) : undefined,
-          reoccurAt: options.reoccurBefore
+          reoccurAt: typeof options.reoccurBefore === 'object'
+            ? options.reoccurBefore.toISOString()
+            : typeof options.reoccurBefore === 'string' ? options.reoccurBefore : undefined,
+          answerHash: {}
         },
         limit: options.limit
       };
