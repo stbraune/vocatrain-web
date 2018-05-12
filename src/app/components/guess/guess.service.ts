@@ -147,7 +147,7 @@ export class GuessService {
                 var reoccurAt = new Date(normalizeDate(answerThen).getTime() + convertMillis(requiredDistance));
                 const reoccurAtSame = reoccurAt.getTime() === normalizeDate(answerThen).getTime();
                 if (reoccurAtSame) {
-                  reoccurAt = new Date(answerThen.getTime() + (300 + Math.floor(Math.random() * 900) * 1000));
+                  reoccurAt = new Date(answerThen.getTime() + (300 + Math.floor(Math.random() * 900)) * 1000);
                 }
 
                 const indexKey = {
