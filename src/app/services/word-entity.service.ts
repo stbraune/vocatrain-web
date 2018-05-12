@@ -66,13 +66,22 @@ export class WordEntityService {
         });
       }
     }`).switchMap((result: any) => {
-      return this.db.runQueryRaw(`words-index`, `by-${options.sort}`, {
-        startkey: options && options.descending ? `\uffff` : options.startkey || ``,
-        endkey: options && options.descending ? options.startkey || `` : `\uffff`,
+      const options1 = {
+        startkey: options && options.descending ? (options.startkey || undefined) : (options.startkey || ``),
+        endkey: options && options.descending ? '' : undefined,
+        // endkey: options && options.descending ? (options.startkey || ``) : undefined,
+        // startkey: (options.startkey || ``),
+        // endkey: options && options.descending ? (options.startkey || ``) : undefined,
+        // startkey: options && options.descending ? `\uffff` : (options.startkey || ``),
+        // endkey: options && options.descending ? (options.startkey || ``) : `\uffff`,
+        // startkey: options && options.startkey || ``,
+        // endkey: `\uffff`,
         limit: options.limit,
         descending: options && options.descending,
         include_docs: true
-      });
+      };
+      console.log('o', options1);
+      return this.db.runQueryRaw(`words-index`, `by-${options.sort}`, options1);
     });
   }
 

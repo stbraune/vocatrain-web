@@ -36,7 +36,7 @@ export class WordsComponent implements OnInit {
     property: string,
     descending: boolean
   } = {
-    property: 'createdAt',
+    property: '_id',
     descending: true
   };
 
@@ -71,13 +71,15 @@ export class WordsComponent implements OnInit {
   }
 
   public loadWordEntities() {
-    this.wordEntityService.getWordEntities({
+    const options = {
       startkey: this.wordEntitiesNextKey,
       limit: this.wordEntitiesPerPage + 1,
       sort: this.sorting.property,
       descending: this.sorting.descending
-    }).subscribe((result) => {
-      console.log(result);
+    };
+    console.log('q', options);
+    this.wordEntityService.getWordEntities(options).subscribe((result) => {
+      console.log('r', result);
       if (result.rows.length === this.wordEntitiesPerPage + 1) {
         this.wordEntities.push(...result.rows.slice(0, this.wordEntitiesPerPage - 1).map((row) => row.doc));
         this.wordEntitiesNextKey = result.rows[this.wordEntitiesPerPage].key;
@@ -130,10 +132,10 @@ export class WordsComponent implements OnInit {
         });
         console.log('persisted', splittedWordEntities);
 
-        wordEntities.forEach((persistedWordEntity) => {
+        wordEntities.reverse().forEach((persistedWordEntity) => {
           const indexOf = this.wordEntities.findIndex((w) => w._id === persistedWordEntity._id);
           if (indexOf === -1) {
-            this.wordEntities.push(persistedWordEntity);
+            this.wordEntities.unshift(persistedWordEntity);
           } else {
             this.wordEntities.splice(indexOf, 1, persistedWordEntity);
           }

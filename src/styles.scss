@@ -150,6 +150,10 @@ h3 {
     align-items: center;
   }
 
+  &--justify-center {
+    justify-content: center;
+  }
+
   .flex-col {
     margin-left: 0.5rem;
     margin-right: 0.5rem;
