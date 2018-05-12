@@ -104,16 +104,6 @@ export class ChipInputComponent {
           $event.preventDefault();
         }
       }
-
-      const result = this.parseChips(this.value);
-      if (result.success) {
-        this.chips.push(...result.chips.filter((chip) => this.chips.indexOf(chip) === -1));
-        this.emitChipsChange();
-
-        this.value = result.value;
-        this.emitValueChange();
-        $event.preventDefault();
-      }
     }
   }
 
@@ -145,7 +135,7 @@ export class ChipInputComponent {
     }
 
     const matches = [];
-    const regex = XRegExp(`([${this.signs}][\\pL-]+)\\s*`, 'g');
+    const regex = XRegExp(`([${this.signs}][\\pL-\\d]+)\\s*`, 'g');
     const sanitized = XRegExp.replace(value, regex, (match) => {
       matches.push(match);
       return ``;
