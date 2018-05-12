@@ -1,16 +1,24 @@
 .chips {
+  display: inline-block;
   &__chip {
-    &:not(:first-child) {
-      margin: 0 0 0 8px;
-    }
+    // &:not(:first-child) {
+    //   margin: 0 0 0 8px;
+    // }
 
     background-color: #616161;
     color: white;
     transition: box-shadow 280ms cubic-bezier(.4,0,.2,1);
     display: inline-flex;
-    padding: 0px 12px;
+    padding: 0px 0px 0px 12px;
+    margin: 2px 4px;
     border-radius: 24px;
     align-items: center;
     cursor: default;
+  }
+
+  &--read {
+    .chips__chip {
+      padding: 0 12px;
+    }
   }
 }
