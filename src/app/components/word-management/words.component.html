@@ -72,7 +72,7 @@
       </ng-template>
     </mat-expansion-panel>
   </li>
-  <li *ngIf="wordEntitiesNextKey" class="margin--top">
+  <li *ngIf="wordEntitiesNextKey !== undefined" class="margin--top">
     <button mat-button class="stretch" (click)="loadWordEntities()">
       <mat-icon>refresh</mat-icon>
       {{'actions.more' | translate}}
