@@ -10,11 +10,11 @@
   </mat-form-field>
 
   <ng-container *ngIf="editedWordEntity.type">
-    <div class="flex flex--no-margin flex--align-center flex--wrap">
-      <h4 class="margin--right">
+    <div class="flex flex--no-margin flex--align-center flex--wrap margin--bottom">
+      <h4 class="margin--0 margin--right">
         {{'words.edit-word.available-tags' | translate}}
       </h4>
-      <ul class="ul--nostyle ul--horizontal-wrap margin--bottom">
+      <ul class="ul--nostyle ul--horizontal-wrap margin--0">
         <li *ngFor="let tag of editedWordEntity.type.tags" class="margin--right">
           #{{tag}}
         </li>
