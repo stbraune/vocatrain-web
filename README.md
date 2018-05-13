@@ -1,8 +1,22 @@
-# VocatrainWeb
+# VocaTrain
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.4.
 
 ![demo](readme/demo.gif)
+
+# Installation
+* Point `$COUCHDB_LUCENE` to some path locating where couchdb-lucene will be installed
+* Let `$COUCHDB_HOME` be the path to your Apache CouchDB installation directory
+* Let `$VOCATRAIN_HOME` be the path to your vocatrain git clone
+* Ensure that CouchDB 2.x is up and running at http://localhost:5984/
+* Install Apache Maven 3.x and make it available through $PATH
+* `git clone git@github.com:rnewson/couchdb-lucene.git` to $COUCHDB_LUCENE (https://github.com/rnewson/couchdb-lucene)
+* `cp doc/couchdb-lucene-package.json $COUCHDB_LUCENE/package.json`
+* `cd $COUCHDB_LUCENE`
+* `npm i`
+* `npm run service:prepare && npm run service:install`
+* Fix couchdb-lucene configuration with help of [doc/couchdb-lucene.ini](couchdb-lucene.ini) (just copy it to `$COUCHDB_LUCENE/target/couchdb-lucene-2.1.0-SNAPSHOT/conf/couchdb-lucene.ini`)
+* Fix Apache CouchDB configuration to add proxy handler for couchdb-lucene (diff [doc/couchdb-local.ini](doc/couchdb-local.ini) with `$COUCHDB_HOME/etc/local.ini`)
 
 ## Development server
 

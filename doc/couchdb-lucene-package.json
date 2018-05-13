@@ -1,0 +1,29 @@
+{
+  "name": "couchdb-lucene",
+  "version": "1.0.0",
+  "description": "## Version Compatibility CouchDB-Lucene works with all version of CouchDB from 0.10 upwards.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "mvn",
+    "unzip": "unzip target/couchdb-lucene-2.1.0-SNAPSHOT-dist.zip -d target",
+    "service:prepare": "npm run build && npm run unzip",
+    "service:install": "winser -i -a --startcmd C:\\Users\\stbraune\\AppData\\Roaming\\nvm\\v8.9.1\\npm.cmd --set \"AppParameters start\"",
+    "service:uninstall": "winser -r -x -s",
+    "service:reinstall": "npm run service:uninstall && npm run service:install",
+    "start": "call target/couchdb-lucene-2.1.0-SNAPSHOT/bin/run.bat"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rnewson/couchdb-lucene.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rnewson/couchdb-lucene/issues"
+  },
+  "homepage": "https://github.com/rnewson/couchdb-lucene#readme",
+  "devDependencies": {
+    "winser": "^1.0.3"
+  }
+}
