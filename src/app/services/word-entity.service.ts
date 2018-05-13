@@ -98,7 +98,8 @@ export class WordEntityService {
   }
 
   public getWordEntitiesFields(): Observable<string[]> {
-    return this.searchWordEntities({}).map((result: any) => result.fields);
+    return this.searchWordEntities({}).map((result: any) => <string[]>result.fields)
+      .map((fields) => fields.reduce((prev, cur) => prev.indexOf(cur) === -1 ? [...prev, cur] : prev, []));
   }
 
   private searchWordEntities(options: any) {
