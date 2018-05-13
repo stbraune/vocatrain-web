@@ -19,6 +19,7 @@
   "words": {
     "title": "Vokabeln",
     "search": "Suche...",
+    "search-help": "Verfügbare Felder:",
     "tags": "Tags",
     "edit-word": {
       "title": "Vokabel bearbeiten",

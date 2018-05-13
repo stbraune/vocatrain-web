@@ -26,6 +26,7 @@ import {
   MatTableModule,
   MatExpansionModule,
   MatDialogModule,
+  MatTooltipModule,
 } from '@angular/material';
 
 import {
@@ -92,6 +93,7 @@ import { WordAddDialogComponent } from './components/word-management/word-add-di
     MatSnackBarModule,
     MatTableModule,
     MatToolbarModule,
+    MatTooltipModule,
     SettingsModule.forRoot()
   ],
   providers: [

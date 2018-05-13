@@ -37,6 +37,7 @@ export class WordsComponent implements OnInit {
   public query = '';
 
   public queryChanged = new Subject<string>();
+  public queryHelpFields = ['type', 'meta', 'tags'];
 
   public sorting: {
     property: string,
@@ -60,6 +61,7 @@ export class WordsComponent implements OnInit {
 
   public ngOnInit(): void {
     this.supportedLanguages = this.settingsService.getLanguages();
+    this.queryHelpFields.push(...this.supportedLanguages);
     this.loadWordTypeEntities();
     this.loadWordEntities();
 
@@ -111,6 +113,15 @@ export class WordsComponent implements OnInit {
 
   public onQueryChanged() {
     this.queryChanged.next(this.query);
+  }
+
+  public onClearQuery() {
+    this.query = '';
+    this.onQueryChanged();
+  }
+
+  public onHelpQuery() {
+    window.open('http://lucene.apache.org/core/3_6_2/queryparsersyntax.html', '_blank');
   }
 
   public sortBy(property: string) {

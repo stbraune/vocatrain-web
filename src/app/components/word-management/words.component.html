@@ -10,6 +10,14 @@
         placeholder="{{'words.search' | translate}}"
         [(ngModel)]="query"
         (ngModelChange)="onQueryChanged()">
+      <span matSuffix>
+        <button mat-icon-button (click)="onHelpQuery()" matTooltip="{{'words.search-help' | translate}} {{queryHelpFields.join(', ')}}">
+          <mat-icon>help</mat-icon>
+        </button>
+        <button mat-icon-button (click)="onClearQuery()">
+          <mat-icon>clear</mat-icon>
+        </button>
+      </span>
     </mat-form-field>
   </div>
   <div class="flex-col">
