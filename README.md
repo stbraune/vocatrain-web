@@ -15,7 +15,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 * `cd $COUCHDB_LUCENE`
 * `npm i`
 * `npm run service:prepare && npm run service:install`
-* Fix couchdb-lucene configuration with help of [doc/couchdb-lucene.ini](couchdb-lucene.ini) (just copy it to `$COUCHDB_LUCENE/target/couchdb-lucene-2.1.0-SNAPSHOT/conf/couchdb-lucene.ini`)
+* Fix couchdb-lucene configuration with help of [doc/couchdb-lucene.ini](doc/couchdb-lucene.ini) (just copy it to `$COUCHDB_LUCENE/target/couchdb-lucene-2.1.0-SNAPSHOT/conf/couchdb-lucene.ini`)
 * Fix Apache CouchDB configuration to add proxy handler for couchdb-lucene (diff [doc/couchdb-local.ini](doc/couchdb-local.ini) with `$COUCHDB_HOME/etc/local.ini`)
 
 ## Development server
