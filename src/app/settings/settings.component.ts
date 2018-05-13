@@ -76,6 +76,9 @@ export class SettingsComponent implements OnInit {
   public onSaveDatabaseSettings() {
     this.settingsService.setDatabaseSettings(this.databaseSettings);
     this.onSettingsSaved();
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
   }
 
   private onSettingsSaved() {
