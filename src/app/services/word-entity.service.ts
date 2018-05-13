@@ -52,40 +52,13 @@ export class WordEntityService {
     }>
   }> {
     if (options.query) {
-      const supportedLanguages = this.settingsService.getLanguages();
-      return this.db.getFulltextQuery('words-index', 'fti', `function (doc) {
-        if (doc._id.substr(0, 'word_'.length) === 'word_') {
-          const supportedLanguages = ${JSON.stringify(supportedLanguages)};
-          const indexDocument = new Document();
-          indexDocument.add(doc.type.title);
-          indexDocument.add(doc.type.title, { field: 'type' });
-          doc.texts.forEach(function (text) {
-            indexDocument.add(text.meta);
-            indexDocument.add(text.meta, { field: 'meta' });
-
-            text.tags.forEach(function(tag) {
-              indexDocument.add(tag);
-              indexDocument.add(tag, { field: 'tags' });
-            });
-            supportedLanguages.forEach(function (lang) {
-              if (text.words[lang] && text.words[lang].value) {
-                indexDocument.add(text.words[lang].value);
-                indexDocument.add(text.words[lang].value, { field: lang });
-              }
-            });
-          });
-          return indexDocument;
-        }
-      }`).switchMap((designDocument) => {
-        return this.db.executeFulltextQuery('words-index', 'fti', {
-          q: options.query,
-          skip: options.startkey,
-          limit: options.limit,
-          include_docs: true
-        });
+      return this.searchWordEntities({
+        q: options.query,
+        skip: options.startkey,
+        limit: options.limit,
+        include_docs: true
       });
     }
-
 
     return this.db.getQuery(`words-index`, `by-${options.sort}`, `function(doc) {
       if (doc._id.substr(0, 'word_'.length) === 'word_') {
@@ -122,6 +95,40 @@ export class WordEntityService {
           include_docs: true
         });
       });
+  }
+
+  public getWordEntitiesFields(): Observable<string[]> {
+    return this.searchWordEntities({}).map((result: any) => result.fields);
+  }
+
+  private searchWordEntities(options: any) {
+    const supportedLanguages = this.settingsService.getLanguages();
+    return this.db.getFulltextQuery('words-index', 'fti', `function (doc) {
+      if (doc._id.substr(0, 'word_'.length) === 'word_') {
+        const supportedLanguages = ${JSON.stringify(supportedLanguages)};
+        const indexDocument = new Document();
+        indexDocument.add(doc.type.title);
+        indexDocument.add(doc.type.title, { field: 'type' });
+        doc.texts.forEach(function (text) {
+          indexDocument.add(text.meta);
+          indexDocument.add(text.meta, { field: 'meta' });
+
+          text.tags.forEach(function(tag) {
+            indexDocument.add(tag);
+            indexDocument.add(tag, { field: 'tags' });
+          });
+          supportedLanguages.forEach(function (lang) {
+            if (text.words[lang] && text.words[lang].value) {
+              indexDocument.add(text.words[lang].value);
+              indexDocument.add(text.words[lang].value, { field: lang });
+            }
+          });
+        });
+        return indexDocument;
+      }
+    }`).switchMap((designDocument) => {
+      return this.db.executeFulltextQuery('words-index', 'fti', options);
+    });
   }
 
   public putWordEntity(wordEntity: WordEntity): Observable<WordEntity> {

@@ -37,7 +37,7 @@ export class WordsComponent implements OnInit {
   public query = '';
 
   public queryChanged = new Subject<string>();
-  public queryHelpFields = ['type', 'meta', 'tags'];
+  public queryHelpFields: string[] = [];
 
   public sorting: {
     property: string,
@@ -61,9 +61,9 @@ export class WordsComponent implements OnInit {
 
   public ngOnInit(): void {
     this.supportedLanguages = this.settingsService.getLanguages();
-    this.queryHelpFields.push(...this.supportedLanguages);
     this.loadWordTypeEntities();
     this.loadWordEntities();
+    this.loadQueryHelpFields();
 
     this.queryChanged
       .debounceTime(300)
@@ -106,6 +106,14 @@ export class WordsComponent implements OnInit {
         this.wordEntitiesNextKey = undefined;
         this.wordEntities.push(...result.rows.map((row) => row.doc));
       }
+    }, (error) => {
+      console.error(error);
+    });
+  }
+
+  public loadQueryHelpFields() {
+    this.wordEntityService.getWordEntitiesFields().subscribe((queryFields) => {
+      this.queryHelpFields.push(...queryFields);
     }, (error) => {
       console.error(error);
     });
