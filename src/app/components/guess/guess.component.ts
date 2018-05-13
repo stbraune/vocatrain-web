@@ -106,6 +106,10 @@ export class GuessComponent implements OnInit {
     const ms = m > 9 ? m : '0' + m;
     const ss = s > 9 ? s : '0' + s;
 
+    if (h === 0) {
+      return ms + ':' + ss;
+    }
+
     return hs + ':' + ms + ':' + ss;
   }
 
