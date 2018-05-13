@@ -43,7 +43,11 @@
   <mat-card-content>
     <div class="flex margin--bottom">
       <div class="flex-col flex-col--grow">
-        {{'guess.duration' | translate}}: {{duration}} - {{'guess.words' | translate}}: {{totalWords}}
+        {{'guess.duration' | translate}}: {{duration}}
+        <span *ngIf="searchOptions.mode === 'by-time'">/ {{formatMinutes(searchOptions.minutes)}}</span>
+        -
+        {{'guess.words' | translate}}: {{totalWords}}
+        <span *ngIf="searchOptions.mode === 'by-amount'">/ {{searchOptions.amount}}</span>
       </div>
       <div class="flex-col flex flex--align-center">
         <div class="key margin--left">

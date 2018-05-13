@@ -93,6 +93,10 @@ export class GuessComponent implements OnInit {
     return this.formatSeconds(((+end) - (+start)) / 1000);
   }
 
+  public formatMinutes(minutes: number): string {
+    return this.formatSeconds(minutes * 60);
+  }
+
   public formatSeconds(seconds: number): string {
     const h = this.parseInt(seconds / 3600);
     const m = this.parseInt((seconds % 3600) / 60);
