@@ -8,7 +8,7 @@
           placeholder="{{'search-options.mode.time' | translate}}"
           [(ngModel)]="searchOptions.minutes"
           (ngModelChange)="onPropertyChanged()"
-          (focus)="radioModeTime.checked = true">
+          (focus)="setMode('by-time')">
       </mat-form-field>
       <mat-radio-button #radioModeWords class="flex-col align--right" value="by-amount">
       </mat-radio-button>
@@ -17,7 +17,7 @@
           placeholder="{{'search-options.mode.words' | translate}}"
           [(ngModel)]="searchOptions.amount"
           (ngModelChange)="onPropertyChanged()"
-          (focus)="radioModeWords.checked = true">
+          (focus)="setMode('by-amount')">
       </mat-form-field>
     </mat-radio-group>
     

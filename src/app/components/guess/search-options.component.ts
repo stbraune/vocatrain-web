@@ -63,6 +63,11 @@ export class SearchOptionsComponent implements OnInit {
     }
   }
 
+  public setMode(mode: 'by-time' | 'by-amount') {
+    this.searchOptions.mode = mode;
+    this.onPropertyChanged();
+  }
+
   public onPropertyChanged() {
     this.searchOptionsChange.emit(this.searchOptions);
   }
