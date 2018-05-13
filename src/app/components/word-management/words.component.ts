@@ -35,6 +35,7 @@ export class WordsComponent implements OnInit {
   };
 
   public query = '';
+  public queryAvailable = false;
 
   public queryChanged = new Subject<string>();
   public queryHelpFields: string[] = [];
@@ -61,6 +62,7 @@ export class WordsComponent implements OnInit {
 
   public ngOnInit(): void {
     this.supportedLanguages = this.settingsService.getLanguages();
+    this.queryAvailable = !!this.settingsService.getDatabaseSettings().couchDbLuceneUrl;
     this.loadWordTypeEntities();
     this.loadWordEntities();
     this.loadQueryHelpFields();

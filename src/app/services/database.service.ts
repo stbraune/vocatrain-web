@@ -5,6 +5,7 @@ import { Subject } from 'rxjs/Subject';
 import { Database } from './database';
 import { DatabaseOptions } from './database-options';
 import { Entity } from '../model';
+import { SettingsService } from '../settings';
 
 import PouchDB from 'pouchdb-core';
 import PouchDBAdapterIdb from 'pouchdb-adapter-idb';
@@ -28,25 +29,28 @@ export class DatabaseService {
 
   public synchronizationSubject = new Subject<any>();
 
-  public constructor() {
+  public constructor(
+    private settingsService: SettingsService
+  ) {
   }
 
   public openDatabase<T extends Entity>(options: DatabaseOptions<T>): Database<T> {
     // for going directly onto couchdb-lucene instance
     // options.couchLuceneUrl = options.couchLuceneUrl || 'http://localhost:5985/local';
     // for using the couchdb proxy handler
-    options.couchLuceneUrl = options.couchLuceneUrl || 'http://localhost:5986/_fti/local';
+    options.couchLuceneUrl = options.couchLuceneUrl || this.settingsService.getDatabaseSettings().couchDbLuceneUrl;
     return new Database<T>(this.getLocalDatabase(), options);
   }
 
   private getLocalDatabase(): any {
-    return this._local = this._local || new PouchDB('vocatrain', {
+    return this._local = this._local || new PouchDB(this.settingsService.getDatabaseSettings().databaseName, {
       adapter: 'idb'
     });
   }
 
   private getRemoteDatabase(): any {
-    return this._remote = this._remote || new PouchDB('http://localhost:5984/vocatrain');
+    return this._remote = this._remote
+      || (this.settingsService.getDatabaseSettings().couchDbUrl && new PouchDB(this.settingsService.getDatabaseSettings().couchDbUrl));
   }
 
   public isSyncing() {
@@ -55,6 +59,15 @@ export class DatabaseService {
 
   public enableSyncing(): Observable<any> {
     if (this._sync) {
+      return;
+    }
+
+    if (!this.settingsService.getDatabaseSettings().enableSynchronization) {
+      return;
+    }
+
+    const remoteDatabase = this.getRemoteDatabase();
+    if (!remoteDatabase) {
       return;
     }
 

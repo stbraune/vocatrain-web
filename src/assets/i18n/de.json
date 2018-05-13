@@ -67,8 +67,16 @@
   },
   "settings": {
     "title": "Einstellungen",
+    "app": "VocaTrain",
+    "app-language": "Anwendungssprache",
     "languages": "Verwendete Sprachen",
-    "language-placeholder": "Sprache hinzufügen"
+    "language-placeholder": "Sprache hinzufügen",
+    "database": "CouchDB",
+    "database-name": "Datenbankname",
+    "database-couchdb-url": "CouchDB URL",
+    "database-couchdb-lucene-url": "CouchDB-Lucene URL",
+    "database-synchronization": "Synchronisierung zwischen lokaler IndexedDB und entfernter CouchDB",
+    "saved": "Einstellungen gespeichert"
   },
   "actions": {
     "delete": "Löschen",

@@ -7,7 +7,8 @@ import {
   MatCardModule,
   MatFormFieldModule,
   MatIconModule,
-  MatInputModule
+  MatInputModule,
+  MatCheckboxModule
 } from '@angular/material';
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -28,6 +29,7 @@ import { SettingsComponent } from './settings.component';
     }),
     MatButtonModule,
     MatCardModule,
+    MatCheckboxModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule

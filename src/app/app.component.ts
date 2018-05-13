@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { DatabaseService } from './services';
 import { MatSnackBar } from '@angular/material';
+
+import { TranslateService } from '@ngx-translate/core';
+
+import { DatabaseService } from './services';
+import { SettingsService } from './settings';
 
 @Component({
   selector: 'app-root',
@@ -9,20 +12,21 @@ import { MatSnackBar } from '@angular/material';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  public synchronizationEnabled = false;
+
   public constructor(
     private translateService: TranslateService,
     private databaseService: DatabaseService,
+    private settingsService: SettingsService,
     private snackBar: MatSnackBar
   ) {
   }
 
   public ngOnInit(): void {
-    let userLang = navigator.language.split('-')[0];
-    userLang = /(en|de|bg)/gi.test(userLang) ? userLang : 'de';
-    userLang = 'de'; // fixme
+    this.synchronizationEnabled = this.settingsService.getDatabaseSettings().enableSynchronization;
 
-    this.translateService.setDefaultLang('en');
-    this.translateService.use(userLang);
+    this.translateService.setDefaultLang(this.settingsService.defaultLanguage);
+    this.translateService.use(this.settingsService.getAppLanguage());
 
     this.databaseService.synchronizationSubject.subscribe((event) => {
       if (event.type === 'error') {
@@ -37,7 +41,10 @@ export class AppComponent implements OnInit {
       this.snackBar.open('Sync broken!', 'Ok');
       this.databaseService.disableSyncing();
     });
-    this.databaseService.enableSyncing();
+
+    if (this.synchronizationEnabled) {
+      this.databaseService.enableSyncing();
+    }
   }
 
   public isSyncing() {

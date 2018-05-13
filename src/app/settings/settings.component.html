@@ -1,7 +1,27 @@
 <h3>
   {{'settings.title' | translate}}
 </h3>
-<mat-card>
+
+<mat-card class="margin--bottom">
+  <mat-card-title>
+    {{'settings.app' | translate}}
+  </mat-card-title>
+  <mat-card-content>
+    <div class="flex flex--column flex--no-margin">
+      <mat-form-field>
+        <input matInput [(ngModel)]="appLanguage" [placeholder]="'settings.app-language' | translate">
+      </mat-form-field>
+    </div>
+  </mat-card-content>
+  <mat-card-actions class="align--right">
+    <button mat-button (click)="onSaveAppSettings()">
+      <mat-icon>done</mat-icon>
+      {{'actions.save' | translate}}
+    </button>
+  </mat-card-actions>
+</mat-card>
+
+<mat-card class="margin--bottom">
   <mat-card-title>
     {{'settings.languages' | translate}}
   </mat-card-title>
@@ -36,7 +56,41 @@
     </ul>
   </mat-card-content>
   <mat-card-actions class="align--right">
-    <button mat-button (click)="onSave()">
+    <button mat-button (click)="onSaveLanguageSettings()">
+      <mat-icon>done</mat-icon>
+      {{'actions.save' | translate}}
+    </button>
+  </mat-card-actions>
+</mat-card>
+
+<mat-card>
+  <mat-card-title>
+    {{'settings.database' | translate}}
+  </mat-card-title>
+  <mat-card-content>
+    <div class="flex flex--column flex--no-margin">
+      <mat-form-field>
+        <input matInput
+          [(ngModel)]="databaseSettings.databaseName"
+          [placeholder]="'settings.database-name' | translate">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput
+          [(ngModel)]="databaseSettings.couchDbUrl"
+          [placeholder]="'settings.database-couchdb-url' | translate">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput
+          [(ngModel)]="databaseSettings.couchDbLuceneUrl"
+          [placeholder]="'settings.database-couchdb-lucene-url' | translate">
+      </mat-form-field>
+      <mat-checkbox [(ngModel)]="databaseSettings.enableSynchronization">
+        {{'settings.database-synchronization' | translate}}
+      </mat-checkbox>
+    </div>
+  </mat-card-content>
+  <mat-card-actions class="align--right">
+    <button mat-button (click)="onSaveDatabaseSettings()">
       <mat-icon>done</mat-icon>
       {{'actions.save' | translate}}
     </button>

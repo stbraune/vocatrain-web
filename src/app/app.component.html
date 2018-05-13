@@ -14,7 +14,7 @@
   </a>
 
   <div class="align--right flex-col flex-col--grow">
-    <button mat-icon-button (click)="toggleSynchronization()">
+    <button *ngIf="synchronizationEnabled" mat-icon-button (click)="toggleSynchronization()">
       <mat-icon *ngIf="!isSyncing()">cloud_off</mat-icon>
       <mat-icon *ngIf="isSyncing()">cloud</mat-icon>
     </button>

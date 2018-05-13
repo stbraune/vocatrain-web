@@ -3,7 +3,7 @@
     {{'words.title' | translate}}
   </h3>
   <div class="flex-col flex-col--1 padding--left">
-    <mat-form-field class="stretch mat-input--no-margin" floatLabel="never">
+    <mat-form-field *ngIf="queryAvailable" class="stretch mat-input--no-margin" floatLabel="never">
       <input matInput
         placeholder="{{'words.search' | translate}}"
         [(ngModel)]="query"
