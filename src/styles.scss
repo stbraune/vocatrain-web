@@ -48,6 +48,7 @@ body {
 
 h3 {
   line-height: 36px;
+  margin: 1.5rem 0;
 }
 
 .app-navbar {
@@ -66,10 +67,18 @@ h3 {
 
 .margin {
   &--0 { margin: 0; }
-  &--top { margin-top: 1rem; }
+  &--top { margin-top: 1.5rem; }
   &--right { margin-right: 1rem; }
   &--left { margin-left: 1rem; }
-  &--bottom  { margin-bottom: 2rem; }
+  &--bottom  { margin-bottom: 1.5rem; }
+}
+
+.padding {
+  &--0 { padding: 0; }
+  &--top { padding-top: 1rem; }
+  &--right { padding-right: 1rem; }
+  &--left { padding-left: 1rem; }
+  &--bottom  { padding-bottom: 1rem; }
 }
 
 .cursor {

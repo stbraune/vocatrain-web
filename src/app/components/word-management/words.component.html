@@ -1,11 +1,9 @@
-<h3 class="flex flex--no-margin flex--align-center">
-  <div class="flex-col">
-    <span class="margin--right">
-      {{'words.title' | translate}}
-    </span>
-  </div>
-  <div class="flex-col flex-col--1">
-    <mat-form-field class="stretch mat-input--no-margin margin--left margin--right" floatLabel="never">
+<div class="flex flex--no-margin flex--align-center margin--top margin--bottom">
+  <h3 class="flex-col padding--right margin--0">
+    {{'words.title' | translate}}
+  </h3>
+  <div class="flex-col flex-col--1 padding--left">
+    <mat-form-field class="stretch mat-input--no-margin" floatLabel="never">
       <input matInput
         placeholder="{{'words.search' | translate}}"
         [(ngModel)]="query"
@@ -20,15 +18,13 @@
       </span>
     </mat-form-field>
   </div>
-  <div class="flex-col">
-    <span class="margin--left">
-      <button mat-button (click)="createWordEntity()" class="stretch">
-        <mat-icon>add</mat-icon>
-        {{'actions.create' | translate}}
-      </button>
-    </span>
+  <div class="flex-col padding--left">
+    <button mat-button (click)="createWordEntity()" class="stretch">
+      <mat-icon>add</mat-icon>
+      {{'actions.create' | translate}}
+    </button>
   </div>
-</h3>
+</div>
 
 <ul class="ul--nostyle">
   <li class="header-row">
