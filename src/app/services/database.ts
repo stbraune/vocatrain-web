@@ -170,7 +170,7 @@ export class Database<T extends Entity> {
     }
 
     return Observable.fromPromise(rp.get({
-      uri: `${this._options.couchLuceneUrl}/${this._database.name}/_design/${designDocumentName}/${indexName}`,
+      uri: `${this._options.couchLuceneUrl}/_design/${designDocumentName}/${indexName}`,
       qs: options,
       json: true
     }));
