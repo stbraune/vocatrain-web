@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
 import { Database } from './database';
+import { DatabaseOptions } from './database-options';
 import { Entity } from '../model';
 
 import PouchDB from 'pouchdb-core';
@@ -30,12 +31,12 @@ export class DatabaseService {
   public constructor() {
   }
 
-  public openDatabase<T extends Entity>(
-    name: string,
-    deserialize?: (item: T) => T,
-    serialize?: (item: T) => T
-  ): Database<T> {
-    return new Database<T>(this.getLocalDatabase(), name, deserialize, serialize);
+  public openDatabase<T extends Entity>(options: DatabaseOptions<T>): Database<T> {
+    // for going directly onto couchdb-lucene instance
+    // options.couchLuceneUrl = options.couchLuceneUrl || 'http://localhost:5985/local';
+    // for using the couchdb proxy handler
+    options.couchLuceneUrl = options.couchLuceneUrl || 'http://localhost:5986/_fti/local';
+    return new Database<T>(this.getLocalDatabase(), options);
   }
 
   private getLocalDatabase(): any {

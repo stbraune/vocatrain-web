@@ -2,7 +2,9 @@ import { Component, OnInit, Input } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/observable/forkJoin';
+import 'rxjs/add/operator/debounceTime';
 
 import { WordTypeEntityService, WordEntityService } from '../../services';
 import { WordTypeEntity, WordEntity } from '../../model';
@@ -32,6 +34,10 @@ export class WordsComponent implements OnInit {
     ]
   };
 
+  public query = '';
+
+  public queryChanged = new Subject<string>();
+
   public sorting: {
     property: string,
     descending: boolean
@@ -56,6 +62,12 @@ export class WordsComponent implements OnInit {
     this.supportedLanguages = this.settingsService.getLanguages();
     this.loadWordTypeEntities();
     this.loadWordEntities();
+
+    this.queryChanged
+      .debounceTime(300)
+      .subscribe((query) => {
+        this.reloadWordEntities();
+      });
   }
 
   private loadWordTypeEntities() {
@@ -72,6 +84,7 @@ export class WordsComponent implements OnInit {
 
   public loadWordEntities() {
     this.wordEntityService.getWordEntities({
+      query: this.query,
       startkey: this.wordEntitiesNextKey,
       limit: this.wordEntitiesPerPage + 1,
       sort: this.sorting.property,
@@ -87,6 +100,10 @@ export class WordsComponent implements OnInit {
     }, (error) => {
       console.error(error);
     });
+  }
+
+  public onQueryChanged() {
+    this.queryChanged.next(this.query);
   }
 
   public sortBy(property: string) {

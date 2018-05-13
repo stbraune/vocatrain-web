@@ -1,7 +1,15 @@
 <h3 class="flex flex--no-margin flex--align-center">
-  <span class="flex-col flex-col--1">
+  <span class="flex-col">
     {{'words.title' | translate}}
   </span>
+  <div class="flex-col flex-col--1">
+    <mat-form-field class="stretch mat-input--no-margin margin--left margin--right">
+      <input matInput
+        placeholder="{{'words.search' | translate}}"
+        [(ngModel)]="query"
+        (ngModelChange)="onQueryChanged()">
+    </mat-form-field>
+  </div>
   <div class="flex-col">
     <button mat-button (click)="createWordEntity()" class="stretch">
       <mat-icon>add</mat-icon>

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/switchMap';
 
 import { DatabaseService } from './database.service';
 import { Database } from './database';
@@ -8,15 +9,21 @@ import { Database } from './database';
 import { WordEntity } from '../model';
 
 import * as uuidv4 from 'uuid/v4';
+import { SettingsService } from '../settings';
+
+declare const Document: any;
 
 @Injectable()
 export class WordEntityService {
   private db: Database<WordEntity>;
 
   public constructor(
-    private databaseService: DatabaseService
+    private databaseService: DatabaseService,
+    private settingsService: SettingsService
   ) {
-    this.db = this.databaseService.openDatabase('word');
+    this.db = this.databaseService.openDatabase({
+      name: 'word'
+    });
   }
 
   public getDatabase(): Database<WordEntity> {
@@ -28,20 +35,60 @@ export class WordEntityService {
   }
 
   public getWordEntities(options: {
+    query?: string,
     startkey: string,
     limit: number,
     sort?: string,
     descending?: boolean
   }): Observable<{
     total_rows: number,
-    offset: number,
+    // offset: number,
     rows: Array<{
-      doc: WordEntity,
+      doc?: WordEntity,
       id: string,
-      key: string,
-      value: any
+      score?: number,
+      key?: string,
+      value?: any
     }>
   }> {
+    if (options.query) {
+      const supportedLanguages = this.settingsService.getLanguages();
+      return this.db.getFulltextQuery('words-index', 'fti', `function (doc) {
+        if (doc._id.substr(0, 'word_'.length) === 'word_') {
+          const supportedLanguages = ${JSON.stringify(supportedLanguages)};
+          const indexDocument = new Document();
+          indexDocument.add(doc.type.title);
+          indexDocument.add(doc.type.title, { field: 'type' });
+          doc.texts.forEach(function (text) {
+            indexDocument.add(text.meta);
+            indexDocument.add(text.meta, { field: 'meta' });
+
+            text.tags.forEach(function(tag) {
+              indexDocument.add(tag);
+              indexDocument.add(tag, { field: 'tags' });
+            });
+            supportedLanguages.forEach(function (lang) {
+              if (text.words[lang] && text.words[lang].value) {
+                indexDocument.add(text.words[lang].value);
+                indexDocument.add(text.words[lang].value, { field: lang });
+              }
+            });
+          });
+          return indexDocument;
+        }
+      }`).switchMap((designDocument) => {
+        return this.db.executeFulltextQuery('words-index', 'fti', {
+          q: options.query,
+          startkey: options && options.descending ? (options.startkey || undefined) : (options.startkey || ``),
+          endkey: options && options.descending ? '' : undefined,
+          limit: options.limit,
+          descending: options && options.descending,
+          include_docs: true
+        });
+      });
+    }
+
+
     return this.db.getQuery(`words-index`, `by-${options.sort}`, `function(doc) {
       if (doc._id.substr(0, 'word_'.length) === 'word_') {
         const sort = '${options.sort}';
@@ -69,14 +116,14 @@ export class WordEntityService {
         });
       }
     }`).switchMap((result: any) => {
-      return this.db.runQueryRaw(`words-index`, `by-${options.sort}`, {
-        startkey: options && options.descending ? (options.startkey || undefined) : (options.startkey || ``),
-        endkey: options && options.descending ? '' : undefined,
-        limit: options.limit,
-        descending: options && options.descending,
-        include_docs: true
+        return this.db.runQueryRaw(`words-index`, `by-${options.sort}`, {
+          startkey: options && options.descending ? (options.startkey || undefined) : (options.startkey || ``),
+          endkey: options && options.descending ? '' : undefined,
+          limit: options.limit,
+          descending: options && options.descending,
+          include_docs: true
+        });
       });
-    });
   }
 
   public putWordEntity(wordEntity: WordEntity): Observable<WordEntity> {

@@ -34,6 +34,8 @@
     "pouchdb-find": "^6.4.3",
     "pouchdb-mapreduce": "^6.4.3",
     "pouchdb-replication": "^6.4.3",
+    "request": "^2.85.0",
+    "request-promise-native": "^1.0.5",
     "rxjs": "^5.5.6",
     "uuid": "^3.2.1",
     "xregexp": "^4.1.1",

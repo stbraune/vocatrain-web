@@ -14,7 +14,9 @@ export class WordTypeEntityService {
   public constructor(
     private databaseService: DatabaseService
   ) {
-    this.db = this.databaseService.openDatabase('word-type');
+    this.db = this.databaseService.openDatabase({
+      name: 'word-type'
+    });
   }
 
   public getWordTypeEntities(): Observable<WordTypeEntity[]> {

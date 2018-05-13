@@ -7,6 +7,9 @@ import 'rxjs/add/operator/switchMap';
 
 import * as uuidv4 from 'uuid/v4';
 
+import * as rp from 'request-promise-native';
+
+import { DatabaseOptions } from './database-options';
 import { Entity } from '../model';
 
 export class Database<T extends Entity> {
@@ -15,9 +18,7 @@ export class Database<T extends Entity> {
 
   public constructor(
     private _database: any,
-    private _name: string,
-    private _deserialize?: (item: T) => T,
-    private _serialize?: (item: T) => T
+    private _options: DatabaseOptions<T>
   ) {
   }
 
@@ -26,11 +27,11 @@ export class Database<T extends Entity> {
   }
 
   public getName() {
-    return this._name;
+    return this._options.name;
   }
 
   public getPrefix(): string {
-    return `${this._name}_`;
+    return `${this._options.name}_`;
   }
 
   public getEntities(options?: any): Observable<T[]> {
@@ -49,7 +50,7 @@ export class Database<T extends Entity> {
 
   public getEntityById(id: string): Observable<T> {
     const observable: Observable<T> = Observable.fromPromise(this._database.get(id));
-    if (this._deserialize) {
+    if (this._options.deserialize) {
       return observable.map((item: T) => this.deserializeEntity(item));
     }
 
@@ -59,7 +60,7 @@ export class Database<T extends Entity> {
   public postEntity(item: T, id?: string): Observable<T> {
     const now = new Date();
     const transient = item.transient;
-    item._id = `${this._name}_${id || now.toJSON()}`;
+    item._id = `${this._options.name}_${id || now.toJSON()}`;
     item.transient = undefined;
     item.updatedAt = item.createdAt = now;
 
@@ -78,7 +79,7 @@ export class Database<T extends Entity> {
   public putEntity(item: T, id?: string): Observable<T> {
     const now = new Date();
     const transient = item.transient;
-    item._id = item._id || `${this._name}_${id || now.toJSON()}`;
+    item._id = item._id || `${this._options.name}_${id || now.toJSON()}`;
     item.transient = undefined;
     item.updatedAt = now;
     item.createdAt = item.createdAt || item.updatedAt;
@@ -105,11 +106,11 @@ export class Database<T extends Entity> {
   private deserializeEntity(item: T): T {
     item.createdAt = new Date(item.createdAt);
     item.updatedAt = new Date(item.updatedAt);
-    return this._deserialize ? this._deserialize(item) : item;
+    return this._options.deserialize ? this._options.deserialize(item) : item;
   }
 
   private serializeEntity(item: T): T {
-    return this._serialize ? this._serialize(item) : item;
+    return this._options.serialize ? this._options.serialize(item) : item;
   }
 
   public queryEntities(queryId: string, viewId, key, map: string | ((item: T) => void)): Observable<any> {
@@ -148,6 +149,31 @@ export class Database<T extends Entity> {
 
       return Observable.of(designDocument);
     });
+  }
+
+  public executeFulltextQuery(designDocumentName: string, indexName: string, options: any): Observable<{
+    q: string,
+    fetch_duration: number,
+    total_rows: number,
+    limit: number,
+    search_duration: number,
+    etag: string,
+    skip: number,
+    rows: Array<{
+      score: number,
+      id: string,
+      doc?: T
+    }>
+  }> {
+    if (!this._options.couchLuceneUrl) {
+      return Observable.throw(`Connection to couchdb-lucene not configured`);
+    }
+
+    return Observable.fromPromise(rp.get({
+      uri: `${this._options.couchLuceneUrl}/${this._database.name}/_design/${designDocumentName}/${indexName}`,
+      qs: options,
+      json: true
+    }));
   }
 
   public getQuery(designDocumentName: string, viewId: string, map: string | ((item: T) => void)): Observable<any> {
