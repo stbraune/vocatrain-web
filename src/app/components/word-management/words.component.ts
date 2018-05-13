@@ -116,8 +116,10 @@ export class WordsComponent implements OnInit {
   }
 
   public onClearQuery() {
-    this.query = '';
-    this.onQueryChanged();
+    if (this.query !== '') {
+      this.query = '';
+      this.onQueryChanged();
+    }
   }
 
   public onHelpQuery() {
