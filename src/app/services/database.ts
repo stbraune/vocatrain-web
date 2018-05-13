@@ -121,32 +121,73 @@ export class Database<T extends Entity> {
     });
   }
 
-  public getQuery(queryId: string, viewId: string, map: string | ((item: T) => void)): Observable<any> {
-    const id = `_design/${queryId}`;
-    const mapfn = typeof map === 'string' ? map : map.toString();
-    return Observable.fromPromise(this._database.get(id))
-      .switchMap((result: any) => {
-        if (!result.views[viewId] || result.views[viewId].map !== mapfn) {
-          result.views[viewId] = result.views[viewId] || {};
-          result.views[viewId].map = mapfn;
-          return this._database.put(result);
-        }
+  public getFulltextQuery(designDocumentName: string, indexName: string, indexFunction: string | ((item: T) => any)) {
+    const indexFunctionString = typeof indexFunction === 'string' ? indexFunction : indexFunction.toString();
+    return this.getDesignDocument(designDocumentName).switchMap((designDocument) => {
+      let changed = false;
+      if (!designDocument.fulltext) {
+        designDocument.fulltext = {};
+        changed = true;
+      }
 
-        return Observable.of(result);
-      })
+      if (!designDocument.fulltext[indexName]) {
+        designDocument.fulltext[indexName] = {
+          index: indexFunctionString
+        };
+        changed = true;
+      }
+
+      if (designDocument.fulltext[indexName].index !== indexFunctionString) {
+        designDocument.fulltext[indexName].index = indexFunctionString;
+        changed = true;
+      }
+
+      if (changed) {
+        return this._database.put(designDocument);
+      }
+
+      return Observable.of(designDocument);
+    });
+  }
+
+  public getQuery(designDocumentName: string, viewId: string, map: string | ((item: T) => void)): Observable<any> {
+    const mapfn = typeof map === 'string' ? map : map.toString();
+    return this.getDesignDocument(designDocumentName).switchMap((designDocument) => {
+      let changed = false;
+      if (!designDocument.views) {
+        designDocument.views = {};
+        changed = true;
+      }
+
+      if (!designDocument.views[viewId]) {
+        designDocument.views[viewId] = {
+          map: mapfn
+        };
+        changed = true;
+      }
+
+      if (designDocument.views[viewId].map !== mapfn) {
+        designDocument.views[viewId].map = mapfn;
+        changed = true;
+      }
+
+      if (changed) {
+        return this._database.put(designDocument);
+      }
+
+      return Observable.of(designDocument);
+    });
+  }
+
+  public getDesignDocument(designDocumentName: string): Observable<any> {
+    const id = `_design/${designDocumentName}`;
+    return Observable.fromPromise(this._database.get(id))
       .catch((error) => {
         if (error.status === 404) {
           return Observable.fromPromise(this._database.put({
-            _id: id,
-            views: {
-              [viewId]: {
-                map: typeof map === 'string' ? map : map.toString()
-              }
-            }
+            _id: id
           }));
         }
-
-        throw error;
       });
   }
 
