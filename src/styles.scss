@@ -165,6 +165,10 @@ h3 {
     justify-content: center;
   }
 
+  &--justify-end {
+    justify-content: flex-end;
+  }
+
   .flex-col {
     margin-left: 0.5rem;
     margin-right: 0.5rem;

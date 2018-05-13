@@ -41,39 +41,47 @@
 
 <mat-card *ngIf="started">
   <mat-card-content>
-    <div class="flex margin--bottom">
-      <div class="flex-col flex-col--grow">
+    <div class="flex margin--bottom flex--align-center">
+      <div class="flex-col flex-col">
         {{'guess.duration' | translate}}: {{duration}}
         <span *ngIf="searchOptions.mode === 'by-time'">/ {{formatMinutes(searchOptions.minutes)}}</span>
         -
         {{'guess.words' | translate}}: {{totalWords}}
         <span *ngIf="searchOptions.mode === 'by-amount'">/ {{searchOptions.amount}}</span>
       </div>
-      <div class="flex-col flex flex--align-center">
-        <div class="key margin--left">
-          <mat-icon>keyboard_arrow_up</mat-icon>
+      <div class="flex-col flex-col--grow flex flex--wrap flex--align-center flex--justify-end">
+        <div class="flex-col flex flex--no-margin flex--align-center">
+          <div class="key">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+          </div>
+          <span class="margin--left">
+            {{'guess.uncover' | translate}}
+          </span>
         </div>
-        <span class="margin--left">
-          {{'guess.uncover' | translate}}
-        </span>
-        <div class="key margin--left">
-          <mat-icon>keyboard_arrow_down</mat-icon>
+        <div class="flex-col flex flex--no-margin flex--align-center margin--left">
+          <div class="key">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+          </div>
+          <span class="margin--left">
+            {{'guess.cover' | translate}}
+          </span>
         </div>
-        <span class="margin--left">
-          {{'guess.cover' | translate}}
-        </span>
-        <div class="key margin--left">
-          <mat-icon>keyboard_arrow_left</mat-icon>
+        <div class="flex-col flex flex--no-margin flex--align-center margin--left">
+          <div class="key">
+            <mat-icon>keyboard_arrow_left</mat-icon>
+          </div>
+          <span class="margin--left">
+            {{'guess.wrong' | translate}}
+          </span>
         </div>
-        <span class="margin--left">
-          {{'guess.wrong' | translate}}
-        </span>
-        <div class="key margin--left">
-          <mat-icon>keyboard_arrow_right</mat-icon>
+        <div class="flex-col flex flex--no-margin flex--align-center margin--left">
+          <div class="key">
+            <mat-icon>keyboard_arrow_right</mat-icon>
+          </div>
+          <span class="margin--left">
+            {{'guess.right' | translate}}
+          </span>
         </div>
-        <span class="margin--left">
-          {{'guess.right' | translate}}
-        </span>
       </div>
     </div>
     <div class="flex margin--bottom">
