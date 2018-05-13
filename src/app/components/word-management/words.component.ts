@@ -20,7 +20,7 @@ import { WordAddDialogComponent } from './word-add-dialog.component';
 export class WordsComponent implements OnInit {
   public wordEntities: WordEntity[] = [];
   public wordEntitiesPerPage = 50;
-  public wordEntitiesNextKey: string;
+  public wordEntitiesNextKey: any;
   public wordTypeEntities: WordTypeEntity[] = [];
 
   public emptyWordEntity: WordEntity = {
@@ -42,9 +42,9 @@ export class WordsComponent implements OnInit {
     property: string,
     descending: boolean
   } = {
-    property: 'creation',
-    descending: true
-  };
+      property: 'creation',
+      descending: true
+    };
 
   @Input()
   public supportedLanguages: string[] = [];
@@ -77,6 +77,13 @@ export class WordsComponent implements OnInit {
   }
 
   public reloadWordEntities() {
+    if (this.query.trim() !== '') {
+      this.sorting = {
+        property: 'creation',
+        descending: true
+      };
+    }
+
     this.wordEntitiesNextKey = undefined;
     this.wordEntities.splice(0);
     this.loadWordEntities();
@@ -91,11 +98,11 @@ export class WordsComponent implements OnInit {
       descending: this.sorting.descending
     }).subscribe((result) => {
       if (result.rows.length === this.wordEntitiesPerPage + 1) {
-        this.wordEntities.push(...result.rows.slice(0, this.wordEntitiesPerPage - 1).map((row) => row.doc));
-        this.wordEntitiesNextKey = result.rows[this.wordEntitiesPerPage].key;
+        this.wordEntitiesNextKey = result.rows[this.wordEntitiesPerPage].key || (this.wordEntities.length + this.wordEntitiesPerPage);
+        this.wordEntities.push(...result.rows.slice(0, this.wordEntitiesPerPage).map((row) => row.doc));
       } else {
-        this.wordEntities.push(...result.rows.map((row) => row.doc));
         this.wordEntitiesNextKey = undefined;
+        this.wordEntities.push(...result.rows.map((row) => row.doc));
       }
     }, (error) => {
       console.error(error);
@@ -107,6 +114,10 @@ export class WordsComponent implements OnInit {
   }
 
   public sortBy(property: string) {
+    if (this.query !== '') {
+      return;
+    }
+
     if (this.sorting.property === property) {
       this.sorting.descending = !this.sorting.descending;
     } else {

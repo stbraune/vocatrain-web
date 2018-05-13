@@ -135,22 +135,6 @@ h3 {
   border-radius: 8px;
 }
 
-.mat-input {
-  &--no-margin {
-    ::ng-deep .mat-form-field-wrapper {
-      padding-bottom: 0;
-    }
-  
-    ::ng-deep .mat-form-field-infix {
-      width: initial;
-    }
-  
-    ::ng-deep .mat-input-underline {
-      bottom: 0;
-    }
-  }
-}
-
 .flex {
   display: flex;
   margin-left: -0.5rem;

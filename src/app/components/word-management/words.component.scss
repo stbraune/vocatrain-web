@@ -30,3 +30,20 @@
   flex: initial;
   flex-basis: 5%;
 }
+
+.mat-input {
+  &--no-margin {
+    ::ng-deep .mat-form-field-wrapper {
+      padding-bottom: 0;
+    }
+  
+    ::ng-deep .mat-form-field-infix {
+      width: initial;
+      border-top: 0;
+    }
+  
+    ::ng-deep .mat-input-underline {
+      bottom: 0;
+    }
+  }
+}

@@ -36,7 +36,7 @@ export class WordEntityService {
 
   public getWordEntities(options: {
     query?: string,
-    startkey: string,
+    startkey: any,
     limit: number,
     sort?: string,
     descending?: boolean
@@ -79,10 +79,8 @@ export class WordEntityService {
       }`).switchMap((designDocument) => {
         return this.db.executeFulltextQuery('words-index', 'fti', {
           q: options.query,
-          startkey: options && options.descending ? (options.startkey || undefined) : (options.startkey || ``),
-          endkey: options && options.descending ? '' : undefined,
+          skip: options.startkey,
           limit: options.limit,
-          descending: options && options.descending,
           include_docs: true
         });
       });
