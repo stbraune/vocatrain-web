@@ -48,6 +48,7 @@ import {
 
 import { AppRoutes } from './app.routes';
 import { SettingsModule } from './settings';
+import { SharedModule } from '../shared';
 import { WordAddDialogComponent } from './components/word-management/word-add-dialog.component';
 
 @NgModule({
@@ -74,6 +75,7 @@ import { WordAddDialogComponent } from './components/word-management/word-add-di
         useExisting: TranslateHttpLoader
       }
     }),
+    SharedModule.forRoot(),
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,

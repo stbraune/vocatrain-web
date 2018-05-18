@@ -63,7 +63,7 @@
   </mat-card-actions>
 </mat-card>
 
-<mat-card>
+<mat-card class="margin--bottom">
   <mat-card-title>
     {{'settings.database' | translate}}
   </mat-card-title>
@@ -91,6 +91,27 @@
   </mat-card-content>
   <mat-card-actions class="align--right">
     <button mat-button (click)="onSaveDatabaseSettings()">
+      <mat-icon>done</mat-icon>
+      {{'actions.save' | translate}}
+    </button>
+  </mat-card-actions>
+</mat-card>
+
+<mat-card>
+  <mat-card-title>
+    {{'settings.backend' | translate}}
+  </mat-card-title>
+  <mat-card-content>
+    <div class="flex flex--column flex--no-margin">
+      <mat-form-field>
+        <input matInput
+          [(ngModel)]="backendSettings.baseUrl"
+          [placeholder]="'settings.backend-base-url' | translate">
+      </mat-form-field>
+    </div>
+  </mat-card-content>
+  <mat-card-actions class="align--right">
+    <button mat-button (click)="onSaveBackendSettings()">
       <mat-icon>done</mat-icon>
       {{'actions.save' | translate}}
     </button>

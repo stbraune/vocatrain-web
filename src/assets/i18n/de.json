@@ -76,6 +76,8 @@
     "database-couchdb-url": "CouchDB URL",
     "database-couchdb-lucene-url": "CouchDB-Lucene URL (Volltextsuche)",
     "database-synchronization": "Synchronisierung zwischen lokaler IndexedDB und entfernter CouchDB",
+    "backend": "VocaTrain Backend",
+    "backend-base-url": "Backend URL",
     "saved": "Einstellungen gespeichert"
   },
   "actions": {

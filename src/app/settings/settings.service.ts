@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { DatabaseSettings } from './database-settings';
+import { BackendSettings } from './backend-settings';
 
 @Injectable()
 export class SettingsService {
@@ -42,5 +43,16 @@ export class SettingsService {
 
   public setDatabaseSettings(databaseSettings: DatabaseSettings) {
     localStorage.setItem('settings.database', JSON.stringify(databaseSettings));
+  }
+
+  public getBackendSettings(): BackendSettings {
+    const backendSettings = localStorage.getItem('settings.backend');
+    return backendSettings ? JSON.parse(backendSettings) : {
+      baseUrl: ''
+    };
+  }
+
+  public setBackendSettings(backendSettings: BackendSettings) {
+    localStorage.setItem('settings.backend', JSON.stringify(backendSettings));
   }
 }

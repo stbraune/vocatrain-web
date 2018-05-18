@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { SettingsService } from './settings.service';
 import { DatabaseSettings } from './database-settings';
+import { BackendSettings } from './backend-settings';
 
 @Component({
   selector: 'settings',
@@ -18,6 +19,7 @@ export class SettingsComponent implements OnInit {
   public language = '';
 
   public databaseSettings: DatabaseSettings;
+  public backendSettings: BackendSettings;
 
   public constructor(
     private settingsService: SettingsService,
@@ -33,6 +35,7 @@ export class SettingsComponent implements OnInit {
     this.languages.sort();
 
     this.databaseSettings = this.settingsService.getDatabaseSettings();
+    this.backendSettings = this.settingsService.getBackendSettings();
   }
 
   public editLanguage($event: MouseEvent, language: string) {
@@ -79,6 +82,11 @@ export class SettingsComponent implements OnInit {
     setTimeout(() => {
       window.location.reload();
     }, 3000);
+  }
+
+  public onSaveBackendSettings() {
+    this.settingsService.setBackendSettings(this.backendSettings);
+    this.onSettingsSaved();
   }
 
   private onSettingsSaved() {

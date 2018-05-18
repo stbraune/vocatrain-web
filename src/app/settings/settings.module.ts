@@ -16,6 +16,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { SettingsService } from './settings.service';
 import { SettingsComponent } from './settings.component';
+import { SharedModule } from '../../shared';
 
 @NgModule({
   imports: [
@@ -32,7 +33,8 @@ import { SettingsComponent } from './settings.component';
     MatCheckboxModule,
     MatFormFieldModule,
     MatIconModule,
-    MatInputModule
+    MatInputModule,
+    SharedModule.forRoot()
   ],
   declarations: [
     SettingsComponent
