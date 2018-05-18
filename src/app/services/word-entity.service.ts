@@ -54,7 +54,7 @@ export class WordEntityService {
     if (options.query) {
       return this.searchWordEntities({
         q: options.query,
-        skip: options.startkey,
+        skip: options.startkey || 0,
         limit: options.limit,
         include_docs: true
       });
