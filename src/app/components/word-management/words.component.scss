@@ -33,12 +33,13 @@
 
 .word {
   google-translate-button {
-    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.4s;
   }
 
   &:hover {
     google-translate-button {
-      visibility: visible;
+      opacity: 1;
     }
   }
 }

@@ -45,6 +45,10 @@ export class GoogleTranslateButtonComponent {
 
   public showSuggestions($event: MouseEvent) {
     $event.stopPropagation();
+    if (this.text.trim() === '') {
+      return;
+    }
+
     if (this.toLanguages.length === 1) {
       this.translateTo(this.toLanguages[0]);
       return;
