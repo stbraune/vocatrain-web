@@ -31,6 +31,18 @@
   flex-basis: 5%;
 }
 
+.word {
+  google-translate-button {
+    visibility: hidden;
+  }
+
+  &:hover {
+    google-translate-button {
+      visibility: visible;
+    }
+  }
+}
+
 .mat-input {
   &--no-margin {
     ::ng-deep .mat-form-field-wrapper {

@@ -88,6 +88,14 @@
     "create": "Neu ...",
     "more": "Mehr ..."
   },
+  "google-translate-button": {
+    "tooltip": "Text übersetzen",
+    "translate-to": {
+      "prefix": "Nach ",
+      "suffix": " übersetzen"
+    },
+    "select-translation": "Übersetzung annehmen"
+  },
   "de": "Deutsch",
   "en": "Englisch",
   "es": "Spanisch",

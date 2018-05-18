@@ -56,8 +56,10 @@
         <div class="flex flex--no-margin flex--align-center stretch">
           <ng-container *ngFor="let text of wordEntity.texts">
             <ng-container *ngFor="let lang of supportedLanguages">
-              <div class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal">
+              <div class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal word">
                 {{text.words[lang] && text.words[lang].value}}
+                <google-translate-button [from]="lang" [to]="supportedLanguages" [text]="text.words[lang].value">
+                </google-translate-button>
               </div>
             </ng-container>
             <div class="flex-col flex-col--20 align--center overflow--hidden word-wrap--break-word white-space--normal">

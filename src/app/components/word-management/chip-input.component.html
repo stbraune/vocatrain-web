@@ -9,5 +9,8 @@
   </ng-container>
   <mat-form-field class="chip-input__input">
     <input #input matInput [placeholder]="placeholder" (keydown)="onKeyDown($event)" (keyup)="onKeyUp($event)" [(ngModel)]="value" (ngModelChange)="emitValueChange()">
+    <span matSuffix>
+      <ng-content></ng-content>
+    </span>
   </mat-form-field>
 </div>

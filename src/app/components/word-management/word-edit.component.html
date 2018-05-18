@@ -32,7 +32,7 @@
           <div #chipInputWrapper
             [attr.data-row]="w"
             [attr.data-col]="l"
-            class="flex-col flex-col--1">
+            class="flex-col flex-col--1 padding--left-05 padding--right-05">
             <chip-input
               [(value)]="text.words[lang].value"
               [(chips)]="text.tags"
@@ -42,6 +42,8 @@
               (cursorPressed)="navigate(chipInputWrapper, $event)"
               (backspacePressed)="onBackspacePressed(chipInputWrapper, text)"
               (enterPressed)="onEnterPressed(chipInputWrapper, text)">
+              <google-translate-button [text]="text.words[lang].value" [from]="lang" [to]="supportedLanguages" (translationSelected)="onTranslationSelected(w, l, lang, $event)">
+              </google-translate-button>
             </chip-input>
           </div>
         </ng-container>
@@ -49,7 +51,7 @@
         <div #chipInputWrapper
           [attr.data-row]="w"
           [attr.data-col]="supportedLanguages.length"
-          class="flex-col flex-col--1 flex-col--grow">
+          class="flex-col flex-col--1 flex-col--grow padding--left-05 padding--right-05">
           <chip-input
             [(value)]="text.meta"
             [(chips)]="text.tags"

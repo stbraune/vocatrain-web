@@ -15,11 +15,11 @@ import { MatSnackBar, MatSelect } from '@angular/material';
 
 import { Observable ,  Subject } from 'rxjs';
 
-
 import { WordTypeEntityService, WordEntityService } from '../../services';
 import { WordTypeEntity, WordEntity } from '../../model';
 import { Text } from '../../model/text';
 import { ChipInputComponent } from './chip-input.component';
+import { GoogleTranslateService, GoogleTranslateAlternative } from '../../../shared';
 
 @Component({
   selector: 'word-edit',
@@ -57,6 +57,7 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
 
   public constructor(
     private wordEntityService: WordEntityService,
+    private googleTranslateService: GoogleTranslateService,
     private snackBar: MatSnackBar
   ) {
   }
@@ -115,6 +116,15 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
         }
       })))
     });
+  }
+
+  public onTranslationSelected(
+    textIndex: number,
+    languageIndex: number,
+    sourceLanguage: string,
+    alternative: GoogleTranslateAlternative & { language: string }
+  ) {
+    this.editedWordEntity.texts[textIndex].words[alternative.language].value = alternative.text;
   }
 
   public navigate(source: HTMLElement, direction: 'up' | 'right' | 'down' | 'left') {

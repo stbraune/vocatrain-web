@@ -1,10 +1,12 @@
+export interface GoogleTranslateAlternative {
+  text: string;
+  score: number;
+}
+
 export interface GoogleTranslateResult {
   text: string;
   confidence: number;
-  alternatives: {
-    text: string,
-    score: number
-  }[];
+  alternatives: GoogleTranslateAlternative[];
   seeAlso: string[];
   from: {
     language: {
