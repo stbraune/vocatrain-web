@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/switchMap';
+import { Observable, pipe } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
 import { DatabaseService } from './database.service';
 import { Database } from './database';
@@ -86,7 +86,7 @@ export class WordEntityService {
           }
         });
       }
-    }`).switchMap((result: any) => {
+    }`).pipe(switchMap((result: any) => {
         return this.db.runQueryRaw(`words-index`, `by-${options.sort}`, {
           startkey: options && options.descending ? (options.startkey || undefined) : (options.startkey || ``),
           endkey: options && options.descending ? '' : undefined,
@@ -94,12 +94,14 @@ export class WordEntityService {
           descending: options && options.descending,
           include_docs: true
         });
-      });
+      }));
   }
 
   public getWordEntitiesFields(): Observable<string[]> {
-    return this.searchWordEntities({}).map((result: any) => <string[]>result.fields)
-      .map((fields) => fields.reduce((prev, cur) => prev.indexOf(cur) === -1 ? [...prev, cur] : prev, []));
+    return this.searchWordEntities({}).pipe(
+      map((result: any) => <string[]>result.fields),
+      map((fields) => fields.reduce((prev, cur) => prev.indexOf(cur) === -1 ? [...prev, cur] : prev, []))
+    );
   }
 
   private searchWordEntities(options: any) {
@@ -127,9 +129,9 @@ export class WordEntityService {
         });
         return indexDocument;
       }
-    }`).switchMap((designDocument) => {
-      return this.db.executeFulltextQuery('words-index', 'fti', options);
-    });
+    }`).pipe(switchMap((designDocument) => {
+        return this.db.executeFulltextQuery('words-index', 'fti', options);
+      }));
   }
 
   public putWordEntity(wordEntity: WordEntity): Observable<WordEntity> {

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { HttpClient } from '@angular/common/http';
+
+import { Observable, Subject } from 'rxjs';
 
 import { Database } from './database';
 import { DatabaseOptions } from './database-options';
@@ -30,6 +31,7 @@ export class DatabaseService {
   public synchronizationSubject = new Subject<any>();
 
   public constructor(
+    private httpClient: HttpClient,
     private settingsService: SettingsService
   ) {
   }
@@ -39,7 +41,7 @@ export class DatabaseService {
     // options.couchLuceneUrl = options.couchLuceneUrl || 'http://localhost:5985/local';
     // for using the couchdb proxy handler
     options.couchLuceneUrl = options.couchLuceneUrl || this.settingsService.getDatabaseSettings().couchDbLuceneUrl;
-    return new Database<T>(this.getLocalDatabase(), options);
+    return new Database<T>(this.getLocalDatabase(), options, this.httpClient);
   }
 
   private getLocalDatabase(): any {

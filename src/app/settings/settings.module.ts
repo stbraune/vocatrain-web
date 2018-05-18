@@ -33,8 +33,7 @@ import { SharedModule } from '../../shared';
     MatCheckboxModule,
     MatFormFieldModule,
     MatIconModule,
-    MatInputModule,
-    SharedModule.forRoot()
+    MatInputModule
   ],
   declarations: [
     SettingsComponent

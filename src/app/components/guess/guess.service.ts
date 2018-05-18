@@ -1,6 +1,7 @@
+
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/throw';
+import { Observable, of, throwError, pipe } from 'rxjs';
+import { map, switchMap, catchError } from 'rxjs/operators';
 
 import { WordEntityService, Database } from '../../services';
 import { WordEntity } from '../../model';
@@ -24,27 +25,27 @@ export class GuessService {
   public findGuessWords(options: SearchOptions): Observable<SearchResult[]> {
     return this.findGuessWordsInternal(Object.assign({}, options, {
       limit: options.searchLevelEnabled ? 100 : 1
-    })).switchMap((words) => {
+    })).pipe(switchMap((words) => {
       if (words.length === 0) {
-        return Observable.of(words);
+        return of(words);
       }
 
       const word = options.searchLevelEnabled
         ? words.find((w) => options.searchLevelMinimum <= w.key.answerLevel && w.key.answerLevel <= options.searchLevelMaximum)
         : words[0];
       if (word) {
-        return Observable.of([word]);
+        return of([word]);
       }
 
       return this.findGuessWords(Object.assign({}, options, {
         reoccurAfter: words[words.length - 1].key.reoccurAt + '1'
       }));
-    });
+    }));
   }
 
   private findGuessWordsInternal(options: SearchOptions): Observable<SearchResult[]> {
     if (options.sourceLanguage === options.targetLanguage) {
-      return Observable.throw(`Source language and target language is the same, that's too easy, bro.`);
+      return throwError(`Source language and target language is the same, that's too easy, bro.`);
     }
 
     options.reoccurBefore = options.reoccurBefore || new Date();
@@ -52,7 +53,7 @@ export class GuessService {
     options.searchLanguages = options.searchLanguages || [options.sourceLanguage, options.targetLanguage];
 
     if (options.searchLanguages.some((language) => [options.sourceLanguage, options.targetLanguage].indexOf(language) === -1)) {
-      return Observable.throw(`Can't search for other languages than source language and/or target language`);
+      return throwError(`Can't search for other languages than source language and/or target language`);
     }
 
     const langs = JSON.stringify([options.sourceLanguage, options.targetLanguage]);
@@ -181,7 +182,7 @@ export class GuessService {
           });
         }
       }`
-    ).switchMap((x) => {
+    ).pipe(switchMap((x) => {
       const couchOptions = {
         include_docs: true,
         startkey: {
@@ -200,8 +201,8 @@ export class GuessService {
         },
         limit: options.limit
       };
-      return this.db.runQueryRaw('words', viewId, couchOptions).map((result) => result.rows);
-    });
+      return this.db.runQueryRaw('words', viewId, couchOptions).pipe(map((result) => result.rows));
+    }));
   }
 
   public guessRight(word: SearchResult) {

@@ -1,10 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/observable/forkJoin';
-import 'rxjs/add/operator/debounceTime';
+import { Observable,  Subject, forkJoin } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 import { WordTypeEntityService, WordEntityService } from '../../services';
 import { WordTypeEntity, WordEntity } from '../../model';
@@ -68,7 +66,7 @@ export class WordsComponent implements OnInit {
     this.loadQueryHelpFields();
 
     this.queryChanged
-      .debounceTime(300)
+      .pipe(debounceTime(300))
       .subscribe((query) => {
         this.reloadWordEntities();
       });
@@ -173,7 +171,7 @@ export class WordsComponent implements OnInit {
       splittedWordEntities[0]._rev = wordEntity._rev;
     }
 
-    Observable.forkJoin(splittedWordEntities.map((w) => this.wordEntityService.putWordEntity(w)))
+    forkJoin(splittedWordEntities.map((w) => this.wordEntityService.putWordEntity(w)))
       .subscribe((wordEntities) => {
         this.snackBar.open('Saved!', null, {
           duration: 3000

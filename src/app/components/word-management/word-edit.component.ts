@@ -13,9 +13,8 @@ import {
 } from '@angular/core';
 import { MatSnackBar, MatSelect } from '@angular/material';
 
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/observable/forkJoin';
+import { Observable ,  Subject } from 'rxjs';
+
 
 import { WordTypeEntityService, WordEntityService } from '../../services';
 import { WordTypeEntity, WordEntity } from '../../model';

@@ -1,16 +1,13 @@
+
 import { EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/fromPromise';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/switchMap';
+import { Observable, from, of, throwError } from 'rxjs';
+import { map, switchMap, catchError } from 'rxjs/operators';
 
 import * as uuidv4 from 'uuid/v4';
 
-import * as rp from 'request-promise-native';
-
 import { DatabaseOptions } from './database-options';
 import { Entity } from '../model';
+import { HttpClient } from '@angular/common/http';
 
 export class Database<T extends Entity> {
   public entitySaved = new EventEmitter<T>();
@@ -18,7 +15,8 @@ export class Database<T extends Entity> {
 
   public constructor(
     private _database: any,
-    private _options: DatabaseOptions<T>
+    private _options: DatabaseOptions<T>,
+    private _httpClient: HttpClient
   ) {
   }
 
@@ -37,21 +35,21 @@ export class Database<T extends Entity> {
   public getEntities(options?: any): Observable<T[]> {
     const defaultEndkey = options && options.descending ? '' : '\uffff';
     const defaultStartkey = options && options.descending ? '\uffff' : '';
-    return Observable.fromPromise(this._database.allDocs({
+    return from(this._database.allDocs({
       include_docs: true,
       startkey: `${options && options.raw ? '' : this.getPrefix()}${options && options.startkey ? options.startkey : defaultStartkey}`,
       endkey: `${options && options.raw ? '' : this.getPrefix()}${options && options.endkey ? options.endkey : defaultEndkey}`,
       descending: options && options.descending,
       limit: options && options.limit
-    })).map((documents: any) => {
+    })).pipe(map((documents: any) => {
       return documents.rows.map((row) => row.doc).map((item) => this.deserializeEntity(item));
-    });
+    }));
   }
 
   public getEntityById(id: string): Observable<T> {
-    const observable: Observable<T> = Observable.fromPromise(this._database.get(id));
+    const observable: Observable<T> = from(this._database.get(id));
     if (this._options.deserialize) {
-      return observable.map((item: T) => this.deserializeEntity(item));
+      return observable.pipe(map((item: T) => this.deserializeEntity(item)));
     }
 
     return observable;
@@ -64,7 +62,7 @@ export class Database<T extends Entity> {
     item.transient = undefined;
     item.updatedAt = item.createdAt = now;
 
-    return Observable.fromPromise(this._database.put(this.serializeEntity(item))).map((result: any) => {
+    return from(this._database.put(this.serializeEntity(item))).pipe(map((result: any) => {
       if (result.ok) {
         item._rev = result.rev;
         item.transient = transient;
@@ -73,7 +71,7 @@ export class Database<T extends Entity> {
       } else {
         throw new Error(`Error while creating entity: ${JSON.stringify(item)}`);
       }
-    });
+    }));
   }
 
   public putEntity(item: T, id?: string): Observable<T> {
@@ -84,7 +82,7 @@ export class Database<T extends Entity> {
     item.updatedAt = now;
     item.createdAt = item.createdAt || item.updatedAt;
 
-    return Observable.fromPromise(this._database.put(this.serializeEntity(item))).map((result: any) => {
+    return from(this._database.put(this.serializeEntity(item))).pipe(map((result: any) => {
       if (result.ok) {
         item._rev = result.rev;
         item.transient = transient;
@@ -93,14 +91,14 @@ export class Database<T extends Entity> {
       } else {
         throw new Error(`Error while updating entity ${item._id}: ${JSON.stringify(item)}`);
       }
-    });
+    }));
   }
 
   public removeEntity(item: T): Observable<boolean> {
-    return Observable.fromPromise(this._database.remove(item)).map((result: any) => {
+    return from(this._database.remove(item)).pipe(map((result: any) => {
       this.entityRemoved.emit(item);
       return result.ok;
-    });
+    }));
   }
 
   private deserializeEntity(item: T): T {
@@ -113,18 +111,18 @@ export class Database<T extends Entity> {
     return this._options.serialize ? this._options.serialize(item) : item;
   }
 
-  public queryEntities(queryId: string, viewId, key, map: string | ((item: T) => void)): Observable<any> {
-    return this.getQuery(queryId, viewId, map).switchMap((result: any) => {
+  public queryEntities(queryId: string, viewId, key, mapFunction: string | ((item: T) => void)): Observable<any> {
+    return this.getQuery(queryId, viewId, mapFunction).pipe(switchMap((result: any) => {
       return this.runQuery(queryId, viewId, {
         key,
         include_docs: true
       });
-    });
+    }));
   }
 
   public getFulltextQuery(designDocumentName: string, indexName: string, indexFunction: string | ((item: T) => any)) {
     const indexFunctionString = typeof indexFunction === 'string' ? indexFunction : indexFunction.toString();
-    return this.getDesignDocument(designDocumentName).switchMap((designDocument) => {
+    return this.getDesignDocument(designDocumentName).pipe(switchMap((designDocument) => {
       let changed = false;
       if (!designDocument.fulltext) {
         designDocument.fulltext = {};
@@ -147,8 +145,8 @@ export class Database<T extends Entity> {
         return this._database.put(designDocument);
       }
 
-      return Observable.of(designDocument);
-    });
+      return of(designDocument);
+    }));
   }
 
   public executeFulltextQuery(designDocumentName: string, indexName: string, options: any): Observable<{
@@ -166,19 +164,17 @@ export class Database<T extends Entity> {
     }>
   }> {
     if (!this._options.couchLuceneUrl) {
-      return Observable.throw(`Connection to couchdb-lucene not configured`);
+      return throwError(`Connection to couchdb-lucene not configured`);
     }
 
-    return Observable.fromPromise(rp.get({
-      uri: `${this._options.couchLuceneUrl}/_design/${designDocumentName}/${indexName}`,
-      qs: options,
-      json: true
-    }));
+    return this._httpClient.get<any>(`${this._options.couchLuceneUrl}/_design/${designDocumentName}/${indexName}`, {
+      params: options
+    });
   }
 
-  public getQuery(designDocumentName: string, viewId: string, map: string | ((item: T) => void)): Observable<any> {
-    const mapfn = typeof map === 'string' ? map : map.toString();
-    return this.getDesignDocument(designDocumentName).switchMap((designDocument) => {
+  public getQuery(designDocumentName: string, viewId: string, mapFunction: string | ((item: T) => void)): Observable<any> {
+    const mapfn = typeof mapFunction === 'string' ? mapFunction : mapFunction.toString();
+    return this.getDesignDocument(designDocumentName).pipe(switchMap((designDocument) => {
       let changed = false;
       if (!designDocument.views) {
         designDocument.views = {};
@@ -201,29 +197,29 @@ export class Database<T extends Entity> {
         return this._database.put(designDocument);
       }
 
-      return Observable.of(designDocument);
-    });
+      return of(designDocument);
+    }));
   }
 
   public getDesignDocument(designDocumentName: string): Observable<any> {
     const id = `_design/${designDocumentName}`;
-    return Observable.fromPromise(this._database.get(id))
-      .catch((error) => {
+    return from(this._database.get(id))
+      .pipe(catchError((error) => {
         if (error.status === 404) {
-          return Observable.fromPromise(this._database.put({
+          return from(this._database.put({
             _id: id
           }));
         }
-      });
+      }));
   }
 
   public runQuery(queryId: string, viewId: string, options: any): Observable<T[]> {
-    return this.runQueryRaw(queryId, viewId, options).map((result: any) => {
+    return this.runQueryRaw(queryId, viewId, options).pipe(map((result: any) => {
       return result.rows.map((row) => row.doc).map((item) => this.deserializeEntity(item));
-    });
+    }));
   }
 
   public runQueryRaw(queryId: string, viewId: string, options: any): Observable<any> {
-    return Observable.fromPromise(this._database.query(queryId + '/' + viewId, options));
+    return from(this._database.query(queryId + '/' + viewId, options));
   }
 }
