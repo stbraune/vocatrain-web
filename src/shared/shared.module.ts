@@ -7,6 +7,7 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { GoogleTranslateService, GoogleTranslateButtonComponent } from './google-translate';
+import { GameLogEntityService } from './game-log';
 
 @NgModule({
   imports: [
@@ -36,7 +37,8 @@ export class SharedModule {
     return {
       ngModule: SharedModule,
       providers: [
-        GoogleTranslateService
+        GoogleTranslateService,
+        GameLogEntityService
       ]
     };
   }

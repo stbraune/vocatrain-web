@@ -8,7 +8,7 @@
     </search-options>
   </mat-card-content>
   <mat-card-actions>
-    <button class="stretch" mat-button (click)="startGuessing()">
+    <button class="stretch" mat-button (click)="onStartGuessing()">
       {{'guess.start' | translate}}
     </button>
   </mat-card-actions>
@@ -156,7 +156,7 @@
     </div>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-button (click)="stopGuessing()" class="stretch">
+    <button mat-button (click)="onStopGuessing()" class="stretch">
       {{'guess.stop' | translate}}
     </button>
   </mat-card-actions>

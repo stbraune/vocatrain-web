@@ -3,12 +3,16 @@ import { MatSnackBar } from '@angular/material';
 
 import { TranslateService } from '@ngx-translate/core';
 
+import { pipe, Observable, throwError, of } from 'rxjs';
+import { switchMap, catchError, map, tap } from 'rxjs/operators';
+
 import { WordEntityService } from '../../services';
 import { GuessService } from './guess.service';
 
 import { SearchOptions } from './search-options';
 import { SearchResult } from './search-result';
 import { SettingsService } from '../../settings';
+import { GameLogEntityService, GameLogEntity } from '../../../shared';
 
 @Component({
   selector: 'guess',
@@ -42,6 +46,7 @@ export class GuessComponent implements OnInit {
     private settingsService: SettingsService,
     private wordEntityService: WordEntityService,
     private guessService: GuessService,
+    private gameLogEntityService: GameLogEntityService,
     private snackBar: MatSnackBar
   ) {
   }
@@ -63,29 +68,37 @@ export class GuessComponent implements OnInit {
     }, false);
   }
 
-  public startGuessing() {
+  public onStartGuessing() {
+    this.startGuessing().subscribe();
+  }
+
+  public startGuessing(): Observable<SearchResult> {
     this.finished = false;
     this.started = true;
     this.startedAt = new Date();
     this.duration = '0:00';
     this.totalWords = 0;
 
-    if (this.durationInterval) {
-      clearInterval(this.durationInterval);
-    }
-
-    this.durationInterval = setInterval(() => {
-      this.duration = this.getDuration();
-
-      if (this.searchOptions.mode === 'by-time') {
-        const millis = new Date().getTime() - this.startedAt.getTime();
-        const minutes = millis / 1000 / 60;
-        if (minutes >= this.searchOptions.minutes) {
-          this.finishGuessing('reached-minutes');
+    return this.gameLogEntityService.startGameLog('guess').pipe(
+      tap((gameLogEntity) => {
+        if (this.durationInterval) {
+          clearInterval(this.durationInterval);
         }
-      }
-    }, 1000);
-    this.nextWord();
+
+        this.durationInterval = setInterval(() => {
+          this.duration = this.getDuration();
+
+          if (this.searchOptions.mode === 'by-time') {
+            const millis = new Date().getTime() - this.startedAt.getTime();
+            const minutes = millis / 1000 / 60;
+            if (minutes >= this.searchOptions.minutes) {
+              this.finishGuessing('reached-minutes').subscribe();
+            }
+          }
+        }, 1000);
+      }),
+      switchMap((gameLogEntity) => this.nextWord())
+    );
   }
 
   public getDuration() {
@@ -120,17 +133,26 @@ export class GuessComponent implements OnInit {
     return parseInt(<string>n, 10);
   }
 
-  public stopGuessing() {
+  public onStopGuessing() {
+    this.stopGuessing().subscribe();
+  }
+
+  public stopGuessing(): Observable<GameLogEntity> {
+    if (!this.started) {
+      return;
+    }
+
     this.started = false;
     if (this.durationInterval) {
       clearInterval(this.durationInterval);
     }
+    return this.gameLogEntityService.finishGameLog();
   }
 
-  public finishGuessing(reason: 'no-more-words' | 'reached-amount' | 'reached-minutes') {
+  public finishGuessing(reason: 'no-more-words' | 'reached-amount' | 'reached-minutes'): Observable<GameLogEntity> {
     this.finished = true;
     this.finishReason = reason;
-    this.stopGuessing();
+    return this.stopGuessing();
   }
 
   public onKeyDown($event: KeyboardEvent) {
@@ -141,7 +163,7 @@ export class GuessComponent implements OnInit {
     const target = <HTMLInputElement>$event.target;
     if ($event.which === 37 || $event.which === 36) {
       // left, home
-      this.guessedWrong();
+      this.guessedWrong().subscribe();
       $event.preventDefault();
     }
 
@@ -153,7 +175,7 @@ export class GuessComponent implements OnInit {
 
     if ($event.which === 39 || $event.which === 35) {
       // right, end
-      this.guessedRight();
+      this.guessedRight().subscribe();
       $event.preventDefault();
     }
 
@@ -178,66 +200,71 @@ export class GuessComponent implements OnInit {
     }
   }
 
-  public guessedRight() {
+  public guessedRight(): Observable<SearchResult> {
     if (this.currentWordState !== 1) {
       return;
     }
 
-    this.guessedWord();
     console.log('Guessed it right!');
-    this.guessService.guessRight(this.currentWord).subscribe((result) => {
-      this.nextWord();
-    }, (error) => {
-      console.error(error);
-    });
+    return this.guessService.guessRight(this.currentWord)
+      .pipe(
+        switchMap((wordEntity) => this.gameLogEntityService.incrementCorrect()),
+        switchMap((gameLogEntity) => this.guessedWord()),
+        switchMap((gameLogEntity) => this.nextWord())
+      );
   }
 
-  public guessedWrong() {
+  public guessedWrong(): Observable<SearchResult> {
     if (this.currentWordState !== 1) {
       return;
     }
 
-    this.guessedWord();
     console.log('Guessed it wrong!');
-    this.guessService.guessWrong(this.currentWord).subscribe((result) => {
-      this.nextWord();
-    }, (error) => {
-      console.error(error);
-    });
+    return this.guessService.guessWrong(this.currentWord)
+      .pipe(
+        switchMap((wordEntity) => this.gameLogEntityService.incrementWrong()),
+        switchMap((gameLogEntity) => this.guessedWord()),
+        switchMap((gameLogEntity) => this.nextWord())
+      );
   }
 
-  private guessedWord() {
+  private guessedWord(): Observable<GameLogEntity> {
     this.currentWordState = 2;
     this.totalWords++;
 
     switch (this.searchOptions.mode) {
       case 'by-amount':
         if (this.totalWords === this.searchOptions.amount) {
-          this.finishGuessing('reached-amount');
+          return this.finishGuessing('reached-amount');
         }
-        break;
+        return this.gameLogEntityService.getCurrentGameLog();
       case 'by-time':
-        break;
+        return this.gameLogEntityService.getCurrentGameLog();
       default:
-        throw new Error(`Unsupported mode: ${this.searchOptions.mode}`);
+        return throwError(`Unsupported mode: ${this.searchOptions.mode}`);
     }
   }
 
-  public nextWord() {
+  public nextWord(): Observable<SearchResult> {
     this.currentWordState = -1;
     this.currentWord = undefined;
-    this.guessService.findGuessWords(Object.assign({}, this.searchOptions, { limit: 1 })).subscribe((searchResults) => {
-      if (searchResults.length > 0) {
-        this.currentWordState = 0;
-        this.currentWord = searchResults[0];
-        this.currentWord.key.answerAt = new Date(this.currentWord.key.answerAt);
-      } else {
-        this.finishGuessing('no-more-words');
-      }
-    }, (err) => {
-      console.error(err);
-      // this.snackBar.open('Oops!', 'Ok');
-      this.finishGuessing('no-more-words');
-    });
+    return this.guessService.findGuessWords(Object.assign({}, this.searchOptions, { limit: 1 }))
+      .pipe(
+        switchMap((searchResults) => {
+          if (searchResults.length === 0) {
+            return this.finishGuessing('no-more-words').pipe(
+              map((gameLogEntity) => null)
+            );
+          }
+
+          this.currentWordState = 0;
+          this.currentWord = searchResults[0];
+          this.currentWord.key.answerAt = new Date(this.currentWord.key.answerAt);
+          return of(this.currentWord);
+        }),
+        catchError((error) => this.finishGuessing('no-more-words').pipe(
+          map((gameLogEntity) => null)
+        )),
+    );
   }
 }
