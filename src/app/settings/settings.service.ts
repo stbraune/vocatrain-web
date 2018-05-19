@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
-import { Subject, BehaviorSubject } from 'rxjs';
+import { Subject, BehaviorSubject, forkJoin, of, throwError, pipe, Observable } from 'rxjs';
+import { map, switchMap, catchError, tap } from 'rxjs/operators';
 
 import { AppSettings } from './app-settings';
 import { DatabaseSettings } from './database-settings';
@@ -13,7 +15,9 @@ export class SettingsService {
   public appSettingsChanged: BehaviorSubject<AppSettings>;
   public databaseSettingsChanged: BehaviorSubject<DatabaseSettings>;
 
-  public constructor() {
+  public constructor(
+    private httpClient: HttpClient
+  ) {
     const appLanguage = localStorage.getItem('settings.app-language')
       || (navigator && navigator.language && navigator.language.split('-')[0]);
     this.appSettingsChanged = new BehaviorSubject<AppSettings>({
@@ -27,7 +31,13 @@ export class SettingsService {
     this.appSettingsChanged.next(this.getAppSettings());
 
     this.databaseSettingsChanged = new BehaviorSubject<DatabaseSettings>({
-      databaseName: 'vocatrain'
+      local: {
+        databaseName: 'vocatrain'
+      },
+      remote: {
+      },
+      fti: {
+      }
     });
     this.databaseSettingsChanged.next(this.getDatabaseSettings());
   }
@@ -52,12 +62,48 @@ export class SettingsService {
   public getDatabaseSettings(): DatabaseSettings {
     const databaseSettings = localStorage.getItem('settings.database');
     const databaseSettings1: DatabaseSettings = databaseSettings ? JSON.parse(databaseSettings) : this.databaseSettingsChanged.getValue();
-    databaseSettings1.enableSynchronization = databaseSettings1.enableSynchronization && !!databaseSettings1.couchDbLuceneUrl;
+    databaseSettings1.local = databaseSettings1.local || {};
+    databaseSettings1.remote = databaseSettings1.remote || {};
+    databaseSettings1.fti = databaseSettings1.fti || {};
+    databaseSettings1.remote.enableSynchronization = databaseSettings1.remote.enableSynchronization
+      && !!databaseSettings1.remote.couchDbUrl;
     return databaseSettings1;
   }
 
-  public setDatabaseSettings(databaseSettings: DatabaseSettings) {
-    localStorage.setItem('settings.database', JSON.stringify(databaseSettings));
-    this.databaseSettingsChanged.next(databaseSettings);
+  public setDatabaseSettings(databaseSettings: DatabaseSettings): Observable<DatabaseSettings> {
+    return this.validateDatabaseSettings(databaseSettings).pipe(
+      tap((result) => {
+        localStorage.setItem('settings.database', JSON.stringify(databaseSettings));
+        this.databaseSettingsChanged.next(databaseSettings);
+      }),
+      map((result) => databaseSettings)
+    );
+  }
+
+  public validateDatabaseSettings(databaseSettings: DatabaseSettings): Observable<boolean> {
+    return forkJoin(
+      databaseSettings.remote.couchDbUrl ? this.httpClient.get<any>(databaseSettings.remote.couchDbUrl).pipe(
+        map((result) => result['couchdb'] && result.version >= '2.1.0'),
+        switchMap((result) => result
+          ? this.httpClient.get<any>(`${databaseSettings.remote.couchDbUrl}/${databaseSettings.remote.databaseName}`).pipe(
+            map((result1) => !!result1),
+            catchError((error) => of('unknown-database'))
+          )
+          : of('unsupported-version')),
+        catchError((error) => of('invalid-url')),
+      ) : of(true),
+      databaseSettings.fti.couchDbLuceneUrl ? this.httpClient.get<any>(databaseSettings.fti.couchDbLuceneUrl).pipe(
+        map((result) => result['couchdb-lucene'] && result.version >= '2.1.0-SNAPSHOT'),
+        switchMap((result) => result
+          ? of(true)
+          : of('unsupported-version')),
+        catchError((error) => of('invalid-url')),
+      ) : of(true)
+    ).pipe(
+      switchMap((results) => results.every((result) => result === true) ? of(true) : throwError({
+        remote: results[0],
+        fti: results[1]
+      }))
+    );
   }
 }

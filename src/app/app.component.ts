@@ -33,7 +33,7 @@ export class AppComponent implements OnInit {
     ).subscribe();
 
     this.settingsService.databaseSettingsChanged.subscribe((databaseSettings) => {
-      this.synchronizationEnabled = databaseSettings.enableSynchronization;
+      this.synchronizationEnabled = databaseSettings.remote.enableSynchronization;
       if (this.synchronizationEnabled) {
         this.databaseService.enableSyncing();
       } else {

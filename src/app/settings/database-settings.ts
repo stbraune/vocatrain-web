@@ -1,6 +1,14 @@
 export interface DatabaseSettings {
-  databaseName: string;
-  couchDbUrl?: string;
-  couchDbLuceneUrl?: string;
-  enableSynchronization?: boolean;
+  local: {
+    databaseName?: string;
+  };
+  remote: {
+    databaseName?: string;
+    couchDbUrl?: string;
+    enableSynchronization?: boolean;
+  };
+  fti: {
+    databaseName?: string;
+    couchDbLuceneUrl?: string;
+  };
 }

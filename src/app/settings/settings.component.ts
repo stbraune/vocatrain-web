@@ -17,6 +17,10 @@ export class SettingsComponent implements OnInit {
 
   public appSettings: AppSettings;
   public databaseSettings: DatabaseSettings;
+  public databaseSettingsValidation: {
+    remote?: string,
+    fti?: string
+  } = {};
 
   public constructor(
     private settingsService: SettingsService,
@@ -66,8 +70,13 @@ export class SettingsComponent implements OnInit {
   }
 
   public onSaveDatabaseSettings() {
-    this.settingsService.setDatabaseSettings(this.databaseSettings);
-    this.onSettingsSaved();
+    this.settingsService.validateDatabaseSettings(this.databaseSettings).subscribe((result) => {
+      this.databaseSettingsValidation = {};
+      this.settingsService.setDatabaseSettings(this.databaseSettings);
+      this.onSettingsSaved();
+    }, (error) => {
+      this.databaseSettingsValidation = error;
+    });
   }
 
   private onSettingsSaved() {

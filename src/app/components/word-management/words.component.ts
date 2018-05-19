@@ -63,7 +63,7 @@ export class WordsComponent implements OnInit {
       this.supportedLanguages = appSettings.userLanguages.filter((userLanguage) => userLanguage.enabled)
         .map((userLanguage) => userLanguage.iso);
     })
-    this.queryAvailable = !!this.settingsService.getDatabaseSettings().couchDbLuceneUrl;
+    this.queryAvailable = !!this.settingsService.getDatabaseSettings().fti.couchDbLuceneUrl;
     this.loadWordTypeEntities();
     this.loadWordEntities();
     this.loadQueryHelpFields();

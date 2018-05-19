@@ -12,7 +12,11 @@
         <input matInput [(ngModel)]="appSettings.appLanguage" [placeholder]="'settings.app-language' | translate">
       </mat-form-field>
     </div>
-    
+  </mat-card-content>
+  <mat-card-subtitle>
+    {{'settings.languages' | translate}}
+  </mat-card-subtitle>
+  <mat-card-content>
     <ul class="ul--nostyle">
       <li *ngFor="let language of appSettings.userLanguages">
         <div class="flex flex--align-center">
@@ -41,7 +45,11 @@
         </div>
       </li>
     </ul>
-    
+  </mat-card-content>
+  <mat-card-subtitle>
+    {{'settings.backend' | translate}}
+  </mat-card-subtitle>
+  <mat-card-content>
     <div class="flex flex--column flex--no-margin">
       <mat-form-field>
         <input matInput
@@ -62,26 +70,82 @@
   <mat-card-title>
     {{'settings.database' | translate}}
   </mat-card-title>
+  <mat-card-subtitle>
+    {{'settings.database-local' | translate}}
+  </mat-card-subtitle>
   <mat-card-content>
     <div class="flex flex--column flex--no-margin">
       <mat-form-field>
         <input matInput
-          [(ngModel)]="databaseSettings.databaseName"
+          [(ngModel)]="databaseSettings.local.databaseName"
           [placeholder]="'settings.database-name' | translate">
       </mat-form-field>
-      <mat-form-field>
-        <input matInput
-          [(ngModel)]="databaseSettings.couchDbUrl"
-          [placeholder]="'settings.database-couchdb-url' | translate">
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput
-          [(ngModel)]="databaseSettings.couchDbLuceneUrl"
-          [placeholder]="'settings.database-couchdb-lucene-url' | translate">
-      </mat-form-field>
-      <mat-checkbox [(ngModel)]="databaseSettings.enableSynchronization">
+    </div>
+  </mat-card-content>
+  <mat-card-subtitle>
+    {{'settings.database-remote' | translate}}
+  </mat-card-subtitle>
+  <mat-card-content>
+    <div>
+      <mat-error *ngIf="databaseSettingsValidation.remote === 'invalid-url'" class="margin--bottom">
+        {{'settings.database-remote-invalid-url' | translate}}
+      </mat-error>
+      <mat-error *ngIf="databaseSettingsValidation.remote === 'unsupported-version'" class="margin--bottom">
+        {{'settings.database-remote-unsupported-version' | translate}}
+      </mat-error>
+      <mat-error *ngIf="databaseSettingsValidation.remote === 'unknown-database'" class="margin--bottom">
+        {{'settings.database-remote-unknown-database' | translate}}
+      </mat-error>
+    </div>
+    <div class="flex flex--column">
+      <div class="flex-col">
+        <div class="flex">
+          <mat-form-field class="flex-col flex-col--1">
+            <input matInput
+              [(ngModel)]="databaseSettings.remote.databaseName"
+              [placeholder]="'settings.database-name' | translate">
+          </mat-form-field>
+          <mat-form-field class="flex-col flex-col--1">
+            <input matInput
+              [(ngModel)]="databaseSettings.remote.couchDbUrl"
+              [placeholder]="'settings.database-couchdb-url' | translate">
+          </mat-form-field>
+        </div>
+      </div>
+      <mat-checkbox class="flex-col" [(ngModel)]="databaseSettings.remote.enableSynchronization">
         {{'settings.database-synchronization' | translate}}
       </mat-checkbox>
+    </div>
+  </mat-card-content>
+  <mat-card-subtitle>
+    {{'settings.database-fulltext-search' | translate}}
+  </mat-card-subtitle>
+  <mat-card-content>
+    <div>
+      <mat-error *ngIf="databaseSettingsValidation.fti === 'invalid-url'" class="margin--bottom">
+        {{'settings.database-fti-invalid-url' | translate}}
+      </mat-error>
+      <mat-error *ngIf="databaseSettingsValidation.fti === 'unsupported-version'" class="margin--bottom">
+        {{'settings.database-fti-unsupported-version' | translate}}
+      </mat-error>
+    </div>
+    <div class="flex">
+      <mat-form-field class="flex-col flex-col--1">
+        <input matInput
+          [(ngModel)]="databaseSettings.fti.databaseName"
+          [placeholder]="'settings.database-name' | translate">
+      </mat-form-field>
+      <mat-form-field class="flex-col flex-col--1">
+        <input matInput
+          [(ngModel)]="databaseSettings.fti.couchDbLuceneUrl"
+          [placeholder]="'settings.database-couchdb-lucene-url' | translate">
+        <mat-error *ngIf="databaseSettingsValidation.fti === 'unsupported-version'">
+          unsupported version
+        </mat-error>
+        <mat-error *ngIf="databaseSettingsValidation.fti === 'invalid-url'">
+          invalid url
+        </mat-error>
+      </mat-form-field>
     </div>
   </mat-card-content>
   <mat-card-actions class="align--right">

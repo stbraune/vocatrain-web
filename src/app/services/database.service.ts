@@ -6,7 +6,7 @@ import { Observable, Subject } from 'rxjs';
 import { Database } from './database';
 import { DatabaseOptions } from './database-options';
 import { Entity } from '../model';
-import { SettingsService } from '../settings';
+import { SettingsService, DatabaseSettings } from '../settings';
 
 import PouchDB from 'pouchdb-core';
 import PouchDBAdapterIdb from 'pouchdb-adapter-idb';
@@ -24,6 +24,8 @@ PouchDB
 
 @Injectable()
 export class DatabaseService {
+  private _settings: DatabaseSettings;
+
   private _local: any;
   private _remote: any;
   private _sync: any;
@@ -34,25 +36,29 @@ export class DatabaseService {
     private httpClient: HttpClient,
     private settingsService: SettingsService
   ) {
+    this.settingsService.databaseSettingsChanged.subscribe((databaseSettings) => {
+      this._settings = databaseSettings;
+    });
   }
 
   public openDatabase<T extends Entity>(options: DatabaseOptions<T>): Database<T> {
     // for going directly onto couchdb-lucene instance
     // options.couchLuceneUrl = options.couchLuceneUrl || 'http://localhost:5985/local';
     // for using the couchdb proxy handler
-    options.couchLuceneUrl = options.couchLuceneUrl || this.settingsService.getDatabaseSettings().couchDbLuceneUrl;
+    options.couchLuceneUrl = options.couchLuceneUrl || `${this._settings.fti.couchDbLuceneUrl}/${this._settings.fti.databaseName}`;
     return new Database<T>(this.getLocalDatabase(), options, this.httpClient);
   }
 
   private getLocalDatabase(): any {
-    return this._local = this._local || new PouchDB(this.settingsService.getDatabaseSettings().databaseName, {
+    return this._local = this._local || new PouchDB(this._settings.local.databaseName, {
       adapter: 'idb'
     });
   }
 
   private getRemoteDatabase(): any {
-    return this._remote = this._remote
-      || (this.settingsService.getDatabaseSettings().couchDbUrl && new PouchDB(this.settingsService.getDatabaseSettings().couchDbUrl));
+    return this._remote = this._remote || (
+      this._settings.remote && new PouchDB(`${this._settings.remote.couchDbUrl}/${this._settings.remote.databaseName}`)
+    );
   }
 
   public isSyncing() {
@@ -64,7 +70,7 @@ export class DatabaseService {
       return;
     }
 
-    if (!this.settingsService.getDatabaseSettings().enableSynchronization) {
+    if (!this._settings.remote.enableSynchronization) {
       return;
     }
 
