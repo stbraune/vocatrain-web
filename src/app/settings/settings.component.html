@@ -9,28 +9,15 @@
   <mat-card-content>
     <div class="flex flex--column flex--no-margin">
       <mat-form-field>
-        <input matInput [(ngModel)]="appLanguage" [placeholder]="'settings.app-language' | translate">
+        <input matInput [(ngModel)]="appSettings.appLanguage" [placeholder]="'settings.app-language' | translate">
       </mat-form-field>
     </div>
-  </mat-card-content>
-  <mat-card-actions class="align--right">
-    <button mat-button (click)="onSaveAppSettings()">
-      <mat-icon>done</mat-icon>
-      {{'actions.save' | translate}}
-    </button>
-  </mat-card-actions>
-</mat-card>
-
-<mat-card class="margin--bottom">
-  <mat-card-title>
-    {{'settings.languages' | translate}}
-  </mat-card-title>
-  <mat-card-content>
+    
     <ul class="ul--nostyle">
-      <li *ngFor="let language of languages">
+      <li *ngFor="let language of appSettings.userLanguages">
         <div class="flex flex--align-center">
           <div class="flex-col flex-col--1 overflow--hiden word-wrap--break-word white-space--normal">
-            {{language | translate}} ({{language}})
+            {{language.iso | translate}} ({{language.iso}})
           </div>
           <div class="flex-col">
             <button mat-icon-button (click)="deleteLanguage($event, language)">
@@ -54,9 +41,17 @@
         </div>
       </li>
     </ul>
+    
+    <div class="flex flex--column flex--no-margin">
+      <mat-form-field>
+        <input matInput
+          [(ngModel)]="appSettings.backendUrl"
+          [placeholder]="'settings.backend-base-url' | translate">
+      </mat-form-field>
+    </div>
   </mat-card-content>
   <mat-card-actions class="align--right">
-    <button mat-button (click)="onSaveLanguageSettings()">
+    <button mat-button (click)="onSaveAppSettings()">
       <mat-icon>done</mat-icon>
       {{'actions.save' | translate}}
     </button>
@@ -91,27 +86,6 @@
   </mat-card-content>
   <mat-card-actions class="align--right">
     <button mat-button (click)="onSaveDatabaseSettings()">
-      <mat-icon>done</mat-icon>
-      {{'actions.save' | translate}}
-    </button>
-  </mat-card-actions>
-</mat-card>
-
-<mat-card>
-  <mat-card-title>
-    {{'settings.backend' | translate}}
-  </mat-card-title>
-  <mat-card-content>
-    <div class="flex flex--column flex--no-margin">
-      <mat-form-field>
-        <input matInput
-          [(ngModel)]="backendSettings.baseUrl"
-          [placeholder]="'settings.backend-base-url' | translate">
-      </mat-form-field>
-    </div>
-  </mat-card-content>
-  <mat-card-actions class="align--right">
-    <button mat-button (click)="onSaveBackendSettings()">
       <mat-icon>done</mat-icon>
       {{'actions.save' | translate}}
     </button>

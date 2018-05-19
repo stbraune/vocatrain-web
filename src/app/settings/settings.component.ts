@@ -4,8 +4,8 @@ import { MatSnackBar } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
 
 import { SettingsService } from './settings.service';
+import { AppSettings } from './app-settings';
 import { DatabaseSettings } from './database-settings';
-import { BackendSettings } from './backend-settings';
 
 @Component({
   selector: 'settings',
@@ -13,13 +13,10 @@ import { BackendSettings } from './backend-settings';
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent implements OnInit {
-  public appLanguage: string;
+  public language: string;
 
-  public languages: string[] = [];
-  public language = '';
-
+  public appSettings: AppSettings;
   public databaseSettings: DatabaseSettings;
-  public backendSettings: BackendSettings;
 
   public constructor(
     private settingsService: SettingsService,
@@ -29,24 +26,19 @@ export class SettingsComponent implements OnInit {
   }
 
   public ngOnInit() {
-    this.appLanguage = this.settingsService.getAppLanguage();
-
-    this.languages = this.settingsService.getLanguages();
-    this.languages.sort();
-
     this.databaseSettings = this.settingsService.getDatabaseSettings();
-    this.backendSettings = this.settingsService.getBackendSettings();
+    this.appSettings = this.settingsService.getAppSettings();
   }
 
   public editLanguage($event: MouseEvent, language: string) {
     this.language = language;
   }
 
-  public deleteLanguage($event: MouseEvent, language: string) {
+  public deleteLanguage($event: MouseEvent, language: { iso: string, enabled: boolean }) {
     $event.stopPropagation();
-    const indexOf = this.languages.indexOf(language);
+    const indexOf = this.appSettings.userLanguages.indexOf(language);
     if (indexOf !== -1) {
-      this.languages.splice(indexOf, 1);
+      this.appSettings.userLanguages.splice(indexOf, 1);
     }
   }
 
@@ -59,33 +51,22 @@ export class SettingsComponent implements OnInit {
 
   public addLanguage() {
     const language = this.language.trim();
-    if (language && this.languages.indexOf(language) === -1) {
+    if (language && this.appSettings.userLanguages.findIndex((userLanguage) => userLanguage.iso === language) === -1) {
       this.language = '';
-      this.languages.push(language);
-      this.languages.sort();
+      this.appSettings.userLanguages.push({
+        iso: language,
+        enabled: true
+      });
     }
   }
 
   public onSaveAppSettings() {
-    this.settingsService.setAppLanguage(this.appLanguage);
-    this.onSettingsSaved();
-  }
-
-  public onSaveLanguageSettings() {
-    this.settingsService.setLanguages(this.languages);
+    this.settingsService.setAppSettings(this.appSettings);
     this.onSettingsSaved();
   }
 
   public onSaveDatabaseSettings() {
     this.settingsService.setDatabaseSettings(this.databaseSettings);
-    this.onSettingsSaved();
-    setTimeout(() => {
-      window.location.reload();
-    }, 3000);
-  }
-
-  public onSaveBackendSettings() {
-    this.settingsService.setBackendSettings(this.backendSettings);
     this.onSettingsSaved();
   }
 

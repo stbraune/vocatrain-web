@@ -6,6 +6,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { DatabaseService } from './services';
 import { SettingsService } from './settings';
 
+import { pipe } from 'rxjs';
+import { map, switchMap, tap } from 'rxjs/operators';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -23,10 +26,20 @@ export class AppComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.synchronizationEnabled = this.settingsService.getDatabaseSettings().enableSynchronization;
-
     this.translateService.setDefaultLang(this.settingsService.defaultLanguage);
-    this.translateService.use(this.settingsService.getAppLanguage());
+    this.settingsService.appSettingsChanged.pipe(
+      map((appSettings) => appSettings.appLanguage),
+      switchMap((appLanguage) => this.translateService.use(appLanguage))
+    ).subscribe();
+
+    this.settingsService.databaseSettingsChanged.subscribe((databaseSettings) => {
+      this.synchronizationEnabled = databaseSettings.enableSynchronization;
+      if (this.synchronizationEnabled) {
+        this.databaseService.enableSyncing();
+      } else {
+        this.databaseService.disableSyncing();
+      }
+    });
 
     this.databaseService.synchronizationSubject.subscribe((event) => {
       if (event.type === 'error') {
@@ -41,10 +54,6 @@ export class AppComponent implements OnInit {
       this.snackBar.open('Sync broken!', 'Ok');
       this.databaseService.disableSyncing();
     });
-
-    if (this.synchronizationEnabled) {
-      this.databaseService.enableSyncing();
-    }
   }
 
   public isSyncing() {

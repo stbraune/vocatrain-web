@@ -59,7 +59,10 @@ export class WordsComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.supportedLanguages = this.settingsService.getLanguages();
+    this.settingsService.appSettingsChanged.subscribe((appSettings) => {
+      this.supportedLanguages = appSettings.userLanguages.filter((userLanguage) => userLanguage.enabled)
+        .map((userLanguage) => userLanguage.iso);
+    })
     this.queryAvailable = !!this.settingsService.getDatabaseSettings().couchDbLuceneUrl;
     this.loadWordTypeEntities();
     this.loadWordEntities();

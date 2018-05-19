@@ -3,16 +3,106 @@
     "title": "VocaTrain"
   },
   "nav": {
+    "guess": {
+      "title": "Guess"
+    },
     "words": {
       "title": "Words"
     },
     "word-types": {
-      "title": "Types"
+      "title": "Word Types"
+    },
+    "settings": {
+      "title": "Settings"
     }
+  },
+  "words": {
+    "title": "Words",
+    "search": "Search...",
+    "search-help": "Available fields:",
+    "tags": "Tags",
+    "edit-word": {
+      "title": "Edit word",
+      "available-tags": "Available tags",
+      "meta": "Help"
+    }
+  },
+  "word-types": {
+    "title": "Word Types"
+  },
+  "guess": {
+    "title": "Gues",
+    "start": "Start!",
+    "finished": "Finished!",
+    "no-more-words": "No more words available!",
+    "reached-amount": "Reached the amount of required words.",
+    "reached-minutes": "Time is over.",
+    "required-duration": "Duration",
+    "total-words": "Total words",
+    "duration": "Duration",
+    "words": "Words",
+    "uncover": "Uncover",
+    "cover": "Cover",
+    "right": "Correct",
+    "wrong": "Wrong",
+    "last-repeat": "Last Repeat",
+    "never": "Never",
+    "current-level": "Current Level",
+    "language": "Language",
+    "tags": "Tags",
+    "meta": "Help",
+    "stop": "Stop"
+  },
+  "search-options": {
+    "mode": {
+      "time": "Time",
+      "minutes": "Minutes",
+      "words": "Words",
+      "amount": "Amount"
+    },
+    "source-language": "Source language",
+    "target-language": "Target language",
+    "min-level": "Lowest level",
+    "max-level": "Highest level"
+  },
+  "settings": {
+    "title": "Settings",
+    "app": "VocaTrain",
+    "app-language": "Application Language",
+    "languages": "Used Languages",
+    "language-placeholder": "Add Language",
+    "database": "CouchDB",
+    "database-name": "Database Name",
+    "database-couchdb-url": "CouchDB URL",
+    "database-couchdb-lucene-url": "CouchDB-Lucene URL (Full text search)",
+    "database-synchronization": "Synchronize the local IndexedDB and remote CouchDB",
+    "backend": "VocaTrain Backend",
+    "backend-base-url": "Backend URL",
+    "saved": "Settings saved"
   },
   "actions": {
     "delete": "Delete",
     "cancel": "Cancel",
-    "save": "Save"
-  }
+    "save": "Save",
+    "add": "Add ...",
+    "create": "New ...",
+    "more": "More ..."
+  },
+  "google-translate-button": {
+    "tooltip": "Translate text",
+    "translate-to": {
+      "prefix": "Translate to ",
+      "suffix": ""
+    },
+    "select-translation": "Accept translation"
+  },
+  "de": "German",
+  "en": "English",
+  "es": "Spanish",
+  "fr": "French",
+  "it": "Italian",
+  "no": "Norwegian",
+  "sv": "Swedish",
+  "bg": "Bulgarian",
+  "ru": "Russian"
 }

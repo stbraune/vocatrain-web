@@ -47,13 +47,16 @@ export class GuessComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.supportedLanguages = this.settingsService.getLanguages();
-    this.searchOptions.sourceLanguage = this.supportedLanguages.length > 0 && this.supportedLanguages[0];
-    this.searchOptions.targetLanguage = this.supportedLanguages.length > 1 && this.supportedLanguages[1];
-    this.searchOptions.searchLanguages = [
-      this.supportedLanguages.length > 0 && this.supportedLanguages[0],
-      this.supportedLanguages.length > 1 && this.supportedLanguages[1]
-    ];
+    this.settingsService.appSettingsChanged.subscribe((appSettings) => {
+      this.supportedLanguages = appSettings.userLanguages.filter((userLanguage) => userLanguage.enabled)
+        .map((userLanguage) => userLanguage.iso);
+      this.searchOptions.sourceLanguage = this.supportedLanguages.length > 0 && this.supportedLanguages[0];
+      this.searchOptions.targetLanguage = this.supportedLanguages.length > 1 && this.supportedLanguages[1];
+      this.searchOptions.searchLanguages = [
+        this.supportedLanguages.length > 0 && this.supportedLanguages[0],
+        this.supportedLanguages.length > 1 && this.supportedLanguages[1]
+      ];
+    });
 
     window.addEventListener('keydown', (event: KeyboardEvent) => {
       this.onKeyDown(event);

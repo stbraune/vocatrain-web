@@ -1,4 +1,4 @@
-<button mat-icon-button (click)="showSuggestions($event)" [matTooltip]="'google-translate-button.tooltip' | translate">
+<button *ngIf="translateConfigured" mat-icon-button (click)="showSuggestions($event)" [matTooltip]="'google-translate-button.tooltip' | translate">
   <mat-icon>remove_red_eye</mat-icon>
 </button>
 

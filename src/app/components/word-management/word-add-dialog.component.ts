@@ -34,7 +34,10 @@ export class WordAddDialogComponent implements OnInit {
   }
 
   public ngOnInit() {
-    this.supportedLanguages = this.settingsService.getLanguages();
+    this.settingsService.appSettingsChanged.subscribe((appSettings) => {
+      this.supportedLanguages = appSettings.userLanguages.filter((userLanguage) => userLanguage.enabled)
+        .map((userLanguage) => userLanguage.iso);
+    });
     this.loadWordTypeEntities();
   }
 

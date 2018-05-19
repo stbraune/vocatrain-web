@@ -57,6 +57,10 @@ export class GoogleTranslateButtonComponent {
     this.bottomSheet.open(this.selectLanguageBottomSheetTemplate);
   }
 
+  public get translateConfigured() {
+    return this.googleTranslateService.translateConfigured();
+  }
+
   public translateTo(lang: string) {
     this.googleTranslateService.translate(this.text, {
       from: this.from,

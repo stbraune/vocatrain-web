@@ -105,7 +105,7 @@ export class WordEntityService {
   }
 
   private searchWordEntities(options: any) {
-    const supportedLanguages = this.settingsService.getLanguages();
+    const supportedLanguages = this.settingsService.getAppSettings().userLanguages.map((userLanguage) => userLanguage.iso);
     return this.db.getFulltextQuery('words-index', 'fti', `function (doc) {
       if (doc._id.substr(0, 'word_'.length) === 'word_') {
         const supportedLanguages = ${JSON.stringify(supportedLanguages)};

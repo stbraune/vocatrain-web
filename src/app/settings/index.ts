@@ -1,3 +1,4 @@
+export * from './app-settings';
 export * from './database-settings';
 export * from './backend-settings';
 export * from './settings.service';
