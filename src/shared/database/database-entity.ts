@@ -1,4 +1,4 @@
-export interface Entity {
+export interface DatabaseEntity {
   _id?: string;
   _rev?: string;
   createdAt?: Date;

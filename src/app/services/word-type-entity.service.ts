@@ -2,9 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
-import { DatabaseService } from './database.service';
-import { Database } from './database';
-
+import { Database, DatabaseService } from '../../shared';
 import { WordTypeEntity } from '../model';
 
 @Injectable()

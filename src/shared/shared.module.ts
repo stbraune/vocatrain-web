@@ -6,6 +6,9 @@ import { MatBottomSheetModule, MatIconModule, MatButtonModule, MatListModule, Ma
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
+import { SettingsModule } from '../settings';
+
+import { DatabaseService } from './database';
 import { GoogleTranslateService, GoogleTranslateButtonComponent } from './google-translate';
 import { GameLogEntityService } from './game-log';
 
@@ -23,7 +26,8 @@ import { GameLogEntityService } from './game-log';
     MatButtonModule,
     MatIconModule,
     MatListModule,
-    MatTooltipModule
+    MatTooltipModule,
+    SettingsModule
   ],
   declarations: [
     GoogleTranslateButtonComponent
@@ -37,6 +41,7 @@ export class SharedModule {
     return {
       ngModule: SharedModule,
       providers: [
+        DatabaseService,
         GoogleTranslateService,
         GameLogEntityService
       ]

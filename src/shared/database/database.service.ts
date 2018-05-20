@@ -3,11 +3,6 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable, Subject } from 'rxjs';
 
-import { Database } from './database';
-import { DatabaseOptions } from './database-options';
-import { Entity } from '../model';
-import { SettingsService, DatabaseSettings } from '../settings';
-
 import PouchDB from 'pouchdb-core';
 import PouchDBAdapterIdb from 'pouchdb-adapter-idb';
 import PouchDBAdapterHttp from 'pouchdb-adapter-http';
@@ -21,6 +16,11 @@ PouchDB
   .plugin(PouchDBMapReduce)
   .plugin(PouchDBReplication)
   .plugin(PouchDBFind);
+
+import { DatabaseEntity } from './database-entity';
+import { Database } from './database';
+import { DatabaseOptions } from './database-options';
+import { SettingsService, DatabaseSettings } from '../../settings';
 
 @Injectable()
 export class DatabaseService {
@@ -41,7 +41,7 @@ export class DatabaseService {
     });
   }
 
-  public openDatabase<T extends Entity>(options: DatabaseOptions<T>): Database<T> {
+  public openDatabase<T extends DatabaseEntity>(options: DatabaseOptions<T>): Database<T> {
     // for going directly onto couchdb-lucene instance
     // options.couchLuceneUrl = options.couchLuceneUrl || 'http://localhost:5985/local';
     // for using the couchdb proxy handler

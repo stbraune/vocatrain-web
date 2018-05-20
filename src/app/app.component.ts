@@ -3,11 +3,11 @@ import { MatSnackBar } from '@angular/material';
 
 import { TranslateService } from '@ngx-translate/core';
 
-import { DatabaseService } from './services';
-import { SettingsService } from './settings';
-
 import { pipe } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
+
+import { DatabaseService } from '../shared';
+import { SettingsService } from '../settings';
 
 @Component({
   selector: 'app-root',

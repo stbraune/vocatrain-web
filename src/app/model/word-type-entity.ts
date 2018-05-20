@@ -1,6 +1,6 @@
-import { Entity } from './entity';
+import { DatabaseEntity } from '../../shared';
 
-export interface WordTypeEntity extends Entity {
+export interface WordTypeEntity extends DatabaseEntity {
   _id?: string;
   _rev?: string;
   title: string;

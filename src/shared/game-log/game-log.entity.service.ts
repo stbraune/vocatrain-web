@@ -3,8 +3,11 @@ import { Injectable } from '@angular/core';
 import { Observable, throwError, pipe, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 
-import { DatabaseService, Database } from '../../app/services';
 import { GameLogEntity } from './game-log.entity';
+import { DatabaseService, Database } from '../database';
+
+// declare const emit: any;
+declare const sum: any;
 
 @Injectable()
 export class GameLogEntityService {
@@ -69,6 +72,53 @@ export class GameLogEntityService {
     return this.updateGameLog(this.currentGameLogEntity, lastStartTime).pipe(
       tap((gameLogEntity) => this.currentGameLogEntity = gameLogEntity)
     );
+  }
+
+  public getAverageDurationPerWord(mode: string) {
+    // https://www.slideshare.net/okurow/couchdb-mapreduce-13321353
+    // ?group_level=1 -> gruppiert nach modus
+    // ?group_level=2 -> gruppiert nach modus und tag (alternativ: ?group=true)
+    // ? -> gesamt, ueber alle modi und alle tage reduziert
+    // ?startkey=["guess", "2018-05-20"]&endkey=["guess", "2018-05-20\uffff"] -> zwischen angegeben bereichen
+    this.db.executeQuery<
+      [string, Date | string],
+      { durationInMillis: number, countTotal: number },
+      { durationInMillis: number, countTotal: number }
+    >({
+        designDocument: 'game-log-stats',
+        viewName: 'average-duration-per-word',
+        mapFunction(doc, emit) {
+          function normalizeDate(d: Date) {
+            return new Date(d.getTime()
+              - (d.getUTCHours() * 60 * 60 * 1000)
+              - (d.getUTCMinutes() * 60 * 1000)
+              - (d.getUTCSeconds() * 1000)
+              - (d.getUTCMilliseconds()));
+          }
+
+          if (doc._id.substr(0, 'game-log_'.length) === 'game-log_') {
+            emit(
+              [
+                doc.mode,
+                normalizeDate(new Date(doc.startTime))
+              ], {
+                durationInMillis: doc.durationInMillis,
+                countTotal: doc.countTotal
+              });
+          }
+        },
+        reduceFunction(keys, values, rereduce) {
+          return {
+            durationInMillis: sum(values.map(function (value) {
+              return value.durationInMillis;
+            })),
+            countTotal: sum(values.map(function (value) {
+              return value.countTotal;
+            }))
+          };
+        }
+      }).subscribe((x) => {
+      });
   }
 
   public createGameLog(mode: string): Observable<GameLogEntity> {

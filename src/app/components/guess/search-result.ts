@@ -1,19 +1,21 @@
 import { WordEntity } from '../../model';
 
+export interface SearchResultKey {
+  searchLanguages: string[];
+  reoccurAt: string | Date;
+  answerHash: number;
+  answerLevel: number;
+  answerLanguage: string;
+  answer: string;
+  answerAt: Date;
+  questionLanguage: string;
+  question: string;
+  tags: string[];
+  meta: string;
+  textIndex: number;
+}
+
 export interface SearchResult {
-  key: {
-    searchLanguages: string[],
-    reoccurAt: Date,
-    answerHash: number,
-    answerLevel: number,
-    answerLanguage: string,
-    answer: string,
-    answerAt: Date,
-    questionLanguage: string,
-    question: string,
-    tags: string[],
-    meta: string,
-    textIndex: number
-  };
-  doc: WordEntity;
+  key: SearchResultKey;
+  doc?: WordEntity;
 }

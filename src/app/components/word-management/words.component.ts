@@ -6,9 +6,10 @@ import { debounceTime } from 'rxjs/operators';
 
 import { WordTypeEntityService, WordEntityService } from '../../services';
 import { WordTypeEntity, WordEntity } from '../../model';
-import { SettingsService } from '../../settings';
-import { WordEditComponent } from '.';
+import { SettingsService } from '../../../settings';
+
 import { WordAddDialogComponent } from './word-add-dialog.component';
+import { WordEditComponent } from './word-edit.component';
 
 @Component({
   selector: 'words',

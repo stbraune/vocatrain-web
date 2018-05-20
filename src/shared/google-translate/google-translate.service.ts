@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { GoogleTranslateOptions } from './google-translate-options';
 import { GoogleTranslateResult } from './google-translate-result';
-import { SettingsService, AppSettings } from '../../app/settings';
+import { SettingsService, AppSettings } from '../../settings';
 
 @Injectable()
 export class GoogleTranslateService {

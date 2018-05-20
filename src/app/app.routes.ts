@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { WordsComponent, WordTypesComponent, GuessComponent } from './components';
-import { SettingsComponent } from './settings';
+import { SettingsComponent } from '../settings';
 
 export const AppRoutes: Routes = [
   {

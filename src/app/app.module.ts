@@ -30,7 +30,7 @@ import {
 } from '@angular/material';
 
 import {
-  DatabaseService, WordTypeEntityService, WordEntityService
+  WordTypeEntityService, WordEntityService
 } from './services';
 
 import { AppComponent } from './app.component';
@@ -47,9 +47,9 @@ import {
 } from './components';
 
 import { AppRoutes } from './app.routes';
-import { SettingsModule } from './settings';
 import { SharedModule } from '../shared';
 import { WordAddDialogComponent } from './components/word-management/word-add-dialog.component';
+import { SettingsModule } from '../settings';
 
 @NgModule({
   declarations: [
@@ -75,7 +75,6 @@ import { WordAddDialogComponent } from './components/word-management/word-add-di
         useExisting: TranslateHttpLoader
       }
     }),
-    SharedModule.forRoot(),
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
@@ -96,6 +95,7 @@ import { WordAddDialogComponent } from './components/word-management/word-add-di
     MatTableModule,
     MatToolbarModule,
     MatTooltipModule,
+    SharedModule.forRoot(),
     SettingsModule.forRoot()
   ],
   providers: [
@@ -104,7 +104,6 @@ import { WordAddDialogComponent } from './components/word-management/word-add-di
       useFactory: TranslateHttpLoaderFactory,
       deps: [HttpClient]
     },
-    DatabaseService,
     WordTypeEntityService,
     WordEntityService,
     GuessService

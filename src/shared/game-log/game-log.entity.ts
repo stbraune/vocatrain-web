@@ -1,6 +1,6 @@
-import { Entity } from '../../app/model';
+import { DatabaseEntity } from '../database';
 
-export interface GameLogEntity extends Entity {
+export interface GameLogEntity extends DatabaseEntity {
   mode: string;
   startTime: Date;
   endTime: Date;

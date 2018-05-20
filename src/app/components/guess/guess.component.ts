@@ -6,13 +6,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { pipe, Observable, throwError, of } from 'rxjs';
 import { switchMap, catchError, map, tap } from 'rxjs/operators';
 
+import { GameLogEntityService, GameLogEntity } from '../../../shared';
+import { SettingsService } from '../../../settings';
 import { WordEntityService } from '../../services';
-import { GuessService } from './guess.service';
 
+import { GuessService } from './guess.service';
 import { SearchOptions } from './search-options';
 import { SearchResult } from './search-result';
-import { SettingsService } from '../../settings';
-import { GameLogEntityService, GameLogEntity } from '../../../shared';
 
 @Component({
   selector: 'guess',
@@ -62,6 +62,8 @@ export class GuessComponent implements OnInit {
         this.supportedLanguages.length > 1 && this.supportedLanguages[1]
       ];
     });
+
+    this.gameLogEntityService.getAverageDurationPerWord('guess');
 
     window.addEventListener('keydown', (event: KeyboardEvent) => {
       this.onKeyDown(event);
