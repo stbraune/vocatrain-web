@@ -1,7 +1,17 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { MatBottomSheetModule, MatIconModule, MatButtonModule, MatListModule, MatTooltipModule } from '@angular/material';
+
+import {
+  MatBottomSheetModule,
+  MatIconModule,
+  MatButtonModule,
+  MatListModule,
+  MatTooltipModule,
+  MatChipsModule,
+  MatFormFieldModule
+} from '@angular/material';
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -19,6 +29,7 @@ import { ChipsComponent } from './chips';
   imports: [
     CommonModule,
     HttpClientModule,
+    FormsModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -27,6 +38,8 @@ import { ChipsComponent } from './chips';
     }),
     MatBottomSheetModule,
     MatButtonModule,
+    MatChipsModule,
+    MatFormFieldModule,
     MatIconModule,
     MatListModule,
     MatTooltipModule,
