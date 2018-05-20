@@ -39,8 +39,6 @@ import {
   WordTypeEditComponent,
   WordEditComponent,
   WordTypesComponent,
-  ChipInputComponent,
-  ChipsComponent,
   GuessComponent,
   GuessService,
   SearchOptionsComponent
@@ -54,8 +52,6 @@ import { SettingsModule } from '../settings';
 @NgModule({
   declarations: [
     AppComponent,
-    ChipsComponent,
-    ChipInputComponent,
     WordsComponent,
     WordTypesComponent,
     WordAddDialogComponent,

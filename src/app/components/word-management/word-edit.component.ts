@@ -15,11 +15,10 @@ import { MatSnackBar, MatSelect } from '@angular/material';
 
 import { Observable ,  Subject } from 'rxjs';
 
+import { GoogleTranslateService, GoogleTranslateAlternative, ChipInputComponent } from '../../../shared';
 import { WordTypeEntityService, WordEntityService } from '../../services';
 import { WordTypeEntity, WordEntity } from '../../model';
 import { Text } from '../../model/text';
-import { ChipInputComponent } from './chip-input.component';
-import { GoogleTranslateService, GoogleTranslateAlternative } from '../../../shared';
 
 @Component({
   selector: 'word-edit',

@@ -9,8 +9,11 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { SettingsModule } from '../settings';
 
 import { DatabaseService } from './database';
+
 import { GoogleTranslateService, GoogleTranslateButtonComponent } from './google-translate';
 import { GameLogEntityService } from './game-log';
+import { ChipInputComponent } from './chip-input';
+import { ChipsComponent } from './chips';
 
 @NgModule({
   imports: [
@@ -30,10 +33,14 @@ import { GameLogEntityService } from './game-log';
     SettingsModule
   ],
   declarations: [
-    GoogleTranslateButtonComponent
+    GoogleTranslateButtonComponent,
+    ChipInputComponent,
+    ChipsComponent
   ],
   exports: [
-    GoogleTranslateButtonComponent
+    GoogleTranslateButtonComponent,
+    ChipInputComponent,
+    ChipsComponent
   ]
 })
 export class SharedModule {
