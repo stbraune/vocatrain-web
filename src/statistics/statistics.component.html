@@ -80,8 +80,9 @@
     </mat-card-subtitle>
     <mat-card-content>
       <div style="display: block; overflow: auto;">
-        <ngx-charts-bar-horizontal
+        <ngx-charts-bar-horizontal #wordsPerLevelChart
           scheme="forest"
+          [view]="[wordsPerLevelChart.getContainerDims().width, 30 * wordsPerLevel.value.length]"
           [results]="wordsPerLevel.value"
           [yAxis]="true">
         </ngx-charts-bar-horizontal>
