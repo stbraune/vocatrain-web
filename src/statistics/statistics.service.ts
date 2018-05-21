@@ -27,7 +27,62 @@ export class StatisticsService {
     startDate?: Date,
     endDate?: Date
   }) {
-    return this.queryGameLogStats(options);
+    return this.queryGameLogStats(Object.assign(options, {
+      group_level: 1
+    }));
+  }
+
+  public getTotalsPerDay(options: {
+    mode: string,
+    startDate: Date,
+    endDate: Date
+  }) {
+    return this.queryGameLogStats(Object.assign(options, {
+      group_level: 2
+    })).pipe(
+      map((result) => {
+        const minDate = result.map((r) => new Date(<string>r.key[1]))
+          .reduce((prev, cur) => prev.getTime() === 0 || prev.getTime() > cur.getTime() ? cur : prev, new Date(0));
+        const maxDate = result.map((r) => new Date(<string>r.key[1]))
+          .reduce((prev, cur) => prev.getTime() === 0 || prev.getTime() < cur.getTime() ? cur : prev, new Date(0));
+        const anyKey = result[0];
+        if (!anyKey) {
+          return result;
+        }
+
+        while (minDate.getTime() < maxDate.getTime()) {
+          if (!result.find((r) => r.key[1] === minDate.toISOString())) {
+            const oneDayMore = new Date(minDate.getTime());
+            oneDayMore.setDate(oneDayMore.getDate() + 1);
+            const index = result.findIndex((r) => r.key[1] === oneDayMore.toISOString());
+            if (index === -1) {
+              result.push({
+                key: [options.mode, minDate.toISOString()],
+                value: {
+                  durationInMillis: 0,
+                  countCorrect: 0,
+                  countWrong: 0,
+                  countTotal: 0
+                }
+              });
+            } else {
+              result.splice(index, 0, {
+                key: [options.mode, minDate.toISOString()],
+                value: {
+                  durationInMillis: 0,
+                  countCorrect: 0,
+                  countWrong: 0,
+                  countTotal: 0
+                }
+              });
+            }
+          }
+
+          minDate.setDate(minDate.getDate() + 1);
+        }
+        return result;
+      })
+    );
   }
 
   public getGameLogEntities(options: {
@@ -38,7 +93,8 @@ export class StatisticsService {
     return this.queryGameLogStats(Object.assign(options, {
       include_docs: true,
       reduce: false,
-      descending: true
+      descending: true,
+      group_level: 1
     })).pipe(
       map((result) => result.map((row) => row.doc))
     );
@@ -50,7 +106,8 @@ export class StatisticsService {
     endDate?: Date,
     reduce?: boolean,
     include_docs?: boolean,
-    descending?: boolean
+    descending?: boolean,
+    group_level: number
   }) {
     // https://www.slideshare.net/okurow/couchdb-mapreduce-13321353
     // ?group_level=1 -> gruppiert nach modus
@@ -114,7 +171,7 @@ export class StatisticsService {
             };
           };
         },
-        group_level: 1,
+        group_level: options.group_level,
         startkey: options.descending ? endkey : startkey,
         endkey: options.descending ? startkey : endkey,
         reduce: options.reduce,
@@ -163,7 +220,38 @@ export class StatisticsService {
           group: true,
           startkey: [options.mode, undefined, undefined],
           endkey: [options.mode, `\uffff`, Number.MAX_VALUE]
-        }))
+        })),
+      map((result) => {
+        const keysWithoutLevel = result.rows.map((row) => <[string, string]>[row.key[0], row.key[1]])
+          .reduce((prev, cur) => prev.findIndex((x) => x[0] === cur[0] && x[1] === cur[1]) === -1 ? [...prev, cur] : prev,
+            <[string, string][]>[]);
+        const groups = keysWithoutLevel.map((keyWithoutLevel) => ({
+          key: keyWithoutLevel,
+          rows: result.rows.filter((row) => row.key[0] === keyWithoutLevel[0] && row.key[1] === keyWithoutLevel[1])
+        }));
+        groups.forEach((group) => {
+          const minLevel = group.rows.map((row) => row.key[2]).reduce((prev, cur) => prev === -1 || prev > cur ? cur : prev, -1);
+          const maxLevel = group.rows.map((row) => row.key[2]).reduce((prev, cur) => prev === -1 || prev < cur ? cur : prev, -1);
+          for (let level = minLevel; level <= maxLevel; level++) {
+            const row = group.rows.find((r) => r.key[0] === group.key[0] && r.key[1] === group.key[1] && r.key[2] === level);
+            if (!row) {
+              const index = result.rows.findIndex((r) => r.key[0] === group.key[0] && r.key[1] === group.key[1] && r.key[2] === level + 1);
+              if (index === -1) {
+                result.rows.push({
+                  key: [group.key[0], group.key[1], level],
+                  value: 0
+                });
+              } else {
+                result.rows.splice(index, 0, {
+                  key: [group.key[0], group.key[1], level],
+                  value: 0
+                });
+              }
+            }
+          }
+        });
+        return result;
+      })
     );
   }
 

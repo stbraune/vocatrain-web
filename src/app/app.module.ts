@@ -9,6 +9,15 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoaderFactory } from './translate-http-loader-factory';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
+import { registerLocaleData } from '@angular/common';
+import localeBg from '@angular/common/locales/bg';
+import localeDe from '@angular/common/locales/de';
+import localeRu from '@angular/common/locales/ru';
+
+registerLocaleData(localeBg);
+registerLocaleData(localeDe);
+registerLocaleData(localeRu);
+
 import {
   MatButtonModule,
   MatCardModule,

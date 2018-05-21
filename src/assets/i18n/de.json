@@ -47,7 +47,12 @@
     "average-per-word": "Durchschnittl. Dauer pro Wort",
     "words-per-level": "Wörter pro Stufe",
     "to": "nach",
-    "level": "Stufe "
+    "level": "Stufe ",
+    "words-per-day": "Wörter pro Tag",
+    "date-format": "dd.MM.yyyy",
+    "correct": "Richtig",
+    "wrong": "Falsch",
+    "total": "Gesamt"
   },
   "guess": {
     "title": "Raten",

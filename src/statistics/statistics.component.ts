@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { DatePipe } from '@angular/common';
+
 import { TranslateService } from '@ngx-translate/core';
 import { ColorHelper } from '@swimlane/ngx-charts';
 
@@ -6,10 +8,28 @@ import { GameLogEntity } from '../shared';
 import { StatisticsService } from './statistics.service';
 
 declare interface WordsPerLevel {
+  // [mode, lang]
   key: [string, string];
   value: {
+    // level
     name: string,
+    // amount
     value: number
+  }[];
+}
+
+declare interface WordsPerDay {
+  // mode
+  key: string;
+  value: {
+    // date
+    name: string,
+    series: {
+      // correct/wrong/total
+      name: string,
+      // amount
+      value: number
+    }[]
   }[];
 }
 
@@ -39,9 +59,9 @@ export class StatisticsComponent implements OnInit {
     }
   }[] = [];
 
-  public last30: GameLogEntity[] = [];
-
   public wordsPerLevels: WordsPerLevel[] = [];
+
+  public wordsPerDays: WordsPerDay[] = [];
 
   public constructor(
     private translateService: TranslateService,
@@ -62,12 +82,6 @@ export class StatisticsComponent implements OnInit {
 
     this.statisticsService.getTotals({ mode: 'guess', startDate: then, endDate: now }).subscribe((result) => {
       this.totalsLast30.push(...result);
-    }, (error) => {
-      console.error(error);
-    });
-
-    this.statisticsService.getGameLogEntities({ mode: 'guess', startDate: then, endDate: now }).subscribe((result) => {
-      this.last30.push(...result);
     }, (error) => {
       console.error(error);
     });
@@ -94,8 +108,55 @@ export class StatisticsComponent implements OnInit {
             }
             return prev;
           }, <WordsPerLevel[]>[]));
+      }, (error) => {
+        console.error(error);
       });
     });
+
+    this.translateService.get(['statistics.date-format', 'statistics.correct', 'statistics.wrong', 'statistics.total'])
+      .subscribe((texts) => {
+        const dateFormatString = texts['statistics.date-format'];
+        const correct = texts['statistics.correct'];
+        const wrong = texts['statistics.wrong'];
+        const total = texts['statistics.total'];
+        this.statisticsService.getTotalsPerDay({ mode: 'guess', startDate: then, endDate: now }).subscribe((result) => {
+          this.wordsPerDays.push(...result
+            .map((r) => ({
+              key: r.key[0],
+              value: [
+                {
+                  name: this.formatDateShort(new Date(<string>r.key[1]), dateFormatString),
+                  series: [
+                    {
+                      name: correct,
+                      value: r.value.countCorrect
+                    },
+                    {
+                      name: wrong,
+                      value: r.value.countWrong
+                    }
+                  ]
+                }
+              ]
+            }))
+            .reduce((prev, cur) => {
+              const index = prev.findIndex((x) => x.key === cur.key);
+              if (index !== -1) {
+                prev[index].value.push(...cur.value);
+              } else {
+                prev.push(cur);
+              }
+              return prev;
+            }, <WordsPerDay[]>[])
+          );
+        }, (error) => {
+          console.error(error);
+        });
+      });
+  }
+
+  public formatDateShort(date: Date, dateFormatString: string): string {
+    return new DatePipe(this.translateService.currentLang).transform(date, dateFormatString);
   }
 
   public formatDuration(start: Date, end: Date): string {

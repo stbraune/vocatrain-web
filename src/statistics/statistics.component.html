@@ -12,25 +12,25 @@
         {{('statistics.mode.' + total.key[0]) | translate}}
       </mat-card-subtitle>
       <mat-card-content>
-        <p>
-          <em>{{'statistics.total-duration' | translate}}</em>
-          {{formatSeconds(total.value.durationInMillis / 1000)}}
+        <p class="flex">
+          <em class="flex-col flex-col--1">{{'statistics.total-duration' | translate}}</em>
+          <span class="flex-col flex-col--1">{{formatSeconds(total.value.durationInMillis / 1000)}}</span>
         </p>
-        <p>
-          <em>{{'statistics.correct-words' | translate}}</em>
-          {{total.value.countCorrect}}
+        <p class="flex">
+          <em class="flex-col flex-col--1">{{'statistics.correct-words' | translate}}</em>
+          <span class="flex-col flex-col--1">{{total.value.countCorrect}}</span>
         </p>
-        <p>
-          <em>{{'statistics.wrong-words' | translate}}</em>
-          {{total.value.countWrong}}
+        <p class="flex">
+          <em class="flex-col flex-col--1">{{'statistics.wrong-words' | translate}}</em>
+          <span class="flex-col flex-col--1">{{total.value.countWrong}}</span>
         </p>
-        <p>
-          <em>{{'statistics.total-words' | translate}}</em>
-          {{total.value.countTotal}}
+        <p class="flex">
+          <em class="flex-col flex-col--1">{{'statistics.total-words' | translate}}</em>
+          <span class="flex-col flex-col--1">{{total.value.countTotal}}</span>
         </p>
-        <p>
-          <em>{{'statistics.average-per-word' | translate}}</em>
-          {{formatSeconds(total.value.durationInMillis / total.value.countTotal / 1000)}}
+        <p class="flex">
+          <em class="flex-col flex-col--1">{{'statistics.average-per-word' | translate}}</em>
+          <span class="flex-col flex-col--1">{{formatSeconds(total.value.durationInMillis / total.value.countTotal / 1000)}}</span>
         </p>
       </mat-card-content>
     </ng-container>
@@ -45,25 +45,25 @@
         {{('statistics.mode.' + total.key[0]) | translate}}
       </mat-card-subtitle>
       <mat-card-content>
-        <p>
-          <em>{{'statistics.total-duration' | translate}}</em>
-          {{formatSeconds(total.value.durationInMillis / 1000)}}
+        <p class="flex">
+          <em class="flex-col flex-col--1">{{'statistics.total-duration' | translate}}</em>
+          <span class="flex-col flex-col--1">{{formatSeconds(total.value.durationInMillis / 1000)}}</span>
         </p>
-        <p>
-          <em>{{'statistics.correct-words' | translate}}</em>
-          {{total.value.countCorrect}}
+        <p class="flex">
+          <em class="flex-col flex-col--1">{{'statistics.correct-words' | translate}}</em>
+          <span class="flex-col flex-col--1">{{total.value.countCorrect}}</span>
         </p>
-        <p>
-          <em>{{'statistics.wrong-words' | translate}}</em>
-          {{total.value.countWrong}}
+        <p class="flex">
+          <em class="flex-col flex-col--1">{{'statistics.wrong-words' | translate}}</em>
+          <span class="flex-col flex-col--1">{{total.value.countWrong}}</span>
         </p>
-        <p>
-          <em>{{'statistics.total-words' | translate}}</em>
-          {{total.value.countTotal}}
+        <p class="flex">
+          <em class="flex-col flex-col--1">{{'statistics.total-words' | translate}}</em>
+          <span class="flex-col flex-col--1">{{total.value.countTotal}}</span>
         </p>
-        <p>
-          <em>{{'statistics.average-per-word' | translate}}</em>
-          {{formatSeconds(total.value.durationInMillis / total.value.countTotal / 1000)}}
+        <p class="flex">
+          <em class="flex-col flex-col--1">{{'statistics.average-per-word' | translate}}</em>
+          <span class="flex-col flex-col--1">{{formatSeconds(total.value.durationInMillis / total.value.countTotal / 1000)}}</span>
         </p>
       </mat-card-content>
     </ng-container>
@@ -82,7 +82,6 @@
       <div style="display: block; overflow: auto;">
         <ngx-charts-bar-horizontal
           scheme="forest"
-          [view]="[300, 200]"
           [results]="wordsPerLevel.value"
           [yAxis]="true">
         </ngx-charts-bar-horizontal>
@@ -91,8 +90,23 @@
   </mat-card>
 </div>
 
-<mat-card>
+<mat-card *ngFor="let wordsPerDay of wordsPerDays" class="margin--bottom">
+  <mat-card-title>
+    {{'statistics.words-per-day' | translate}}
+  </mat-card-title>
+  <mat-card-subtitle>
+    {{('statistics.mode.' + wordsPerDay.key) | translate}}
+  </mat-card-subtitle>
   <mat-card-content>
-    <pre>{{last30 | json}}</pre>
+    <div style="display: block; overflow: auto;">
+      <ngx-charts-bar-vertical-stacked
+        scheme="forest"
+        [results]="wordsPerDay.value"
+        [showDataLabel]="true"
+        [yAxis]="true"
+        [xAxis]="true"
+        [showGridLines]="false">
+      </ngx-charts-bar-vertical-stacked>
+    </div>
   </mat-card-content>
 </mat-card>
