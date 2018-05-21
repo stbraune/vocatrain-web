@@ -52,9 +52,9 @@ export class StatisticsService {
 
         while (minDate.getTime() < maxDate.getTime()) {
           if (!result.find((r) => r.key[1] === minDate.toISOString())) {
-            const oneDayMore = new Date(minDate.getTime());
-            oneDayMore.setDate(oneDayMore.getDate() + 1);
-            const index = result.findIndex((r) => r.key[1] === oneDayMore.toISOString());
+            const oneDayLess = new Date(minDate.getTime());
+            oneDayLess.setDate(oneDayLess.getDate() - 1);
+            const index = result.findIndex((r) => r.key[1] === oneDayLess.toISOString());
             if (index === -1) {
               result.push({
                 key: [options.mode, minDate.toISOString()],
@@ -66,7 +66,7 @@ export class StatisticsService {
                 }
               });
             } else {
-              result.splice(index, 0, {
+              result.splice(index + 1, 0, {
                 key: [options.mode, minDate.toISOString()],
                 value: {
                   durationInMillis: 0,
@@ -227,14 +227,14 @@ export class StatisticsService {
           for (let level = minLevel; level <= maxLevel; level++) {
             const row = group.rows.find((r) => r.key[0] === group.key[0] && r.key[1] === group.key[1] && r.key[2] === level);
             if (!row) {
-              const index = result.rows.findIndex((r) => r.key[0] === group.key[0] && r.key[1] === group.key[1] && r.key[2] === level + 1);
+              const index = result.rows.findIndex((r) => r.key[0] === group.key[0] && r.key[1] === group.key[1] && r.key[2] === level - 1);
               if (index === -1) {
                 result.rows.push({
                   key: [group.key[0], group.key[1], level],
                   value: 0
                 });
               } else {
-                result.rows.splice(index, 0, {
+                result.rows.splice(index + 1, 0, {
                   key: [group.key[0], group.key[1], level],
                   value: 0
                 });
