@@ -5,12 +5,13 @@ import { HttpClientModule } from '@angular/common/http';
 
 import {
   MatBottomSheetModule,
-  MatIconModule,
   MatButtonModule,
-  MatListModule,
-  MatTooltipModule,
   MatChipsModule,
-  MatFormFieldModule
+  MatFormFieldModule,
+  MatIconModule,
+  MatInputModule,
+  MatListModule,
+  MatTooltipModule
 } from '@angular/material';
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -41,6 +42,7 @@ import { ChipsComponent } from './chips';
     MatChipsModule,
     MatFormFieldModule,
     MatIconModule,
+    MatInputModule,
     MatListModule,
     MatTooltipModule,
     SettingsModule
