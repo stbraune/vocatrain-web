@@ -88,7 +88,6 @@ export class StatisticsComponent implements OnInit {
 
     this.translateService.get('statistics.level').subscribe((level) => {
       this.statisticsService.queryWordsPerLevel({ mode: 'guess' }).subscribe((result) => {
-        console.log('per level', result);
         this.wordsPerLevels.push(...result.rows
           .map((row) => ({
             key: <[string, string]>[row.key[0], row.key[1]],
