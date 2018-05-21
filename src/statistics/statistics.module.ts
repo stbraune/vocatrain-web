@@ -3,20 +3,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import {
-  MatButtonModule,
-  MatCardModule,
-  MatFormFieldModule,
-  MatIconModule,
-  MatInputModule,
-  MatCheckboxModule
+  MatCardModule
 } from '@angular/material';
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { SettingsService } from './settings.service';
-import { SettingsComponent } from './settings.component';
-import { SettingsRoutingModule } from './settings.routing.module';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+
+import { SharedModule } from '../shared';
+
+import { StatisticsService } from './statistics.service';
+import { StatisticsComponent } from './statistics.component';
+import { StatisticsRoutingModule } from './statistics.routing.module';
 
 @NgModule({
   imports: [
@@ -28,24 +27,24 @@ import { SettingsRoutingModule } from './settings.routing.module';
         useExisting: TranslateHttpLoader
       }
     }),
-    MatButtonModule,
     MatCardModule,
-    MatCheckboxModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    SettingsRoutingModule
+    NgxChartsModule,
+    SharedModule,
+    StatisticsRoutingModule
   ],
   declarations: [
-    SettingsComponent
+    StatisticsComponent
+  ],
+  exports: [
+    StatisticsComponent
   ]
 })
-export class SettingsModule {
+export class StatisticsModule {
   public static forRoot(): ModuleWithProviders {
     return {
-      ngModule: SettingsModule,
+      ngModule: StatisticsModule,
       providers: [
-        SettingsService
+        StatisticsService
       ]
     };
   }

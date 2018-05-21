@@ -4,4 +4,7 @@ export interface DatabaseFetchOptions<TKey> {
   endkey?: Partial<TKey>;
   limit?: number;
   descending?: boolean;
+  reduce?: boolean;
+  group?: boolean;
+  group_level?: number;
 }

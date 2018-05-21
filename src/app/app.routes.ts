@@ -20,9 +20,5 @@ export const AppRoutes: Routes = [
   {
     path: 'word-types',
     component: WordTypesComponent
-  },
-  {
-    path: 'settings',
-    component: SettingsComponent
   }
 ];

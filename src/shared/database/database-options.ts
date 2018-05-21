@@ -3,4 +3,5 @@ export interface DatabaseOptions<T> {
   deserialize?: (item: T) => T;
   serialize?: (item: T) => T;
   couchLuceneUrl?: string;
+  debugging?: boolean;
 }

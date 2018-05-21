@@ -1,6 +1,6 @@
 export interface DatabaseQueryResult<TEntity, TKey, TValue> {
-  total_rows: number;
-  offset: number;
+  total_rows?: number;
+  offset?: number;
   rows: {
     id?: string,
     key: TKey,

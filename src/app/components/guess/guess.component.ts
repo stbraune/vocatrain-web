@@ -63,8 +63,6 @@ export class GuessComponent implements OnInit {
       ];
     });
 
-    this.gameLogEntityService.getAverageDurationPerWord('guess');
-
     window.addEventListener('keydown', (event: KeyboardEvent) => {
       this.onKeyDown(event);
     }, false);

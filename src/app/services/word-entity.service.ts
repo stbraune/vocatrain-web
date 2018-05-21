@@ -60,33 +60,35 @@ export class WordEntityService {
     return this.db.executeQuery<string>({
       designDocument: `words-index`,
       viewName: `by-${options.sort}`,
-      mapFunction: `function(doc) {
-        if (doc._id.substr(0, 'word_'.length) === 'word_') {
-          const sort = '${options.sort}';
-          if (doc[sort]) {
-            emit(doc[sort]);
+      mapFunction(emit) {
+        return `function(doc) {
+          if (doc._id.substr(0, 'word_'.length) === 'word_') {
+            const sort = '${options.sort}';
+            if (doc[sort]) {
+              emit(doc[sort]);
+            }
+
+            if (sort === 'creation') {
+              emit([doc.createdAt, doc._id]);
+            }
+
+            doc.texts.forEach(function (text) {
+              if (typeof text[sort] === 'string') {
+                emit([text[sort], doc._id]);
+              }
+
+              if (Array.isArray(text[sort])) {
+                text[sort].sort();
+                emit([text[sort], doc._id]);
+              }
+
+              if (text.words && text.words[sort]) {
+                emit([text.words[sort].value, doc._id]);
+              }
+            });
           }
-
-          if (sort === 'creation') {
-            emit([doc.createdAt, doc._id]);
-          }
-
-          doc.texts.forEach(function (text) {
-            if (typeof text[sort] === 'string') {
-              emit([text[sort], doc._id]);
-            }
-
-            if (Array.isArray(text[sort])) {
-              text[sort].sort();
-              emit([text[sort], doc._id]);
-            }
-
-            if (text.words && text.words[sort]) {
-              emit([text.words[sort].value, doc._id]);
-            }
-          });
-        }
-      }`,
+        }`;
+      },
       startkey: options && options.descending ? (<string>options.startkey || undefined) : (<string>options.startkey || ``),
       endkey: options && options.descending ? '' : undefined,
       limit: options.limit,
@@ -106,30 +108,32 @@ export class WordEntityService {
     return this.db.executeFulltextQuery(Object.assign({
       designDocument: 'words-index',
       indexName: 'fti',
-      indexFunction: `function (doc) {
-        if (doc._id.substr(0, 'word_'.length) === 'word_') {
-          const supportedLanguages = ${JSON.stringify(supportedLanguages)};
-          const indexDocument = new Document();
-          indexDocument.add(doc.type.title);
-          indexDocument.add(doc.type.title, { field: 'type' });
-          doc.texts.forEach(function (text) {
-            indexDocument.add(text.meta);
-            indexDocument.add(text.meta, { field: 'meta' });
+      indexFunction() {
+        return `function (doc) {
+          if (doc._id.substr(0, 'word_'.length) === 'word_') {
+            const supportedLanguages = ${JSON.stringify(supportedLanguages)};
+            const indexDocument = new Document();
+            indexDocument.add(doc.type.title);
+            indexDocument.add(doc.type.title, { field: 'type' });
+            doc.texts.forEach(function (text) {
+              indexDocument.add(text.meta);
+              indexDocument.add(text.meta, { field: 'meta' });
 
-            text.tags.forEach(function(tag) {
-              indexDocument.add(tag);
-              indexDocument.add(tag, { field: 'tags' });
+              text.tags.forEach(function(tag) {
+                indexDocument.add(tag);
+                indexDocument.add(tag, { field: 'tags' });
+              });
+              supportedLanguages.forEach(function (lang) {
+                if (text.words[lang] && text.words[lang].value) {
+                  indexDocument.add(text.words[lang].value);
+                  indexDocument.add(text.words[lang].value, { field: lang });
+                }
+              });
             });
-            supportedLanguages.forEach(function (lang) {
-              if (text.words[lang] && text.words[lang].value) {
-                indexDocument.add(text.words[lang].value);
-                indexDocument.add(text.words[lang].value, { field: lang });
-              }
-            });
-          });
-          return indexDocument;
-        }
-      }`
+            return indexDocument;
+          }
+        }`;
+      }
     }, options));
   }
 

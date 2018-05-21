@@ -48,6 +48,7 @@ import { AppRoutes } from './app.routes';
 import { SharedModule } from '../shared';
 import { WordAddDialogComponent } from './components/word-management/word-add-dialog.component';
 import { SettingsModule } from '../settings';
+import { StatisticsModule } from '../statistics';
 
 @NgModule({
   declarations: [
@@ -92,7 +93,8 @@ import { SettingsModule } from '../settings';
     MatToolbarModule,
     MatTooltipModule,
     SharedModule.forRoot(),
-    SettingsModule.forRoot()
+    SettingsModule.forRoot(),
+    StatisticsModule.forRoot()
   ],
   providers: [
     {

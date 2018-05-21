@@ -46,6 +46,7 @@ export class DatabaseService {
     // options.couchLuceneUrl = options.couchLuceneUrl || 'http://localhost:5985/local';
     // for using the couchdb proxy handler
     options.couchLuceneUrl = options.couchLuceneUrl || `${this._settings.fti.couchDbLuceneUrl}/${this._settings.fti.databaseName}`;
+    options.debugging = true;
     return new Database<T>(this.getLocalDatabase(), options, this.httpClient);
   }
 

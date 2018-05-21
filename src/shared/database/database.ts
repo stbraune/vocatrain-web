@@ -10,6 +10,7 @@ import * as uuidv4 from 'uuid/v4';
 import { DatabaseOptions } from './database-options';
 
 import { DatabaseEntity } from './database-entity';
+import { DatabaseDocument } from './database-document';
 import { DatabaseDesignDocument } from './database-design-document';
 
 import { DatabaseGetQueryOptions } from './database-get-query-options';
@@ -33,6 +34,11 @@ export class Database<TEntity extends DatabaseEntity> {
     private _options: DatabaseOptions<TEntity>,
     private _httpClient: HttpClient
   ) {
+    if (_options.debugging) {
+      this._database.on('error', function(error) {
+        console.error(`An unexpected error occurred in database for ${this._options.name}`, error);
+      });
+    }
   }
 
   public getDatabase() {
@@ -77,16 +83,10 @@ export class Database<TEntity extends DatabaseEntity> {
     item.transient = undefined;
     item.updatedAt = item.createdAt = now;
 
-    return from(this._database.put(this.serializeEntity(item))).pipe(map((result: any) => {
-      if (result.ok) {
-        item._rev = result.rev;
-        item.transient = transient;
-        this.entitySaved.emit(item);
-        return item;
-      } else {
-        throw new Error(`Error while creating entity: ${JSON.stringify(item)}`);
-      }
-    }));
+    return this.putDocument(this.serializeEntity(item)).pipe(
+      tap((persistedItem) => persistedItem.transient = transient),
+      tap((persistedItem) => this.entitySaved.emit(persistedItem))
+    );
   }
 
   public putEntity(item: TEntity, id?: string): Observable<TEntity> {
@@ -97,16 +97,19 @@ export class Database<TEntity extends DatabaseEntity> {
     item.updatedAt = now;
     item.createdAt = item.createdAt || item.updatedAt;
 
-    return from(this._database.put(this.serializeEntity(item))).pipe(map((result: any) => {
-      if (result.ok) {
-        item._rev = result.rev;
-        item.transient = transient;
-        this.entitySaved.emit(item);
-        return item;
-      } else {
-        throw new Error(`Error while updating entity ${item._id}: ${JSON.stringify(item)}`);
-      }
-    }));
+    return this.putDocument(this.serializeEntity(item)).pipe(
+      tap((persistedItem) => persistedItem.transient = transient),
+      tap((persistedItem) => this.entitySaved.emit(persistedItem))
+    );
+  }
+
+  private putDocument<T extends DatabaseDocument>(document: T): Observable<T> {
+    return from(this._database.put(document)).pipe(
+      switchMap((result: { ok: boolean, id: string, rev: string }) => result.ok ? of(Object.assign(document, {
+        _id: result.id,
+        _rev: result.rev
+      })) : throwError(`Error while putting document: ${document._id}: ${JSON.stringify(document)}`))
+    );
   }
 
   public removeEntity(item: TEntity): Observable<boolean> {
@@ -145,8 +148,10 @@ export class Database<TEntity extends DatabaseEntity> {
   public getQuery<TKey, TValue = {}, TReduce = {}>(
     options: DatabaseGetQueryOptions<TEntity, TKey, TValue, TReduce>
   ): Observable<DatabaseDesignDocument> {
-    const mapFunction = typeof options.mapFunction === 'function' ? options.mapFunction.toString() : options.mapFunction;
-    const reduceFunction = typeof options.reduceFunction === 'function' ? options.reduceFunction.toString() : options.reduceFunction;
+    const mapFunction = options.mapFunction && options.mapFunction(undefined);
+    const mapFunctionString = typeof mapFunction === 'function' ? mapFunction.toString() : mapFunction;
+    const reduceFunction = options.reduceFunction && options.reduceFunction();
+    const reduceFunctionString = typeof reduceFunction === 'function' ? reduceFunction.toString() : reduceFunction;
     return this.getDesignDocument(options.designDocument).pipe(
       switchMap((designDocument) => any(
         {
@@ -158,14 +163,14 @@ export class Database<TEntity extends DatabaseEntity> {
           then: () => designDocument.views[options.viewName] = {}
         },
         {
-          if: () => designDocument.views[options.viewName].map !== mapFunction && mapFunction !== undefined,
-          then: () => designDocument.views[options.viewName].map = mapFunction
+          if: () => designDocument.views[options.viewName].map !== mapFunctionString && mapFunctionString !== undefined,
+          then: () => designDocument.views[options.viewName].map = mapFunctionString
         },
         {
-          if: () => designDocument.views[options.viewName].reduce !== reduceFunction && reduceFunction !== undefined,
-          then: () => designDocument.views[options.viewName].reduce = reduceFunction
+          if: () => designDocument.views[options.viewName].reduce !== reduceFunctionString && reduceFunctionString !== undefined,
+          then: () => designDocument.views[options.viewName].reduce = reduceFunctionString
         }
-      ) ? from(this._database.put(designDocument)) : of(designDocument))
+      ) ? this.putDocument(designDocument) : of(designDocument))
     );
   }
 
@@ -199,7 +204,8 @@ export class Database<TEntity extends DatabaseEntity> {
       return throwError(`Connection to couchdb-lucene not configured`);
     }
 
-    const indexFunction = typeof options.indexFunction === 'function' ? options.indexFunction.toString() : options.indexFunction;
+    const indexFunction = options.indexFunction && options.indexFunction();
+    const indexFunctionString = typeof indexFunction === 'function' ? indexFunction.toString() : indexFunction;
     return this.getDesignDocument(options.designDocument).pipe(
       switchMap((designDocument) => any(
         {
@@ -211,10 +217,10 @@ export class Database<TEntity extends DatabaseEntity> {
           then: () => designDocument.fulltext[options.indexName] = {}
         },
         {
-          if: () => designDocument.fulltext[options.indexName].index !== indexFunction && indexFunction !== undefined,
-          then: () => designDocument.fulltext[options.indexName].index = indexFunction
+          if: () => designDocument.fulltext[options.indexName].index !== indexFunctionString && indexFunctionString !== undefined,
+          then: () => designDocument.fulltext[options.indexName].index = indexFunctionString
         }
-      ) ? from(this._database.put(designDocument)) : of(designDocument))
+      ) ? this.putDocument(designDocument) : of(designDocument))
     );
   }
 
@@ -244,7 +250,7 @@ export class Database<TEntity extends DatabaseEntity> {
   public getDesignDocument(designDocumentName: string): Observable<DatabaseDesignDocument> {
     const id = `_design/${designDocumentName}`;
     return from(this._database.get(id)).pipe(
-      catchError((error) => (error.status === 404) ? from(this._database.put({ _id: id })) : throwError(error))
+      catchError((error) => (error.status === 404) ? this.putDocument({ _id: id }) : throwError(error))
     );
   }
 }

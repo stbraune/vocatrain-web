@@ -1,6 +1,6 @@
-import { DatabaseEntity } from './database-entity';
+import { DatabaseDocument } from './database-document';
 
-export interface DatabaseDesignDocument extends DatabaseEntity {
+export interface DatabaseDesignDocument extends DatabaseDocument {
   views?: {
     [viewName: string]: {
       map?: string,
