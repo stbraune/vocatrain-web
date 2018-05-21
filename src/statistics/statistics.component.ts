@@ -154,6 +154,10 @@ export class StatisticsComponent implements OnInit {
       });
   }
 
+  public percent(a, b) {
+    return Math.round(a * 10000 / b) / 100;
+  }
+
   public formatDateShort(date: Date, dateFormatString: string): string {
     return new DatePipe(this.translateService.currentLang).transform(date, dateFormatString);
   }

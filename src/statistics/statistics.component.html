@@ -22,7 +22,7 @@
         </p>
         <p class="flex">
           <em class="flex-col flex-col--1">{{'statistics.wrong-words' | translate}}</em>
-          <span class="flex-col flex-col--1">{{total.value.countWrong}}</span>
+          <span class="flex-col flex-col--1">{{total.value.countWrong}} ({{percent(total.value.countWrong, total.value.countTotal)}}%)</span>
         </p>
         <p class="flex">
           <em class="flex-col flex-col--1">{{'statistics.total-words' | translate}}</em>
@@ -55,7 +55,7 @@
         </p>
         <p class="flex">
           <em class="flex-col flex-col--1">{{'statistics.wrong-words' | translate}}</em>
-          <span class="flex-col flex-col--1">{{total.value.countWrong}}</span>
+          <span class="flex-col flex-col--1">{{total.value.countWrong}} ({{percent(total.value.countWrong, total.value.countTotal)}}%)</span>
         </p>
         <p class="flex">
           <em class="flex-col flex-col--1">{{'statistics.total-words' | translate}}</em>
