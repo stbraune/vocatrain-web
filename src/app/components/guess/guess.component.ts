@@ -139,7 +139,7 @@ export class GuessComponent implements OnInit {
 
   public stopGuessing(): Observable<GameLogEntity> {
     if (!this.started) {
-      return;
+      return of(undefined);
     }
 
     this.started = false;
@@ -202,7 +202,7 @@ export class GuessComponent implements OnInit {
 
   public guessedRight(): Observable<SearchResult> {
     if (this.currentWordState !== 1) {
-      return;
+      return of(undefined);
     }
 
     console.log('Guessed it right!');
@@ -216,7 +216,7 @@ export class GuessComponent implements OnInit {
 
   public guessedWrong(): Observable<SearchResult> {
     if (this.currentWordState !== 1) {
-      return;
+      return of(undefined);
     }
 
     console.log('Guessed it wrong!');
