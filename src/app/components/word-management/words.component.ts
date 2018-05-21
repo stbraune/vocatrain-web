@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 
-import { Observable,  Subject, forkJoin } from 'rxjs';
+import { Observable, Subject, forkJoin } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 import { WordTypeEntityService, WordEntityService } from '../../services';
@@ -116,6 +116,10 @@ export class WordsComponent implements OnInit {
   }
 
   public loadQueryHelpFields() {
+    if (!this.queryAvailable) {
+      return;
+    }
+
     this.wordEntityService.getWordEntitiesFields().subscribe((queryFields) => {
       this.queryHelpFields.push(...queryFields);
     }, (error) => {
