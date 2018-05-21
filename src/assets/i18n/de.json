@@ -33,6 +33,22 @@
   "word-types": {
     "title": "Vokabelarten"
   },
+  "statistics": {
+    "title": "Statistiken",
+    "totals": "Gesamt",
+    "last30": "Letzte 30 Tage",
+    "mode": {
+      "guess": "Raten"
+    },
+    "total-duration": "Gesamtdauer",
+    "correct-words": "Richtige Wörter",
+    "wrong-words": "Falsche Wörter",
+    "total-words": "Gesamtanzahl Wörter",
+    "average-per-word": "Durchschnittl. Dauer pro Wort",
+    "words-per-level": "Wörter pro Stufe",
+    "to": "nach",
+    "level": "Stufe "
+  },
   "guess": {
     "title": "Raten",
     "start": "Starten!",
