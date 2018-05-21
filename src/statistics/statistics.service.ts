@@ -201,22 +201,14 @@ export class StatisticsService {
                   langs.forEach(function (lang) {
                     modes.forEach(function (mode) {
                       emit([mode, lang, (text && text.words && text.words[lang] && text.words[lang].games
-                        && text.words[lang].games[mode] && text.words[lang].games[mode].level) || 0], 1);
+                        && text.words[lang].games[mode] && text.words[lang].games[mode].level) || 0]);
                     });
                   });
                 });
               }
             }`;
           },
-          reduceFunction() {
-            return function (keys, values, rereduce) {
-              if (rereduce) {
-                return sum(values);
-              } else {
-                return values.length;
-              }
-            };
-          },
+          reduceFunction: () => '_count',
           group: true,
           startkey: [options.mode, undefined, undefined],
           endkey: [options.mode, `\uffff`, Number.MAX_VALUE]
@@ -276,11 +268,7 @@ export class StatisticsService {
           }
         };
       },
-      reduceFunction() {
-        return function (keys, values, rereduce) {
-          return rereduce ? sum(values) : values.length;
-        };
-      },
+      reduceFunction: () => '_count',
       group: true
     }).pipe(
       map((result) => result.rows.map((row) => row.key))
@@ -304,11 +292,7 @@ export class StatisticsService {
           }
         };
       },
-      reduceFunction() {
-        return function (keys, values, rereduce) {
-          return rereduce ? sum(values) : values.length;
-        };
-      },
+      reduceFunction: () => '_count',
       group: true
     }).pipe(
       map((result) => result.rows.map((row) => row.key))
