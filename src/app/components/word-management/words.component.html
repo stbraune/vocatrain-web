@@ -39,7 +39,7 @@
             <mat-icon *ngIf="sorting.property === lang && sorting.descending">arrow_downward</mat-icon>
           </div>
         </ng-container>
-        <div class="flex-col flex-col--20 align--center overflow--hidden word-wrap--break-word white-space--normal flex flex--no-margin flex--align-center flex--justify-center"
+        <div class="flex-col flex-col--17 align--center overflow--hidden word-wrap--break-word white-space--normal flex flex--no-margin flex--align-center flex--justify-center"
           [class.cursor--pointer]="query === ''"
           (click)="sortBy('tags')">
           <span>{{'words.tags' | translate}}</span>
