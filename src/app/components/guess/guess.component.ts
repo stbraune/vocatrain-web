@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
+import { trigger, animate } from '@angular/animations';
 
 import { TranslateService } from '@ngx-translate/core';
 
@@ -13,11 +14,31 @@ import { WordEntityService } from '../../services';
 import { GuessService } from './guess.service';
 import { SearchOptions } from './search-options';
 import { SearchResult } from './search-result';
+import { state } from '@angular/animations';
+import { style } from '@angular/animations';
+import { transition } from '@angular/animations';
 
 @Component({
   selector: 'guess',
   templateUrl: './guess.component.html',
-  styleUrls: ['./guess.component.scss']
+  styleUrls: ['./guess.component.scss'],
+  animations: [
+    trigger('guessed', [
+      state('undefined', style({
+        backgroundColor: '#424242'
+      })),
+      state('right', style({
+        backgroundColor: '#558B2F'
+      })),
+      state('wrong', style({
+        backgroundColor: '#D84315'
+      })),
+      transition('* => right', animate('1.5s ease-out')),
+      transition('* => wrong', animate('1.5s ease-out')),
+      transition('right => *', animate('0.5s 0.2s ease-out')),
+      transition('wrong => *', animate('0.5s 0.2s ease-out'))
+    ])
+  ]
 })
 export class GuessComponent implements OnInit {
   public supportedLanguages: string[] = [];
@@ -36,6 +57,7 @@ export class GuessComponent implements OnInit {
   public startedAt: Date;
   public currentWord: SearchResult;
   public currentWordState = -1;
+  public lastGuessResult: 'undefined' | 'right' | 'wrong' = 'undefined';
   public duration = '0:00';
   public durationInterval;
   public totalWords = 0;
@@ -200,31 +222,31 @@ export class GuessComponent implements OnInit {
     }
   }
 
-  public guessedRight(): Observable<SearchResult> {
+  public guessedRight(): Observable<GameLogEntity> {
     if (this.currentWordState !== 1) {
       return of(undefined);
     }
 
     console.log('Guessed it right!');
+    this.lastGuessResult = 'right';
     return this.guessService.guessRight(this.currentWord)
       .pipe(
         switchMap((wordEntity) => this.gameLogEntityService.incrementCorrect()),
-        switchMap((gameLogEntity) => this.guessedWord()),
-        switchMap((gameLogEntity) => this.nextWord())
+        switchMap((gameLogEntity) => this.guessedWord())
       );
   }
 
-  public guessedWrong(): Observable<SearchResult> {
+  public guessedWrong(): Observable<GameLogEntity> {
     if (this.currentWordState !== 1) {
       return of(undefined);
     }
 
     console.log('Guessed it wrong!');
+    this.lastGuessResult = 'wrong';
     return this.guessService.guessWrong(this.currentWord)
       .pipe(
         switchMap((wordEntity) => this.gameLogEntityService.incrementWrong()),
-        switchMap((gameLogEntity) => this.guessedWord()),
-        switchMap((gameLogEntity) => this.nextWord())
+        switchMap((gameLogEntity) => this.guessedWord())
       );
   }
 
@@ -242,6 +264,14 @@ export class GuessComponent implements OnInit {
         return this.gameLogEntityService.getCurrentGameLog();
       default:
         return throwError(`Unsupported mode: ${this.searchOptions.mode}`);
+    }
+  }
+
+  public guessedDone() {
+    console.log('animation done', this.lastGuessResult);
+    if (this.lastGuessResult !== 'undefined') {
+      this.lastGuessResult = 'undefined';
+      this.nextWord().pipe(tap((r) => console.log(r))).subscribe();
     }
   }
 
