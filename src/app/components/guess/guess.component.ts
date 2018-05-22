@@ -268,10 +268,9 @@ export class GuessComponent implements OnInit {
   }
 
   public guessedDone() {
-    console.log('animation done', this.lastGuessResult);
     if (this.lastGuessResult !== 'undefined') {
       this.lastGuessResult = 'undefined';
-      this.nextWord().pipe(tap((r) => console.log(r))).subscribe();
+      this.nextWord().subscribe();
     }
   }
 
