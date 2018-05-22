@@ -133,7 +133,7 @@
         </mat-card-content>
       </mat-card>
       <mat-card class="align--center flex-col flex-col--50 word-card"
-        [@guessed]="lastGuessResult" (@guessed.done)="guessedDone()">
+        [@guessed]="lastGuessResult" (@guessed.start)="pauseTimer()" (@guessed.done)="guessedDone()">
         <mat-card-title *ngIf="currentWord && currentWordState >= 1">
           {{currentWord.key.answer}}
         </mat-card-title>

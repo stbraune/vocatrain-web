@@ -5,7 +5,7 @@ import { trigger, animate } from '@angular/animations';
 import { TranslateService } from '@ngx-translate/core';
 
 import { pipe, Observable, throwError, of } from 'rxjs';
-import { switchMap, catchError, map, tap } from 'rxjs/operators';
+import { switchMap, catchError, map, tap, filter } from 'rxjs/operators';
 
 import { GameLogEntityService, GameLogEntity } from '../../../shared';
 import { SettingsService } from '../../../settings';
@@ -63,6 +63,7 @@ export class GuessComponent implements OnInit {
   public totalWords = 0;
   public finished = false;
   public finishReason: 'no-more-words' | 'reached-amount' | 'reached-minutes';
+  public timerPaused = false;
 
   public constructor(
     private settingsService: SettingsService,
@@ -109,18 +110,18 @@ export class GuessComponent implements OnInit {
 
         this.durationInterval = setInterval(() => {
           this.duration = this.getDuration();
-
-          if (this.searchOptions.mode === 'by-time') {
-            const millis = new Date().getTime() - this.startedAt.getTime();
-            const minutes = millis / 1000 / 60;
-            if (minutes >= this.searchOptions.minutes) {
-              this.finishGuessing('reached-minutes').subscribe();
-            }
+          if (!this.timerPaused) {
+            // fixes ending the game before animation is completed
+            this.reachedGoal().subscribe();
           }
         }, 1000);
       }),
       switchMap((gameLogEntity) => this.nextWord())
     );
+  }
+
+  public pauseTimer(): void {
+    this.timerPaused = true;
   }
 
   public getDuration() {
@@ -169,12 +170,6 @@ export class GuessComponent implements OnInit {
       clearInterval(this.durationInterval);
     }
     return this.gameLogEntityService.finishGameLog();
-  }
-
-  public finishGuessing(reason: 'no-more-words' | 'reached-amount' | 'reached-minutes'): Observable<GameLogEntity> {
-    this.finished = true;
-    this.finishReason = reason;
-    return this.stopGuessing();
   }
 
   public onKeyDown($event: KeyboardEvent) {
@@ -253,24 +248,42 @@ export class GuessComponent implements OnInit {
   private guessedWord(): Observable<GameLogEntity> {
     this.currentWordState = 2;
     this.totalWords++;
-
-    switch (this.searchOptions.mode) {
-      case 'by-amount':
-        if (this.totalWords === this.searchOptions.amount) {
-          return this.finishGuessing('reached-amount');
-        }
-        return this.gameLogEntityService.getCurrentGameLog();
-      case 'by-time':
-        return this.gameLogEntityService.getCurrentGameLog();
-      default:
-        return throwError(`Unsupported mode: ${this.searchOptions.mode}`);
-    }
+    return this.gameLogEntityService.getCurrentGameLog();
   }
 
   public guessedDone() {
-    if (this.lastGuessResult !== 'undefined') {
-      this.lastGuessResult = 'undefined';
-      this.nextWord().subscribe();
+    this.timerPaused = false;
+    if (this.lastGuessResult === 'undefined') {
+      return;
+    }
+
+    this.reachedGoal().pipe(
+      filter((reachedGoal) => !reachedGoal),
+      tap((reachedGoal) => this.lastGuessResult = 'undefined'),
+      switchMap((reachedGoal) => this.nextWord())
+    ).subscribe();
+  }
+
+  private reachedGoal(): Observable<boolean> {
+    switch (this.searchOptions.mode) {
+      case 'by-amount':
+        if (this.totalWords === this.searchOptions.amount) {
+          return this.finishGuessing('reached-amount').pipe(
+            map((gameLogEntity) => true)
+          );
+        }
+        return of(false);
+      case 'by-time':
+        const millis = new Date().getTime() - this.startedAt.getTime();
+        const minutes = millis / 1000 / 60;
+        if (minutes >= this.searchOptions.minutes) {
+          return this.finishGuessing('reached-minutes').pipe(
+            map((gameLogEntity) => true)
+          );
+        }
+        return of(false);
+      default:
+        return throwError(`Unsupported mode: ${this.searchOptions.mode}`);
     }
   }
 
@@ -295,5 +308,15 @@ export class GuessComponent implements OnInit {
           map((gameLogEntity) => null)
         )),
     );
+  }
+
+  public finishGuessing(reason: 'no-more-words' | 'reached-amount' | 'reached-minutes'): Observable<GameLogEntity> {
+    if (this.finished) {
+      return this.gameLogEntityService.getCurrentGameLog();
+    }
+
+    this.finished = true;
+    this.finishReason = reason;
+    return this.stopGuessing();
   }
 }
