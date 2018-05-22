@@ -24,22 +24,24 @@ export class GuessService {
   public findGuessWords(options: SearchOptions): Observable<SearchResult[]> {
     return this.findGuessWordsInternal(Object.assign({}, options, {
       limit: options.searchLevelEnabled ? 100 : 1
-    })).pipe(switchMap((words) => {
-      if (words.length === 0) {
-        return of(words);
-      }
+    })).pipe(
+      switchMap((words) => {
+        if (words.length === 0) {
+          return of(words);
+        }
 
-      const word = options.searchLevelEnabled
-        ? words.find((w) => options.searchLevelMinimum <= w.key.answerLevel && w.key.answerLevel <= options.searchLevelMaximum)
-        : words[0];
-      if (word) {
-        return of([word]);
-      }
+        const word = options.searchLevelEnabled
+          ? words.find((w) => options.searchLevelMinimum <= w.key.answerLevel && w.key.answerLevel <= options.searchLevelMaximum)
+          : words[0];
+        if (word) {
+          return of([word]);
+        }
 
-      return this.findGuessWords(Object.assign({}, options, {
-        reoccurAfter: words[words.length - 1].key.reoccurAt + '1'
-      }));
-    }));
+        return this.findGuessWords(Object.assign({}, options, {
+          reoccurAfter: words[words.length - 1].key.reoccurAt + '1'
+        }));
+      })
+    );
   }
 
   private findGuessWordsInternal(options: SearchOptions): Observable<SearchResult[]> {
