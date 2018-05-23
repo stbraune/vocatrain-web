@@ -148,15 +148,23 @@ export class GuessService {
                     return;
                   }
 
+                  const createdAt = normalizeDate(new Date(doc.createdAt))
+
                   const answerLevel = (answerWord.games && answerWord.games['guess'] && answerWord.games['guess'].level) || 0;
-                  const answerThen = new Date((answerWord.games && answerWord.games['guess'] && answerWord.games['guess'].date) || 0);
+                  const answerThen = new Date((answerWord.games && answerWord.games['guess'] && answerWord.games['guess'].date)
+                    || createdAt.getTime());
 
                   const requiredLanguage = getRequiredLanguage(answerLevel, mod, sourceLanguage, targetLanguage);
                   const requiredDistance = getRequiredDistance(answerLevel, mod);
-                  var reoccurAt = new Date(normalizeDate(answerThen).getTime() + convertMillis(requiredDistance));
+;
+                  const reoccurAt = new Date(normalizeDate(answerThen).getTime() + convertMillis(requiredDistance));
+                  if (reoccurAt.getTime() === createdAt.getTime()) {
+                    reoccurAt.setDate(reoccurAt.getDate() + 1);
+                  }
+
                   const reoccurAtSame = reoccurAt.getTime() === normalizeDate(answerThen).getTime();
                   if (reoccurAtSame) {
-                    reoccurAt = new Date(answerThen.getTime() + (300 + Math.floor(Math.random() * 900)) * 1000);
+                    reoccurAt.setSeconds(reoccurAt.getSeconds() + (300 + Math.floor(Math.random() * 900)));
                   }
 
                   const indexKey = {
