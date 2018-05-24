@@ -1,5 +1,5 @@
-import { DatabaseEntity } from '../../shared';
-import { WordTypeEntity } from './word-type-entity';
+import { DatabaseEntity } from '../database';
+import { WordTypeEntity } from '../word-types';
 import { Text } from './text';
 
 export interface WordEntity extends DatabaseEntity {

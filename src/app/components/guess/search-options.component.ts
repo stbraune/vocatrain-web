@@ -1,10 +1,8 @@
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
-import { WordEntityService } from '../../services';
 import { GuessService } from './guess.service';
 
 import { environment } from '../../../environments/environment';
-
-import { SearchOptions } from './search-options';
+import { SearchOptions } from '../../../shared';
 
 @Component({
   selector: 'search-options',

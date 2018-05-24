@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
-import { Database, DatabaseService } from '../../shared';
-import { WordTypeEntity } from '../model';
+import { Database, DatabaseService } from '../database';
+import { WordTypeEntity } from './word-type-entity';
 
 @Injectable()
 export class WordTypeEntityService {

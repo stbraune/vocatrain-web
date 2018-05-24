@@ -7,13 +7,12 @@ import { TranslateService } from '@ngx-translate/core';
 import { pipe, Observable, throwError, of } from 'rxjs';
 import { switchMap, catchError, map, tap, filter } from 'rxjs/operators';
 
-import { GameLogEntityService, GameLogEntity } from '../../../shared';
+import { GameLogEntityService, GameLogEntity } from '../../../shared/game-log';
+import { WordEntityService } from '../../../shared/words';
+import { SearchOptions, SearchResult } from '../../../shared/game';
 import { SettingsService } from '../../../settings';
-import { WordEntityService } from '../../services';
 
 import { GuessService } from './guess.service';
-import { SearchOptions } from './search-options';
-import { SearchResult } from './search-result';
 import { state } from '@angular/animations';
 import { style } from '@angular/animations';
 import { transition } from '@angular/animations';

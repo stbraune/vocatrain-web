@@ -1,9 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialogRef } from '@angular/material';
 
-import { WordEntity, WordTypeEntity } from '../../model';
 import { SettingsService } from '../../../settings';
-import { WordTypeEntityService } from '../../services';
+import { WordTypeEntityService, WordTypeEntity, WordEntity } from '../../../shared';
 
 import { WordEditComponent } from './word-edit.component';
 

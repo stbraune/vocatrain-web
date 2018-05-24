@@ -1,2 +1,2 @@
+export * from './word-type-entity';
 export * from './word-type-entity.service';
-export * from './word-entity.service';

@@ -38,10 +38,6 @@ import {
   MatTooltipModule,
 } from '@angular/material';
 
-import {
-  WordTypeEntityService, WordEntityService
-} from './services';
-
 import { AppComponent } from './app.component';
 import {
   WordsComponent,
@@ -111,8 +107,6 @@ import { StatisticsModule } from '../statistics';
       useFactory: TranslateHttpLoaderFactory,
       deps: [HttpClient]
     },
-    WordTypeEntityService,
-    WordEntityService,
     GuessService
   ],
   entryComponents: [

@@ -1,6 +1,5 @@
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
-import { WordTypeEntityService } from '../../services';
-import { WordTypeEntity } from '../../model';
+import { WordTypeEntityService, WordTypeEntity } from '../../../shared';
 import { MatSnackBar } from '@angular/material';
 
 @Component({

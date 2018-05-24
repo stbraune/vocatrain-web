@@ -22,7 +22,10 @@ import { SettingsModule } from '../settings';
 import { DatabaseService } from './database';
 
 import { GoogleTranslateService, GoogleTranslateButtonComponent } from './google-translate';
+import { WordEntityService } from './words';
+import { WordTypeEntityService } from './word-types';
 import { GameLogEntityService } from './game-log';
+import { GameService } from './game';
 import { ChipInputComponent } from './chip-input';
 import { ChipsComponent } from './chips';
 
@@ -65,6 +68,9 @@ export class SharedModule {
       providers: [
         DatabaseService,
         GoogleTranslateService,
+        WordEntityService,
+        WordTypeEntityService,
+        GameService,
         GameLogEntityService
       ]
     };

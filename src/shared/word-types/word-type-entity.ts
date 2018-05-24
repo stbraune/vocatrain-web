@@ -1,4 +1,4 @@
-import { DatabaseEntity } from '../../shared';
+import { DatabaseEntity } from '../database';
 
 export interface WordTypeEntity extends DatabaseEntity {
   _id?: string;

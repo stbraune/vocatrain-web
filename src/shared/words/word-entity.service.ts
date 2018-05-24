@@ -5,9 +5,9 @@ import { map, switchMap } from 'rxjs/operators';
 
 import * as uuidv4 from 'uuid/v4';
 
-import { Database, DatabaseService, DatabaseRunFulltextQueryOptions } from '../../shared';
+import { Database, DatabaseService, DatabaseRunFulltextQueryOptions } from '../database';
 import { SettingsService } from '../../settings';
-import { WordEntity } from '../model';
+import { WordEntity } from './word-entity';
 
 declare const Document: any;
 

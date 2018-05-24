@@ -1,4 +1,4 @@
-import { WordEntity } from '../../model';
+import { WordEntity } from '../words';
 
 export interface SearchResultKey {
   searchLanguages: string[];

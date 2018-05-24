@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { WordTypeEntity, WordEntity } from '../../model';
-import { WordTypeEntityService } from '../../services';
+import { WordTypeEntityService, WordTypeEntity } from '../../../shared';
 
 @Component({
   selector: 'word-types',

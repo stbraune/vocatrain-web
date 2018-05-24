@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Database, GameLogEntity, GameLogEntityService } from '../shared';
-import { WordEntityService } from '../app/services';
+import { WordEntityService, WordEntity } from '../shared';
 
 import { Observable, pipe, zip } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-
-import { WordEntity } from '../app/model';
 
 declare const sum: any;
 

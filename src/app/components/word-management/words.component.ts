@@ -4,8 +4,7 @@ import { MatDialog, MatSnackBar } from '@angular/material';
 import { Observable, Subject, forkJoin } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
-import { WordTypeEntityService, WordEntityService } from '../../services';
-import { WordTypeEntity, WordEntity } from '../../model';
+import { WordTypeEntityService, WordEntityService, WordTypeEntity, WordEntity } from '../../../shared';
 import { SettingsService } from '../../../settings';
 
 import { WordAddDialogComponent } from './word-add-dialog.component';
