@@ -68,6 +68,14 @@ export class GuessComponent implements OnInit {
       ];
     });
 
+    this.gameService.getMinimumLevel('guess').subscribe((minLevel) => {
+      this.searchOptions.searchLevelMinimum = minLevel;
+    });
+
+    this.gameService.getMaximumLevel('guess').subscribe((maxLevel) => {
+      this.searchOptions.searchLevelMaximum = maxLevel;
+    });
+
     window.addEventListener('keydown', (event: KeyboardEvent) => {
       this.onKeyDown(event);
     }, false);

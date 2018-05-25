@@ -260,10 +260,9 @@ export class GameService {
     }
 
     const langs = JSON.stringify([options.sourceLanguage, options.targetLanguage]);
-    const viewId = `words-${mode}-${options.sourceLanguage}-${options.targetLanguage}-${options.mod}`;
     return this.db.executeQuery<SearchResultKey>({
       designDocument: 'words',
-      viewName: viewId,
+      viewName: `words-${mode}-${options.sourceLanguage}-${options.targetLanguage}-${options.mod}`,
       mapFunction(emit) {
         return `function (doc) {
           const mode = '${mode}';
@@ -420,6 +419,62 @@ export class GameService {
       limit: options.limit
     }).pipe(
       map((result) => result.rows)
+    );
+  }
+
+  public getMinimumLevel(mode: string): Observable<number> {
+    return this.db.executeQuery<{}, number, number>({
+      designDocument: 'words',
+      viewName: `min-level-${mode}`,
+      mapFunction(emit) {
+        return `function (doc) {
+          if (doc._id.substring(0, 'word_'.length) === 'word_') {
+            const mode = '${mode}';
+            doc.texts.forEach(function (text) {
+              Object.keys(text.words).forEach(function (lang) {
+                if (text.words[lang].games && text.words[lang].games[mode]) {
+                  emit(undefined, text.words[lang].games[mode].level);
+                }
+              });
+            });
+          }
+        }`;
+      },
+      reduceFunction() {
+        return function(keys, values, rereduce) {
+          return Math.min.apply(null, values);
+        };
+      }
+    }).pipe(
+      map((result) => result.rows.length > 0 && result.rows[0].value)
+    );
+  }
+
+  public getMaximumLevel(mode: string): Observable<number> {
+    return this.db.executeQuery<{}, number, number>({
+      designDocument: 'words',
+      viewName: `max-level-${mode}`,
+      mapFunction(emit) {
+        return `function (doc) {
+          if (doc._id.substring(0, 'word_'.length) === 'word_') {
+            const mode = '${mode}';
+            doc.texts.forEach(function (text) {
+              Object.keys(text.words).forEach(function (lang) {
+                if (text.words[lang].games && text.words[lang].games[mode]) {
+                  emit(undefined, text.words[lang].games[mode].level);
+                }
+              });
+            });
+          }
+        }`;
+      },
+      reduceFunction() {
+        return function(keys, values, rereduce) {
+          return Math.max.apply(null, values);
+        };
+      }
+    }).pipe(
+      map((result) => result.rows.length > 0 && result.rows[0].value)
     );
   }
 }
