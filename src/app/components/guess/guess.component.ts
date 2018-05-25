@@ -135,7 +135,6 @@ export class GuessComponent implements OnInit {
   }
 
   public guessedAnimationStarted(): void {
-    console.log('pauseTimer', this.game && this.game.wordState && this.game.wordState.reason);
     if (['correct', 'wrong'].indexOf(this.game.wordState.reason) !== -1) {
       this.gameService.pauseGame(this.game).subscribe();
     }

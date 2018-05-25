@@ -8,35 +8,9 @@ import { WordEntityService, WordEntity } from '../words';
 import { SearchOptions } from './search-options';
 import { SearchResult, SearchResultKey } from './search-result';
 import { GameLogEntityService, GameLogEntity } from '../game-log';
-
-export type GameState =
-  { state: 'undefined', reason: 'undefined' }
-  | { state: 'started', reason: 'started' }
-  | { state: 'paused', reason: 'paused' }
-  | { state: 'stopped', reason: 'no-more-words' | 'reached-amount' | 'reached-minutes' | 'stopped' };
-export type WordState = { state: 'undefined', reason: 'undefined' | 'next-word' }
-  | { state: 'covered', reason: 'covered' | 'by-user' }
-  | { state: 'uncovered', reason: 'uncovered' | 'by-user' }
-  | { state: 'solved', reason: 'correct' | 'wrong' };
-
-export interface Game {
-  mode: string;
-
-  searchOptions: SearchOptions;
-  gameLogEntity: GameLogEntity;
-
-  gameState: GameState;
-  gameStateChanged: Subject<{ previous: GameState, current: GameState }>;
-
-  durationReferenceDate: Date;
-  duration: number;
-  durationInterval: any;
-  amount: number;
-
-  word: SearchResult;
-  wordState: WordState;
-  wordStateChanged: Subject<{ previous: WordState, current: WordState }>;
-}
+import { Game } from './game';
+import { GameState } from './game-state';
+import { WordState } from './word-state';
 
 @Injectable()
 export class GameService {
@@ -50,7 +24,6 @@ export class GameService {
   }
 
   public startGame(mode: string, searchOptions: SearchOptions): Observable<Game> {
-    console.log('startGame');
     const game: Game = {
       mode: mode,
       searchOptions: searchOptions,
@@ -94,7 +67,6 @@ export class GameService {
   }
 
   public nextWord(game: Game): Observable<SearchResult> {
-    console.log('nextWord');
     game.word = undefined;
     game.wordState = { state: 'undefined', reason: 'next-word' };
 
@@ -119,7 +91,6 @@ export class GameService {
   }
 
   public coverWord(game: Game): Observable<Game> {
-    console.log('coverWord');
     if (game.gameState.state === 'started' && game.wordState.state === 'uncovered') {
       game.wordStateChanged.next({
         previous: game.wordState,
@@ -131,7 +102,6 @@ export class GameService {
   }
 
   public uncoverWord(game: Game): Observable<Game> {
-    console.log('uncoverWord');
     if (game.gameState.state === 'started' && game.wordState.state === 'covered') {
       game.wordStateChanged.next({
         previous: game.wordState,
@@ -143,7 +113,6 @@ export class GameService {
   }
 
   public solveWordCorrect(game: Game): Observable<Game> {
-    console.log('solveWordCorrect');
     if (game.gameState.state === 'started' && game.wordState.state === 'uncovered') {
       game.amount++;
       const translatedWord = game.word.doc.texts[game.word.key.textIndex].words[game.word.key.answerLanguage];
@@ -171,7 +140,6 @@ export class GameService {
   }
 
   public solveWordWrong(game: Game): Observable<Game> {
-    console.log('solveWordWrong');
     if (game.gameState.state === 'started' && game.wordState.state === 'uncovered') {
       game.amount++;
       const translatedWord = game.word.doc.texts[game.word.key.textIndex].words[game.word.key.answerLanguage];
@@ -221,7 +189,6 @@ export class GameService {
   }
 
   public pauseGame(game: Game): Observable<Game> {
-    console.log('pauseGame');
     game.gameStateChanged.next({
       previous: game.gameState,
       current: game.gameState = { state: 'paused', reason: 'paused' }
@@ -230,7 +197,6 @@ export class GameService {
   }
 
   public resumeGame(game: Game): Observable<Game> {
-    console.log('resumeGame');
     game.durationReferenceDate = new Date();
     game.gameStateChanged.next({
       previous: game.gameState,
@@ -240,7 +206,6 @@ export class GameService {
   }
 
   public stopGame(game: Game, reason: 'no-more-words' | 'reached-amount' | 'reached-minutes' | 'stopped'): Observable<Game> {
-    console.log('stopGame', game, reason);
     if (['started', 'paused'].indexOf(game.gameState.state) === -1) {
       return throwError(`Game is not started`);
     }
