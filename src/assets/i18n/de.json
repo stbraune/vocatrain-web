@@ -6,6 +6,9 @@
     "guess": {
       "title": "Raten"
     },
+    "type": {
+      "title": "Tippen"
+    },
     "words": {
       "title": "Vokabeln"
     },
@@ -38,7 +41,8 @@
     "totals": "Gesamt",
     "last30": "Letzte 30 Tage",
     "mode": {
-      "guess": "Raten"
+      "guess": "Raten",
+      "type": "Tippen"
     },
     "total-duration": "Gesamtdauer",
     "correct-words": "Richtige Wörter",

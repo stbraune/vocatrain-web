@@ -1,0 +1,151 @@
+<h3>
+  {{'type.title' | translate}}
+</h3>
+
+<mat-card *ngIf="!game || (game.gameState.state !== 'started' && game.gameState.state !== 'paused')" class="margin--bottom">
+  <mat-card-content>
+    <search-options [supportedLanguages]="supportedLanguages" [(searchOptions)]="searchOptions">
+    </search-options>
+  </mat-card-content>
+  <mat-card-actions>
+    <button class="stretch" mat-button (click)="startGame()">
+      {{'type.start' | translate}}
+    </button>
+  </mat-card-actions>
+</mat-card>
+
+<mat-card *ngIf="game && (game.gameState.state === 'started' || game.gameState.state === 'paused')">
+  <mat-card-content>
+    <div class="margin--bottom">
+      <div class="flex-col flex-col">
+        {{'type.duration' | translate}}: {{formatMillis(game.duration)}}
+        <span *ngIf="searchOptions.mode === 'by-time'">/ {{formatMinutes(searchOptions.minutes)}}</span>
+        -
+        {{'type.words' | translate}}: {{game.amount}}
+        <span *ngIf="searchOptions.mode === 'by-amount'">/ {{searchOptions.amount}}</span>
+      </div>
+    </div>
+    <div class="flex margin--bottom">
+      <div class="flex-col flex-col--grow">
+        <strong>{{'type.last-repeat' | translate}}:</strong>
+        <span *ngIf="!game.word || game.word.key.answerAt.getTime() === 0; else answerAtOk">
+          {{'type.never' | translate}}
+        </span>
+        <ng-template #answerAtOk>
+          <span>
+            {{game.word.key.answerAt | date:'dd.MM.yy H:mm'}}
+          </span>
+        </ng-template>
+      </div>
+      <div class="flex-col flex-col--grow align--right">
+        <strong>{{'type.current-level' | translate}}:</strong>
+        <span *ngIf="game.word; else answerLevelUnknown">
+          {{game.word.key.answerLevel}}
+        </span>
+        <ng-template #answerLevelUnknown>
+          ?
+        </ng-template>
+      </div>
+    </div>
+    <div class="flex">
+      <mat-card class="align--center flex-col flex-col--50 word-card">
+        <mat-card-title *ngIf="game.word">
+          {{game.word.key.question}}
+        </mat-card-title>
+        <mat-card-content *ngIf="game.word">
+          <p>
+            <strong>{{'type.language' | translate}}:</strong>
+            {{game.word.key.questionLanguage}}
+          </p>
+          <p *ngIf="game.word.key.tags.length > 0">
+            <strong>{{'type.tags' | translate}}:</strong>
+            <chips [chips]="game.word.key.tags" mode="read"></chips>
+          </p>
+          <p *ngIf="game.word.key.meta">
+            <strong>{{'type.meta' | translate}}:</strong>
+            {{game.word.key.meta}}
+          </p>
+        </mat-card-content>
+        <mat-card-content *ngIf="!game.word" class="align--center">
+          <div class="display--inline-block">
+            <mat-spinner>
+            </mat-spinner>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="align--center flex-col flex-col--50 word-card">
+        <mat-card-title *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
+          {{game.word.key.answer}}
+        </mat-card-title>
+        <mat-card-content *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
+          <p>
+            <strong>{{'type.language' | translate}}:</strong>
+            {{game.word.key.answerLanguage}}
+          </p>
+          <p *ngIf="game.word.key.tags.length > 0">
+            <strong>{{'type.tags' | translate}}:</strong>
+            <chips [chips]="game.word.key.tags" mode="read"></chips>
+          </p>
+        </mat-card-content>
+        <mat-card-content *ngIf="!game.word || game.wordState.state === 'undefined' || game.wordState.state === 'covered'" class="align--center">
+          <div class="display--inline-block">
+            <mat-spinner>
+            </mat-spinner>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </mat-card-content>
+  <mat-card-actions>
+    <div class="flex flex--align-center flex--justify-space-between">
+      <key [label]="'type.uncover' | translate" class="flex-col flex-col--1">
+        <mat-icon>keyboard_arrow_up</mat-icon>
+      </key>
+      <key [label]="'type.cover' | translate" class="flex-col flex-col--1 margin--left">
+        <mat-icon>keyboard_arrow_down</mat-icon>
+      </key>
+      <key [label]="'type.wrong' | translate" class="flex-col flex-col--1 margin--left">
+        <mat-icon>keyboard_arrow_left</mat-icon>
+      </key>
+      <key [label]="'type.right' | translate" class="flex-col flex-col--1 margin--left">
+        <mat-icon>keyboard_arrow_right</mat-icon>
+      </key>
+      <key *ngIf="game.gameState.state === 'started'" [label]="'type.pause' | translate" class="flex-col flex-col--1 margin--left" (click)="pauseGame()">
+        <mat-icon>pause</mat-icon>
+      </key>
+      <key *ngIf="game.gameState.state === 'paused'" [label]="'type.resume' | translate" class="flex-col flex-col--1 margin--left" (click)="resumeGame()">
+        <mat-icon>play_arrow</mat-icon>
+      </key>
+    </div>
+  </mat-card-actions>
+  <mat-card-actions>
+    <button mat-button (click)="stopTyping()" class="stretch">
+      {{'type.stop' | translate}}
+    </button>
+  </mat-card-actions>
+</mat-card>
+
+<mat-card *ngIf="game && game.gameState.state === 'stopped'">
+  <mat-card-title>
+    {{'type.finished' | translate}}
+  </mat-card-title>
+  <mat-card-content>
+    <p *ngIf="game.gameState.reason === 'no-more-words'">
+      {{'type.no-more-words' | translate}}
+    </p>
+    <p *ngIf="game.gameState.reason === 'reached-amount'">
+      {{'type.reached-amount' | translate}}
+    </p>
+    <p *ngIf="game.gameState.reason === 'reached-minutes'">
+      {{'type.reached-minutes' | translate}}
+    </p>
+    <p>
+      <strong>{{'type.required-duration' | translate}}:</strong>
+      {{formatMillis(game.duration)}}
+    </p>
+    <p>
+      <strong>{{'type.total-words' | translate}}:</strong>
+      {{game.amount}}
+    </p>
+  </mat-card-content>
+</mat-card>

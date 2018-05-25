@@ -74,84 +74,89 @@ export class StatisticsComponent implements OnInit {
     const then = new Date(now);
     then.setDate(then.getDate() - 30);
 
-    this.statisticsService.getTotals({ mode: 'guess' }).subscribe((result) => {
-      this.totalsOverall.push(...result);
-    }, (error) => {
-      console.error(error);
-    });
-
-    this.statisticsService.getTotals({ mode: 'guess', startDate: then, endDate: now }).subscribe((result) => {
-      this.totalsLast30.push(...result);
-    }, (error) => {
-      console.error(error);
-    });
-
-    this.translateService.get('statistics.level').subscribe((level) => {
-      this.statisticsService.queryWordsPerLevel({ mode: 'guess' }).subscribe((result) => {
-        this.wordsPerLevels.push(...result.rows
-          .map((row) => ({
-            key: <[string, string]>[row.key[0], row.key[1]],
-            value: [
-              {
-                name: level + row.key[2],
-                value: row.value
-              }
-            ]
-          }))
-          .reduce((prev, cur) => {
-            const index = prev.findIndex((x) => x.key[0] === cur.key[0] && x.key[1] === cur.key[1]);
-            if (index !== -1) {
-              prev[index].value.push(...cur.value);
-            } else {
-              prev.push(cur);
-            }
-            return prev;
-          }, <WordsPerLevel[]>[]));
-      }, (error) => {
-        console.error(error);
-      });
-    });
-
-    this.translateService.get(['statistics.date-format', 'statistics.correct', 'statistics.wrong', 'statistics.total'])
-      .subscribe((texts) => {
-        const dateFormatString = texts['statistics.date-format'];
-        const correct = texts['statistics.correct'];
-        const wrong = texts['statistics.wrong'];
-        const total = texts['statistics.total'];
-        this.statisticsService.getTotalsPerDay({ mode: 'guess', startDate: then, endDate: now }).subscribe((result) => {
-          this.wordsPerDays.push(...result
-            .map((r) => ({
-              key: r.key[0],
-              value: [
-                {
-                  name: this.formatDateShort(new Date(<string>r.key[1]), dateFormatString),
-                  series: [
-                    {
-                      name: correct,
-                      value: r.value.countCorrect
-                    },
-                    {
-                      name: wrong,
-                      value: r.value.countWrong
-                    }
-                  ]
-                }
-              ]
-            }))
-            .reduce((prev, cur) => {
-              const index = prev.findIndex((x) => x.key === cur.key);
-              if (index !== -1) {
-                prev[index].value.push(...cur.value);
-              } else {
-                prev.push(cur);
-              }
-              return prev;
-            }, <WordsPerDay[]>[])
-          );
+    this.statisticsService.queryAllGameModes().subscribe((gameModes) => {
+      gameModes.forEach((mode) => {
+        this.statisticsService.getTotals({ mode: mode }).subscribe((result) => {
+          this.totalsOverall.push(...result);
         }, (error) => {
           console.error(error);
         });
+
+        this.statisticsService.getTotals({ mode: mode, startDate: then, endDate: now }).subscribe((result) => {
+          this.totalsLast30.push(...result);
+        }, (error) => {
+          console.error(error);
+        });
+
+        this.translateService.get('statistics.level').subscribe((level) => {
+          this.statisticsService.queryWordsPerLevel({ mode: mode }).subscribe((result) => {
+            this.wordsPerLevels.push(...result.rows
+              .map((row) => ({
+                key: <[string, string]>[row.key[0], row.key[1]],
+                value: [
+                  {
+                    name: level + row.key[2],
+                    value: row.value
+                  }
+                ]
+              }))
+              .reduce((prev, cur) => {
+                const index = prev.findIndex((x) => x.key[0] === cur.key[0] && x.key[1] === cur.key[1]);
+                if (index !== -1) {
+                  prev[index].value.push(...cur.value);
+                } else {
+                  prev.push(cur);
+                }
+                return prev;
+              }, <WordsPerLevel[]>[]));
+          }, (error) => {
+            console.error(error);
+          });
+        });
+
+        this.translateService.get(['statistics.date-format', 'statistics.correct', 'statistics.wrong', 'statistics.total'])
+          .subscribe((texts) => {
+            const dateFormatString = texts['statistics.date-format'];
+            const correct = texts['statistics.correct'];
+            const wrong = texts['statistics.wrong'];
+            const total = texts['statistics.total'];
+            this.statisticsService.getTotalsPerDay({ mode: mode, startDate: then, endDate: now }).subscribe((result) => {
+              this.wordsPerDays.push(...result
+                .map((r) => ({
+                  key: r.key[0],
+                  value: [
+                    {
+                      name: this.formatDateShort(new Date(<string>r.key[1]), dateFormatString),
+                      series: [
+                        {
+                          name: correct,
+                          value: r.value.countCorrect
+                        },
+                        {
+                          name: wrong,
+                          value: r.value.countWrong
+                        }
+                      ]
+                    }
+                  ]
+                }))
+                .reduce((prev, cur) => {
+                  const index = prev.findIndex((x) => x.key === cur.key);
+                  if (index !== -1) {
+                    prev[index].value.push(...cur.value);
+                  } else {
+                    prev.push(cur);
+                  }
+                  return prev;
+                }, <WordsPerDay[]>[])
+              );
+            }, (error) => {
+              console.error(error);
+            });
+          });
       });
+    });
+
   }
 
   public percent(a, b) {

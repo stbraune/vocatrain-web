@@ -446,7 +446,7 @@ export class GameService {
         };
       }
     }).pipe(
-      map((result) => result.rows.length > 0 && result.rows[0].value)
+      map((result) => result.rows.length > 0 ? result.rows[0].value : 0)
     );
   }
 
@@ -474,7 +474,7 @@ export class GameService {
         };
       }
     }).pipe(
-      map((result) => result.rows.length > 0 && result.rows[0].value)
+      map((result) => result.rows.length > 0 ? result.rows[0].value : 0)
     );
   }
 }

@@ -52,6 +52,7 @@ import { WordAddDialogComponent } from './components/word-management/word-add-di
 import { SettingsModule } from '../settings';
 import { StatisticsModule } from '../statistics';
 import { GuessModule } from '../guess';
+import { TypeModule } from '../type';
 
 @NgModule({
   declarations: [
@@ -95,6 +96,7 @@ import { GuessModule } from '../guess';
     MatTooltipModule,
     SharedModule.forRoot(),
     GuessModule.forRoot(),
+    TypeModule.forRoot(),
     StatisticsModule.forRoot(),
     SettingsModule.forRoot()
   ],
