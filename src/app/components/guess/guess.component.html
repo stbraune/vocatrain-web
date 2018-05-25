@@ -74,9 +74,15 @@
         </mat-card-content>
       </mat-card>
       <mat-card class="align--center flex-col flex-col--50 word-card"
+<<<<<<< HEAD
         [@guessed]="game.wordState.reason" (@guessed.start)="guessedAnimationStarted()" (@guessed.done)="guessedAnimationDone()">
         <mat-card-title *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
           {{game.word.key.answer}}
+=======
+        [@guessed]="lastGuessResult" (@guessed.start)="pauseTimer()" (@guessed.done)="guessedDone()">
+        <mat-card-title *ngIf="currentWord && currentWordState >= 1">
+          {{currentWord.key.answer}}
+>>>>>>> 1e0800472ee46e5c014c0bdbdfc9c94a07a0a92c
         </mat-card-title>
         <mat-card-content *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
           <p>
