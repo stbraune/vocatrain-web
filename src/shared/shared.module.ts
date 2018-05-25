@@ -11,7 +11,10 @@ import {
   MatIconModule,
   MatInputModule,
   MatListModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatRadioModule,
+  MatSelectModule,
+  MatCheckboxModule
 } from '@angular/material';
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -20,16 +23,19 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { SettingsModule } from '../settings';
 
 import { DatabaseService } from './database';
-
+import { DateFormatService } from './date-format';
 import { GoogleTranslateService, GoogleTranslateButtonComponent } from './google-translate';
-import { WordEntityService } from './words';
-import { WordTypeEntityService } from './word-types';
-import { GameLogEntityService } from './game-log';
-import { GameService } from './game';
+
 import { ChipInputComponent } from './chip-input';
 import { ChipsComponent } from './chips';
 import { KeyComponent } from './key';
-import { DateFormatService } from './date-format';
+
+import { WordEntityService } from './words';
+import { WordTypeEntityService } from './word-types';
+
+import { SearchOptionsComponent } from './search-options';
+import { GameLogEntityService } from './game-log';
+import { GameService } from './game';
 
 @NgModule({
   imports: [
@@ -44,11 +50,14 @@ import { DateFormatService } from './date-format';
     }),
     MatBottomSheetModule,
     MatButtonModule,
+    MatCheckboxModule,
     MatChipsModule,
+    MatRadioModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
     MatListModule,
+    MatSelectModule,
     MatTooltipModule,
     SettingsModule
   ],
@@ -56,13 +65,15 @@ import { DateFormatService } from './date-format';
     GoogleTranslateButtonComponent,
     ChipInputComponent,
     ChipsComponent,
-    KeyComponent
+    KeyComponent,
+    SearchOptionsComponent
   ],
   exports: [
     GoogleTranslateButtonComponent,
     ChipInputComponent,
     ChipsComponent,
-    KeyComponent
+    KeyComponent,
+    SearchOptionsComponent
   ]
 })
 export class SharedModule {

@@ -4,9 +4,9 @@ import { throwError, Observable, of, Subject, pipe } from 'rxjs';
 import { map, switchMap, catchError, tap, filter } from 'rxjs/operators';
 
 import { Database } from '../database';
+import { SearchOptions } from '../search-options';
+import { SearchResult, SearchResultKey } from '../search-result';
 import { WordEntityService, WordEntity } from '../words';
-import { SearchOptions } from './search-options';
-import { SearchResult, SearchResultKey } from './search-result';
 import { GameLogEntityService, GameLogEntity } from '../game-log';
 import { Game } from './game';
 import { GameState } from './game-state';

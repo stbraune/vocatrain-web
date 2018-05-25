@@ -7,9 +7,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { pipe, Observable, throwError, of } from 'rxjs';
 import { switchMap, catchError, map, tap, filter } from 'rxjs/operators';
 
-import { SettingsService } from '../../../settings';
-import { GameService, Game, SearchOptions, SearchResult } from '../../../shared/game';
-import { DateFormatService } from '../../../shared';
+import { SettingsService } from '../settings';
+import { DateFormatService, GameService, Game, SearchOptions, SearchResult } from '../shared';
 
 @Component({
   selector: 'guess',

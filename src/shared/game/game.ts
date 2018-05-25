@@ -2,8 +2,8 @@ import { Subject } from 'rxjs';
 
 import { GameLogEntity } from '../game-log';
 
-import { SearchOptions } from './search-options';
-import { SearchResult } from './search-result';
+import { SearchOptions } from '../search-options';
+import { SearchResult } from '../search-result';
 import { GameState } from './game-state';
 import { WordState } from './word-state';
 

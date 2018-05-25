@@ -43,9 +43,7 @@ import {
   WordsComponent,
   WordTypeEditComponent,
   WordEditComponent,
-  WordTypesComponent,
-  GuessComponent,
-  SearchOptionsComponent
+  WordTypesComponent
 } from './components';
 
 import { AppRoutes } from './app.routes';
@@ -53,6 +51,7 @@ import { SharedModule } from '../shared';
 import { WordAddDialogComponent } from './components/word-management/word-add-dialog.component';
 import { SettingsModule } from '../settings';
 import { StatisticsModule } from '../statistics';
+import { GuessModule } from '../guess';
 
 @NgModule({
   declarations: [
@@ -61,9 +60,7 @@ import { StatisticsModule } from '../statistics';
     WordTypesComponent,
     WordAddDialogComponent,
     WordTypeEditComponent,
-    WordEditComponent,
-    SearchOptionsComponent,
-    GuessComponent,
+    WordEditComponent
   ],
   imports: [
     RouterModule.forRoot(AppRoutes, {
@@ -97,8 +94,9 @@ import { StatisticsModule } from '../statistics';
     MatToolbarModule,
     MatTooltipModule,
     SharedModule.forRoot(),
-    SettingsModule.forRoot(),
-    StatisticsModule.forRoot()
+    GuessModule.forRoot(),
+    StatisticsModule.forRoot(),
+    SettingsModule.forRoot()
   ],
   providers: [
     {

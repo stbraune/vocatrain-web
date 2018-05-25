@@ -1,5 +1,3 @@
-import { WordEntity } from '../words';
-
 export interface SearchResultKey {
   searchLanguages: string[];
   reoccurAt: string | Date;
@@ -13,9 +11,4 @@ export interface SearchResultKey {
   tags: string[];
   meta: string;
   textIndex: number;
-}
-
-export interface SearchResult {
-  key: SearchResultKey;
-  doc?: WordEntity;
 }
