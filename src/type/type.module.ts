@@ -6,7 +6,9 @@ import {
   MatButtonModule,
   MatCardModule,
   MatProgressSpinnerModule,
-  MatIconModule
+  MatIconModule,
+  MatFormFieldModule,
+  MatInputModule
 } from '@angular/material';
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -30,6 +32,8 @@ import { SharedModule } from '../shared';
     MatCardModule,
     MatProgressSpinnerModule,
     MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
     SharedModule,
     TypeRoutingModule
   ],

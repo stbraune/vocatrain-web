@@ -8,7 +8,7 @@
     </search-options>
   </mat-card-content>
   <mat-card-actions>
-    <button class="stretch" mat-button (click)="startGuessing()">
+    <button class="stretch" mat-button (click)="startGame()">
       {{'guess.start' | translate}}
     </button>
   </mat-card-actions>
@@ -99,16 +99,16 @@
   </mat-card-content>
   <mat-card-actions>
     <div class="flex flex--align-center flex--justify-space-between">
-      <key [label]="'guess.uncover' | translate" class="flex-col flex-col--1">
+      <key [label]="'guess.uncover' | translate" class="flex-col flex-col--1" (click)="uncoverWord()">
         <mat-icon>keyboard_arrow_up</mat-icon>
       </key>
-      <key [label]="'guess.cover' | translate" class="flex-col flex-col--1 margin--left">
+      <key [label]="'guess.cover' | translate" class="flex-col flex-col--1 margin--left" (click)="coverWord()">
         <mat-icon>keyboard_arrow_down</mat-icon>
       </key>
-      <key [label]="'guess.wrong' | translate" class="flex-col flex-col--1 margin--left">
+      <key [label]="'guess.wrong' | translate" class="flex-col flex-col--1 margin--left" (click)="solveWrong()">
         <mat-icon>keyboard_arrow_left</mat-icon>
       </key>
-      <key [label]="'guess.right' | translate" class="flex-col flex-col--1 margin--left">
+      <key [label]="'guess.right' | translate" class="flex-col flex-col--1 margin--left" (click)="solveCorrect()">
         <mat-icon>keyboard_arrow_right</mat-icon>
       </key>
       <key *ngIf="game.gameState.state === 'started'" [label]="'guess.pause' | translate" class="flex-col flex-col--1 margin--left" (click)="pauseGame()">
@@ -120,7 +120,7 @@
     </div>
   </mat-card-actions>
   <mat-card-actions>
-    <button mat-button (click)="stopGuessing()" class="stretch">
+    <button mat-button (click)="stopGame()" class="stretch">
       {{'guess.stop' | translate}}
     </button>
   </mat-card-actions>

@@ -83,6 +83,32 @@
     "meta": "Hilfe",
     "stop": "Aufhören"
   },
+  "type": {
+    "title": "Tippen",
+    "start": "Starten!",
+    "finished": "Fertig!",
+    "no-more-words": "Keine weiteren Vokabeln vorhanden!",
+    "reached-amount": "Die Anzahl erforderlicher Vokabeln wurde erreicht.",
+    "reached-minutes": "Die Zeit ist abgelaufen.",
+    "required-duration": "Benötigte Dauer",
+    "total-words": "Geschaffte Vokabeln",
+    "duration": "Dauer",
+    "words": "Vokabeln",
+    "uncover": "Aufdecken",
+    "cover": "Zudecken",
+    "right": "Richtig",
+    "wrong": "Falsch",
+    "pause": "Pause",
+    "resume": "Fortsetzen",
+    "last-repeat": "Letzte Wiederholung",
+    "never": "Nie",
+    "current-level": "Aktuelle Stufe",
+    "language": "Sprache",
+    "tags": "Tags",
+    "meta": "Hilfe",
+    "stop": "Aufhören",
+    "answer": "Antwort"
+  },
   "search-options": {
     "mode": {
       "time": "Zeit",

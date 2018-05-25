@@ -47,7 +47,7 @@
         </ng-template>
       </div>
     </div>
-    <div class="flex">
+    <div class="flex margin--bottom">
       <mat-card class="align--center flex-col flex-col--50 word-card">
         <mat-card-title *ngIf="game.word">
           {{game.word.key.question}}
@@ -73,7 +73,8 @@
           </div>
         </mat-card-content>
       </mat-card>
-      <mat-card class="align--center flex-col flex-col--50 word-card">
+      <mat-card class="align--center flex-col flex-col--50 word-card"
+        [@typed]="answerState" (@typed.start)="typedAnimationStarted()" (@typed.done)="typedAnimationDone()">
         <mat-card-title *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
           {{game.word.key.answer}}
         </mat-card-title>
@@ -95,19 +96,27 @@
         </mat-card-content>
       </mat-card>
     </div>
+    <div>
+      <mat-form-field class="stretch">
+        <input matInput #answerInput
+          placeholder="{{'type.answer' | translate}}"
+          [(ngModel)]="answer"
+          (keypress)="onKeyPress($event)">
+      </mat-form-field>
+    </div>
   </mat-card-content>
   <mat-card-actions>
     <div class="flex flex--align-center flex--justify-space-between">
-      <key [label]="'type.uncover' | translate" class="flex-col flex-col--1">
+      <key [label]="'type.uncover' | translate" class="flex-col flex-col--1" (click)="uncoverWord()">
         <mat-icon>keyboard_arrow_up</mat-icon>
       </key>
-      <key [label]="'type.cover' | translate" class="flex-col flex-col--1 margin--left">
+      <key [label]="'type.cover' | translate" class="flex-col flex-col--1 margin--left" (click)="coverWord()">
         <mat-icon>keyboard_arrow_down</mat-icon>
       </key>
-      <key [label]="'type.wrong' | translate" class="flex-col flex-col--1 margin--left">
+      <key [label]="'type.wrong' | translate" class="flex-col flex-col--1 margin--left" (click)="solvedCorrect()">
         <mat-icon>keyboard_arrow_left</mat-icon>
       </key>
-      <key [label]="'type.right' | translate" class="flex-col flex-col--1 margin--left">
+      <key [label]="'type.right' | translate" class="flex-col flex-col--1 margin--left" (click)="solvedWrong()">
         <mat-icon>keyboard_arrow_right</mat-icon>
       </key>
       <key *ngIf="game.gameState.state === 'started'" [label]="'type.pause' | translate" class="flex-col flex-col--1 margin--left" (click)="pauseGame()">

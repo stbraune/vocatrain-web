@@ -80,7 +80,7 @@ export class GuessComponent implements OnInit {
     }, false);
   }
 
-  public startGuessing() {
+  public startGame() {
     this.gameService.startGame('guess', this.searchOptions).pipe(
       tap((game) => this.game = game)
     ).subscribe();
@@ -99,46 +99,41 @@ export class GuessComponent implements OnInit {
       return;
     }
 
-    const target = <HTMLInputElement>$event.target;
     if ($event.which === 37 || $event.which === 36) {
       // left, home
-      this.guessedWrong().subscribe();
-      $event.preventDefault();
+      this.solveWrong();
     }
 
     if ($event.which === 38 || $event.which === 33) {
       // up, page up
-      this.showTranslation();
-      $event.preventDefault();
+      this.uncoverWord();
     }
 
     if ($event.which === 39 || $event.which === 35) {
       // right, end
-      this.guessedRight().subscribe();
-      $event.preventDefault();
+      this.solveCorrect();
     }
 
     if ($event.which === 40 || $event.which === 34) {
       // down, page down
-      this.hideTranslation();
-      $event.preventDefault();
+      this.coverWord();
     }
   }
 
-  public hideTranslation() {
+  public coverWord() {
     this.gameService.coverWord(this.game).subscribe();
   }
 
-  public showTranslation() {
+  public uncoverWord() {
     this.gameService.uncoverWord(this.game).subscribe();
   }
 
-  public guessedRight(): Observable<Game> {
-    return this.gameService.solveWordCorrect(this.game);
+  public solveCorrect() {
+    this.gameService.solveWordCorrect(this.game).subscribe();
   }
 
-  public guessedWrong(): Observable<Game> {
-    return this.gameService.solveWordWrong(this.game);
+  public solveWrong() {
+    this.gameService.solveWordWrong(this.game).subscribe();
   }
 
   public guessedAnimationStarted(): void {
@@ -155,7 +150,7 @@ export class GuessComponent implements OnInit {
     }
   }
 
-  public stopGuessing() {
+  public stopGame() {
     this.gameService.stopGame(this.game, 'stopped').subscribe();
   }
 
