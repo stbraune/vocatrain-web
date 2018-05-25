@@ -28,6 +28,8 @@ import { GameLogEntityService } from './game-log';
 import { GameService } from './game';
 import { ChipInputComponent } from './chip-input';
 import { ChipsComponent } from './chips';
+import { KeyComponent } from './key';
+import { DateFormatService } from './date-format';
 
 @NgModule({
   imports: [
@@ -53,12 +55,14 @@ import { ChipsComponent } from './chips';
   declarations: [
     GoogleTranslateButtonComponent,
     ChipInputComponent,
-    ChipsComponent
+    ChipsComponent,
+    KeyComponent
   ],
   exports: [
     GoogleTranslateButtonComponent,
     ChipInputComponent,
-    ChipsComponent
+    ChipsComponent,
+    KeyComponent
   ]
 })
 export class SharedModule {
@@ -67,6 +71,7 @@ export class SharedModule {
       ngModule: SharedModule,
       providers: [
         DatabaseService,
+        DateFormatService,
         GoogleTranslateService,
         WordEntityService,
         WordTypeEntityService,

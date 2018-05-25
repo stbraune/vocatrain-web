@@ -1,21 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
-import { trigger, animate } from '@angular/animations';
+import { trigger, animate, state, style, transition } from '@angular/animations';
 
 import { TranslateService } from '@ngx-translate/core';
 
 import { pipe, Observable, throwError, of } from 'rxjs';
 import { switchMap, catchError, map, tap, filter } from 'rxjs/operators';
 
-import { GameLogEntityService, GameLogEntity } from '../../../shared/game-log';
-import { WordEntityService } from '../../../shared/words';
-import { SearchOptions, SearchResult } from '../../../shared/game';
 import { SettingsService } from '../../../settings';
-
-import { GuessService } from './guess.service';
-import { state } from '@angular/animations';
-import { style } from '@angular/animations';
-import { transition } from '@angular/animations';
+import { GameService, Game, SearchOptions, SearchResult } from '../../../shared/game';
+import { DateFormatService } from '../../../shared';
 
 @Component({
   selector: 'guess',
@@ -23,18 +17,18 @@ import { transition } from '@angular/animations';
   styleUrls: ['./guess.component.scss'],
   animations: [
     trigger('guessed', [
-      state('undefined', style({
+      state('covered', style({
         backgroundColor: '#424242'
       })),
-      state('right', style({
+      state('correct', style({
         backgroundColor: '#558B2F'
       })),
       state('wrong', style({
         backgroundColor: '#D84315'
       })),
-      transition('* => right', animate('1.5s ease-out')),
+      transition('* => correct', animate('1.5s ease-out')),
       transition('* => wrong', animate('1.5s ease-out')),
-      transition('right => *', animate('0.5s 0.2s ease-out')),
+      transition('correct => *', animate('0.5s 0.2s ease-out')),
       transition('wrong => *', animate('0.5s 0.2s ease-out'))
     ])
   ]
@@ -52,23 +46,12 @@ export class GuessComponent implements OnInit {
     searchLevelMaximum: 100
   };
 
-  public started = false;
-  public startedAt: Date;
-  public currentWord: SearchResult;
-  public currentWordState = -1;
-  public lastGuessResult: 'undefined' | 'right' | 'wrong' = 'undefined';
-  public duration = '0:00';
-  public durationInterval;
-  public totalWords = 0;
-  public finished = false;
-  public finishReason: 'no-more-words' | 'reached-amount' | 'reached-minutes';
-  public timerPaused = false;
+  public game: Game;
 
   public constructor(
     private settingsService: SettingsService,
-    private wordEntityService: WordEntityService,
-    private guessService: GuessService,
-    private gameLogEntityService: GameLogEntityService,
+    private gameService: GameService,
+    private dateFormatService: DateFormatService,
     private snackBar: MatSnackBar
   ) {
   }
@@ -90,90 +73,22 @@ export class GuessComponent implements OnInit {
     }, false);
   }
 
-  public onStartGuessing() {
-    this.startGuessing().subscribe();
+  public startGuessing() {
+    this.gameService.startGame('guess', this.searchOptions).pipe(
+      tap((game) => this.game = game)
+    ).subscribe();
   }
 
-  public startGuessing(): Observable<SearchResult> {
-    this.finished = false;
-    this.started = true;
-    this.startedAt = new Date();
-    this.duration = '0:00';
-    this.lastGuessResult = 'undefined';
-    this.totalWords = 0;
-
-    return this.gameLogEntityService.startGameLog('guess').pipe(
-      tap((gameLogEntity) => {
-        if (this.durationInterval) {
-          clearInterval(this.durationInterval);
-        }
-
-        this.durationInterval = setInterval(() => {
-          this.duration = this.getDuration();
-          if (!this.timerPaused) {
-            // fixes ending the game before animation is completed
-            this.reachedGoal().subscribe();
-          }
-        }, 1000);
-      }),
-      switchMap((gameLogEntity) => this.nextWord())
-    );
+  public pauseGame() {
+    this.gameService.pauseGame(this.game).subscribe();
   }
 
-  public pauseTimer(): void {
-    this.timerPaused = true;
-  }
-
-  public getDuration() {
-    return this.formatDuration(this.startedAt, new Date());
-  }
-
-  public formatDuration(start: Date, end: Date): string {
-    return this.formatSeconds(((+end) - (+start)) / 1000);
-  }
-
-  public formatMinutes(minutes: number): string {
-    return this.formatSeconds(minutes * 60);
-  }
-
-  public formatSeconds(seconds: number): string {
-    const h = this.parseInt(seconds / 3600);
-    const m = this.parseInt((seconds % 3600) / 60);
-    const s = this.parseInt(seconds % 60);
-
-    const hs = h > 9 ? h : '0' + h;
-    const ms = m > 9 ? m : '0' + m;
-    const ss = s > 9 ? s : '0' + s;
-
-    if (h === 0) {
-      return ms + ':' + ss;
-    }
-
-    return hs + ':' + ms + ':' + ss;
-  }
-
-  private parseInt(n: any): number {
-    return parseInt(<string>n, 10);
-  }
-
-  public onStopGuessing() {
-    this.stopGuessing().subscribe();
-  }
-
-  public stopGuessing(): Observable<GameLogEntity> {
-    if (!this.started) {
-      return of(undefined);
-    }
-
-    this.started = false;
-    if (this.durationInterval) {
-      clearInterval(this.durationInterval);
-    }
-    return this.gameLogEntityService.finishGameLog();
+  public resumeGame() {
+    this.gameService.resumeGame(this.game).subscribe();
   }
 
   public onKeyDown($event: KeyboardEvent) {
-    if (!this.started) {
+    if (!this.game || this.game.gameState.state !== 'started') {
       return;
     }
 
@@ -204,119 +119,45 @@ export class GuessComponent implements OnInit {
   }
 
   public hideTranslation() {
-    if (this.currentWordState === 1) {
-      this.currentWordState = 0;
-      console.log('Hiding translation');
-    }
+    this.gameService.coverWord(this.game).subscribe();
   }
 
   public showTranslation() {
-    if (this.currentWordState === 0) {
-      this.currentWordState = 1;
-      console.log('Showing translation');
+    this.gameService.uncoverWord(this.game).subscribe();
+  }
+
+  public guessedRight(): Observable<Game> {
+    return this.gameService.solveWordCorrect(this.game);
+  }
+
+  public guessedWrong(): Observable<Game> {
+    return this.gameService.solveWordWrong(this.game);
+  }
+
+  public guessedAnimationStarted(): void {
+    console.log('pauseTimer', this.game && this.game.wordState && this.game.wordState.reason);
+    if (['correct', 'wrong'].indexOf(this.game.wordState.reason) !== -1) {
+      this.gameService.pauseGame(this.game).subscribe();
     }
   }
 
-  public guessedRight(): Observable<GameLogEntity> {
-    if (this.currentWordState !== 1) {
-      return of(undefined);
-    }
-
-    console.log('Guessed it right!');
-    this.lastGuessResult = 'right';
-    return this.guessService.guessRight(this.currentWord)
-      .pipe(
-        switchMap((wordEntity) => this.gameLogEntityService.incrementCorrect()),
-        switchMap((gameLogEntity) => this.guessedWord())
-      );
-  }
-
-  public guessedWrong(): Observable<GameLogEntity> {
-    if (this.currentWordState !== 1) {
-      return of(undefined);
-    }
-
-    console.log('Guessed it wrong!');
-    this.lastGuessResult = 'wrong';
-    return this.guessService.guessWrong(this.currentWord)
-      .pipe(
-        switchMap((wordEntity) => this.gameLogEntityService.incrementWrong()),
-        switchMap((gameLogEntity) => this.guessedWord())
-      );
-  }
-
-  private guessedWord(): Observable<GameLogEntity> {
-    this.currentWordState = 2;
-    this.totalWords++;
-    return this.gameLogEntityService.getCurrentGameLog();
-  }
-
-  public guessedDone() {
-    this.timerPaused = false;
-    if (this.lastGuessResult === 'undefined') {
-      return;
-    }
-
-    this.reachedGoal().pipe(
-      filter((reachedGoal) => !reachedGoal),
-      tap((reachedGoal) => this.lastGuessResult = 'undefined'),
-      switchMap((reachedGoal) => this.nextWord())
-    ).subscribe();
-  }
-
-  private reachedGoal(): Observable<boolean> {
-    switch (this.searchOptions.mode) {
-      case 'by-amount':
-        if (this.totalWords === this.searchOptions.amount) {
-          return this.finishGuessing('reached-amount').pipe(
-            map((gameLogEntity) => true)
-          );
-        }
-        return of(false);
-      case 'by-time':
-        const millis = new Date().getTime() - this.startedAt.getTime();
-        const minutes = millis / 1000 / 60;
-        if (minutes >= this.searchOptions.minutes) {
-          return this.finishGuessing('reached-minutes').pipe(
-            map((gameLogEntity) => true)
-          );
-        }
-        return of(false);
-      default:
-        return throwError(`Unsupported mode: ${this.searchOptions.mode}`);
+  public guessedAnimationDone() {
+    if (['correct', 'wrong'].indexOf(this.game.wordState.reason) !== -1) {
+      this.gameService.resumeGame(this.game).pipe(
+        switchMap((game) => this.gameService.nextWord(game))
+      ).subscribe();
     }
   }
 
-  public nextWord(): Observable<SearchResult> {
-    this.currentWordState = -1;
-    this.currentWord = undefined;
-    return this.guessService.findGuessWords(Object.assign({}, this.searchOptions, { limit: 1 }))
-      .pipe(
-        switchMap((searchResults) => {
-          if (searchResults.length === 0) {
-            return this.finishGuessing('no-more-words').pipe(
-              map((gameLogEntity) => null)
-            );
-          }
-
-          this.currentWordState = 0;
-          this.currentWord = searchResults[0];
-          this.currentWord.key.answerAt = new Date(this.currentWord.key.answerAt);
-          return of(this.currentWord);
-        }),
-        catchError((error) => this.finishGuessing('no-more-words').pipe(
-          map((gameLogEntity) => null)
-        )),
-    );
+  public stopGuessing() {
+    this.gameService.stopGame(this.game, 'stopped').subscribe();
   }
 
-  public finishGuessing(reason: 'no-more-words' | 'reached-amount' | 'reached-minutes'): Observable<GameLogEntity> {
-    if (this.finished) {
-      return this.gameLogEntityService.getCurrentGameLog();
-    }
+  public formatMinutes(minutes: number): string {
+    return this.dateFormatService.formatMinutes(minutes);
+  }
 
-    this.finished = true;
-    this.finishReason = reason;
-    return this.stopGuessing();
+  public formatMillis(millis: number): string {
+    return this.dateFormatService.formatMillis(millis);
   }
 }

@@ -1,5 +1,4 @@
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
-import { GuessService } from './guess.service';
 
 import { environment } from '../../../environments/environment';
 import { SearchOptions } from '../../../shared';

@@ -2,104 +2,45 @@
   {{'guess.title' | translate}}
 </h3>
 
-<mat-card *ngIf="!started" class="margin--bottom">
+<mat-card *ngIf="!game || (game.gameState.state !== 'started' && game.gameState.state !== 'paused')" class="margin--bottom">
   <mat-card-content>
     <search-options [supportedLanguages]="supportedLanguages" [(searchOptions)]="searchOptions">
     </search-options>
   </mat-card-content>
   <mat-card-actions>
-    <button class="stretch" mat-button (click)="onStartGuessing()">
+    <button class="stretch" mat-button (click)="startGuessing()">
       {{'guess.start' | translate}}
     </button>
   </mat-card-actions>
 </mat-card>
 
-<mat-card *ngIf="finished">
-  <mat-card-title>
-    {{'guess.finished' | translate}}
-  </mat-card-title>
+<mat-card *ngIf="game && (game.gameState.state === 'started' || game.gameState.state === 'paused')">
   <mat-card-content>
-    <p *ngIf="finishReason === 'no-more-words'">
-      {{'guess.no-more-words' | translate}}
-    </p>
-    <p *ngIf="finishReason === 'reached-amount'">
-      {{'guess.reached-amount' | translate}}
-    </p>
-    <p *ngIf="finishReason === 'reached-minutes'">
-      {{'guess.reached-minutes' | translate}}
-    </p>
-    <p>
-      <strong>{{'guess.required-duration' | translate}}:</strong>
-      {{duration}}
-    </p>
-    <p>
-      <strong>{{'guess.total-words' | translate}}:</strong>
-      {{totalWords}}
-    </p>
-  </mat-card-content>
-</mat-card>
-
-<mat-card *ngIf="started">
-  <mat-card-content>
-    <div class="flex margin--bottom flex--align-center">
+    <div class="margin--bottom">
       <div class="flex-col flex-col">
-        {{'guess.duration' | translate}}: {{duration}}
+        {{'guess.duration' | translate}}: {{formatMillis(game.duration)}}
         <span *ngIf="searchOptions.mode === 'by-time'">/ {{formatMinutes(searchOptions.minutes)}}</span>
         -
-        {{'guess.words' | translate}}: {{totalWords}}
+        {{'guess.words' | translate}}: {{game.amount}}
         <span *ngIf="searchOptions.mode === 'by-amount'">/ {{searchOptions.amount}}</span>
-      </div>
-      <div class="flex-col flex-col--grow flex flex--wrap flex--align-center flex--justify-end">
-        <div class="flex-col flex flex--no-margin flex--align-center">
-          <div class="key">
-            <mat-icon>keyboard_arrow_up</mat-icon>
-          </div>
-          <span class="margin--left">
-            {{'guess.uncover' | translate}}
-          </span>
-        </div>
-        <div class="flex-col flex flex--no-margin flex--align-center margin--left">
-          <div class="key">
-            <mat-icon>keyboard_arrow_down</mat-icon>
-          </div>
-          <span class="margin--left">
-            {{'guess.cover' | translate}}
-          </span>
-        </div>
-        <div class="flex-col flex flex--no-margin flex--align-center margin--left">
-          <div class="key">
-            <mat-icon>keyboard_arrow_left</mat-icon>
-          </div>
-          <span class="margin--left">
-            {{'guess.wrong' | translate}}
-          </span>
-        </div>
-        <div class="flex-col flex flex--no-margin flex--align-center margin--left">
-          <div class="key">
-            <mat-icon>keyboard_arrow_right</mat-icon>
-          </div>
-          <span class="margin--left">
-            {{'guess.right' | translate}}
-          </span>
-        </div>
       </div>
     </div>
     <div class="flex margin--bottom">
       <div class="flex-col flex-col--grow">
         <strong>{{'guess.last-repeat' | translate}}:</strong>
-        <span *ngIf="!currentWord || currentWord.key.answerAt.getTime() === 0; else answerAtOk">
+        <span *ngIf="!game.word || game.word.key.answerAt.getTime() === 0; else answerAtOk">
           {{'guess.never' | translate}}
         </span>
         <ng-template #answerAtOk>
           <span>
-            {{currentWord.key.answerAt | date:'dd.MM.yy H:mm'}}
+            {{game.word.key.answerAt | date:'dd.MM.yy H:mm'}}
           </span>
         </ng-template>
       </div>
       <div class="flex-col flex-col--grow align--right">
         <strong>{{'guess.current-level' | translate}}:</strong>
-        <span *ngIf="currentWord; else answerLevelUnknown">
-          {{currentWord.key.answerLevel}}
+        <span *ngIf="game.word; else answerLevelUnknown">
+          {{game.word.key.answerLevel}}
         </span>
         <ng-template #answerLevelUnknown>
           ?
@@ -108,24 +49,24 @@
     </div>
     <div class="flex">
       <mat-card class="align--center flex-col flex-col--50 word-card">
-        <mat-card-title *ngIf="currentWord">
-          {{currentWord.key.question}}
+        <mat-card-title *ngIf="game.word">
+          {{game.word.key.question}}
         </mat-card-title>
-        <mat-card-content *ngIf="currentWord">
+        <mat-card-content *ngIf="game.word">
           <p>
             <strong>{{'guess.language' | translate}}:</strong>
-            {{currentWord.key.questionLanguage}}
+            {{game.word.key.questionLanguage}}
           </p>
-          <p *ngIf="currentWord.key.tags.length > 0">
+          <p *ngIf="game.word.key.tags.length > 0">
             <strong>{{'guess.tags' | translate}}:</strong>
-            <chips [chips]="currentWord.key.tags" mode="read"></chips>
+            <chips [chips]="game.word.key.tags" mode="read"></chips>
           </p>
-          <p *ngIf="currentWord.key.meta">
+          <p *ngIf="game.word.key.meta">
             <strong>{{'guess.meta' | translate}}:</strong>
-            {{currentWord.key.meta}}
+            {{game.word.key.meta}}
           </p>
         </mat-card-content>
-        <mat-card-content *ngIf="!currentWord" class="align--center">
+        <mat-card-content *ngIf="!game.word" class="align--center">
           <div class="display--inline-block">
             <mat-spinner>
             </mat-spinner>
@@ -133,21 +74,21 @@
         </mat-card-content>
       </mat-card>
       <mat-card class="align--center flex-col flex-col--50 word-card"
-        [@guessed]="lastGuessResult" (@guessed.start)="pauseTimer()" (@guessed.done)="guessedDone()">
-        <mat-card-title *ngIf="currentWord && currentWordState >= 1">
-          {{currentWord.key.answer}}
+        [@guessed]="game.wordState.reason" (@guessed.start)="guessedAnimationStarted()" (@guessed.done)="guessedAnimationDone()">
+        <mat-card-title *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
+          {{game.word.key.answer}}
         </mat-card-title>
-        <mat-card-content *ngIf="currentWord && currentWordState >= 1">
+        <mat-card-content *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
           <p>
             <strong>{{'guess.language' | translate}}:</strong>
-            {{currentWord.key.answerLanguage}}
+            {{game.word.key.answerLanguage}}
           </p>
-          <p *ngIf="currentWord.key.tags.length > 0">
+          <p *ngIf="game.word.key.tags.length > 0">
             <strong>{{'guess.tags' | translate}}:</strong>
-            <chips [chips]="currentWord.key.tags" mode="read"></chips>
+            <chips [chips]="game.word.key.tags" mode="read"></chips>
           </p>
         </mat-card-content>
-        <mat-card-content *ngIf="!currentWord || currentWordState < 1" class="align--center">
+        <mat-card-content *ngIf="!game.word || game.wordState.state === 'undefined' || game.wordState.state === 'covered'" class="align--center">
           <div class="display--inline-block">
             <mat-spinner>
             </mat-spinner>
@@ -157,8 +98,55 @@
     </div>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-button (click)="onStopGuessing()" class="stretch">
+    <div class="flex flex--align-center flex--justify-space-between">
+      <key [label]="'guess.uncover' | translate" class="flex-col flex-col--1">
+        <mat-icon>keyboard_arrow_up</mat-icon>
+      </key>
+      <key [label]="'guess.cover' | translate" class="flex-col flex-col--1 margin--left">
+        <mat-icon>keyboard_arrow_down</mat-icon>
+      </key>
+      <key [label]="'guess.wrong' | translate" class="flex-col flex-col--1 margin--left">
+        <mat-icon>keyboard_arrow_left</mat-icon>
+      </key>
+      <key [label]="'guess.right' | translate" class="flex-col flex-col--1 margin--left">
+        <mat-icon>keyboard_arrow_right</mat-icon>
+      </key>
+      <key *ngIf="game.gameState.state === 'started'" [label]="'guess.pause' | translate" class="flex-col flex-col--1 margin--left" (click)="pauseGame()">
+        <mat-icon>pause</mat-icon>
+      </key>
+      <key *ngIf="game.gameState.state === 'paused'" [label]="'guess.resume' | translate" class="flex-col flex-col--1 margin--left" (click)="resumeGame()">
+        <mat-icon>play_arrow</mat-icon>
+      </key>
+    </div>
+  </mat-card-actions>
+  <mat-card-actions>
+    <button mat-button (click)="stopGuessing()" class="stretch">
       {{'guess.stop' | translate}}
     </button>
   </mat-card-actions>
+</mat-card>
+
+<mat-card *ngIf="game && game.gameState.state === 'stopped'">
+  <mat-card-title>
+    {{'guess.finished' | translate}}
+  </mat-card-title>
+  <mat-card-content>
+    <p *ngIf="game.gameState.reason === 'no-more-words'">
+      {{'guess.no-more-words' | translate}}
+    </p>
+    <p *ngIf="game.gameState.reason === 'reached-amount'">
+      {{'guess.reached-amount' | translate}}
+    </p>
+    <p *ngIf="game.gameState.reason === 'reached-minutes'">
+      {{'guess.reached-minutes' | translate}}
+    </p>
+    <p>
+      <strong>{{'guess.required-duration' | translate}}:</strong>
+      {{formatMillis(game.duration)}}
+    </p>
+    <p>
+      <strong>{{'guess.total-words' | translate}}:</strong>
+      {{game.amount}}
+    </p>
+  </mat-card-content>
 </mat-card>

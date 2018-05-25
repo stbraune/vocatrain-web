@@ -45,7 +45,6 @@ import {
   WordEditComponent,
   WordTypesComponent,
   GuessComponent,
-  GuessService,
   SearchOptionsComponent
 } from './components';
 
@@ -106,8 +105,7 @@ import { StatisticsModule } from '../statistics';
       provide: TranslateHttpLoader,
       useFactory: TranslateHttpLoaderFactory,
       deps: [HttpClient]
-    },
-    GuessService
+    }
   ],
   entryComponents: [
     WordAddDialogComponent

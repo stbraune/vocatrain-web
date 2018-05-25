@@ -1,25 +1,266 @@
 import { Injectable } from '@angular/core';
 
-import { throwError, Observable, of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { throwError, Observable, of, Subject, pipe } from 'rxjs';
+import { map, switchMap, catchError, tap, filter } from 'rxjs/operators';
 
 import { Database } from '../database';
 import { WordEntityService, WordEntity } from '../words';
 import { SearchOptions } from './search-options';
 import { SearchResult, SearchResultKey } from './search-result';
+import { GameLogEntityService, GameLogEntity } from '../game-log';
+
+export type GameState =
+  { state: 'undefined', reason: 'undefined' }
+  | { state: 'started', reason: 'started' }
+  | { state: 'paused', reason: 'paused' }
+  | { state: 'stopped', reason: 'no-more-words' | 'reached-amount' | 'reached-minutes' | 'stopped' };
+export type WordState = { state: 'undefined', reason: 'undefined' | 'next-word' }
+  | { state: 'covered', reason: 'covered' | 'by-user' }
+  | { state: 'uncovered', reason: 'uncovered' | 'by-user' }
+  | { state: 'solved', reason: 'correct' | 'wrong' };
+
+export interface Game {
+  mode: string;
+
+  searchOptions: SearchOptions;
+  gameLogEntity: GameLogEntity;
+
+  gameState: GameState;
+  gameStateChanged: Subject<{ previous: GameState, current: GameState }>;
+
+  durationReferenceDate: Date;
+  duration: number;
+  durationInterval: any;
+  amount: number;
+
+  word: SearchResult;
+  wordState: WordState;
+  wordStateChanged: Subject<{ previous: WordState, current: WordState }>;
+}
 
 @Injectable()
 export class GameService {
   private db: Database<WordEntity>;
 
   public constructor(
-    private wordEntityService: WordEntityService
+    private wordEntityService: WordEntityService,
+    private gameLogEntityService: GameLogEntityService
   ) {
     this.db = wordEntityService.getDatabase();
   }
 
-  public findGuessWords(mode: string, options: SearchOptions): Observable<SearchResult[]> {
-    return this.findGuessWordsInternal(mode, Object.assign({}, options, {
+  public startGame(mode: string, searchOptions: SearchOptions): Observable<Game> {
+    console.log('startGame');
+    const game: Game = {
+      mode: mode,
+      searchOptions: searchOptions,
+      gameLogEntity: undefined,
+      gameState: { state: 'undefined', reason: 'undefined' },
+      gameStateChanged: new Subject<{ previous: GameState, current: GameState }>(),
+      word: undefined,
+      wordState: { state: 'undefined', reason: 'undefined' },
+      wordStateChanged: new Subject<{ previous: WordState, current: WordState }>(),
+      durationReferenceDate: new Date(),
+      duration: 0,
+      durationInterval: undefined,
+      amount: 0
+    };
+
+    game.gameStateChanged.next({
+      previous: game.gameState,
+      current: game.gameState = { state: 'started', reason: 'started' }
+    });
+
+    return this.gameLogEntityService.startGameLog(mode).pipe(
+      tap((gameLogEntity) => game.gameLogEntity = gameLogEntity),
+      tap((gameLogEntity) => {
+        if (game.durationInterval) {
+          clearInterval(game.durationInterval);
+        }
+
+        game.durationInterval = setInterval(() => {
+          if (game.gameState.state === 'started') {
+            const now = new Date();
+            game.duration += now.getTime() - game.durationReferenceDate.getTime();
+            game.durationReferenceDate = now;
+
+            this.reachedGoal(game).subscribe();
+          }
+        }, 500);
+      }),
+      switchMap((gameLogEntity) => this.nextWord(game)),
+      map((searchResult) => game)
+    );
+  }
+
+  public nextWord(game: Game): Observable<SearchResult> {
+    console.log('nextWord');
+    game.word = undefined;
+    game.wordState = { state: 'undefined', reason: 'next-word' };
+
+    return this.reachedGoal(game).pipe(
+      filter((reachedGoal) => !reachedGoal),
+      switchMap((reachedGoal) => this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 1 }))),
+      switchMap((searchResults) => {
+        if (searchResults.length === 0) {
+          return this.stopGame(game, 'no-more-words').pipe(
+            map((gameLogEntity) => null)
+          );
+        }
+
+        game.word = searchResults[0];
+        game.wordState = { state: 'covered', reason: 'covered' };
+        return of(game.word);
+      }),
+      catchError((error) => this.stopGame(game, 'no-more-words').pipe(
+        map((gameLogEntity) => null)
+      )),
+    );
+  }
+
+  public coverWord(game: Game): Observable<Game> {
+    console.log('coverWord');
+    if (game.gameState.state === 'started' && game.wordState.state === 'uncovered') {
+      game.wordStateChanged.next({
+        previous: game.wordState,
+        current: game.wordState = { state: 'covered', reason: 'by-user' }
+      });
+    }
+
+    return of(game);
+  }
+
+  public uncoverWord(game: Game): Observable<Game> {
+    console.log('uncoverWord');
+    if (game.gameState.state === 'started' && game.wordState.state === 'covered') {
+      game.wordStateChanged.next({
+        previous: game.wordState,
+        current: game.wordState = { state: 'uncovered', reason: 'by-user' }
+      });
+    }
+
+    return of(game);
+  }
+
+  public solveWordCorrect(game: Game): Observable<Game> {
+    console.log('solveWordCorrect');
+    if (game.gameState.state === 'started' && game.wordState.state === 'uncovered') {
+      game.amount++;
+      const translatedWord = game.word.doc.texts[game.word.key.textIndex].words[game.word.key.answerLanguage];
+      translatedWord.games = translatedWord.games || {};
+      translatedWord.games[game.mode] = translatedWord.games[game.mode] || {
+        date: new Date(),
+        level: 0
+      };
+
+      translatedWord.games[game.mode].level++;
+      translatedWord.games[game.mode].date = new Date();
+
+      return this.db.putEntity(game.word.doc).pipe(
+        switchMap((wordEntity) => this.gameLogEntityService.incrementCorrect(game.gameLogEntity, game.durationReferenceDate)),
+        tap((gameLogEntity) => game.gameLogEntity = gameLogEntity),
+        tap((gameLogEntity) => game.wordStateChanged.next({
+          previous: game.wordState,
+          current: game.wordState = { state: 'solved', reason: 'correct' }
+        })),
+        map((gameLogEntity) => game)
+      );
+    }
+
+    return of(game);
+  }
+
+  public solveWordWrong(game: Game): Observable<Game> {
+    console.log('solveWordWrong');
+    if (game.gameState.state === 'started' && game.wordState.state === 'uncovered') {
+      game.amount++;
+      const translatedWord = game.word.doc.texts[game.word.key.textIndex].words[game.word.key.answerLanguage];
+      translatedWord.games = translatedWord.games || {};
+      translatedWord.games[game.mode] = translatedWord.games[game.mode] || {
+        date: new Date(),
+        level: 0
+      };
+
+      translatedWord.games[game.mode].level = 0;
+      translatedWord.games[game.mode].date = new Date();
+
+      return this.db.putEntity(game.word.doc).pipe(
+        switchMap((wordEntity) => this.gameLogEntityService.incrementWrong(game.gameLogEntity, game.durationReferenceDate)),
+        tap((gameLogEntity) => game.gameLogEntity = gameLogEntity),
+        tap((gameLogEntity) => game.wordStateChanged.next({
+          previous: game.wordState,
+          current: game.wordState = { state: 'solved', reason: 'wrong' }
+        })),
+        map((gameLogEntity) => game)
+      );
+    }
+
+    return of(game);
+  }
+
+  private reachedGoal(game: Game): Observable<boolean> {
+    switch (game.searchOptions.mode) {
+      case 'by-amount':
+        if (game.amount === game.searchOptions.amount) {
+          return this.stopGame(game, 'reached-amount').pipe(
+            map((gameLogEntity) => true)
+          );
+        }
+        return of(false);
+      case 'by-time':
+        const minutes = game.duration / 1000 / 60;
+        if (minutes >= game.searchOptions.minutes) {
+          return this.stopGame(game, 'reached-minutes').pipe(
+            map((gameLogEntity) => true)
+          );
+        }
+        return of(false);
+      default:
+        return throwError(`Unsupported mode: ${game.searchOptions.mode}`);
+    }
+  }
+
+  public pauseGame(game: Game): Observable<Game> {
+    console.log('pauseGame');
+    game.gameStateChanged.next({
+      previous: game.gameState,
+      current: game.gameState = { state: 'paused', reason: 'paused' }
+    });
+    return of(game);
+  }
+
+  public resumeGame(game: Game): Observable<Game> {
+    console.log('resumeGame');
+    game.durationReferenceDate = new Date();
+    game.gameStateChanged.next({
+      previous: game.gameState,
+      current: game.gameState = { state: 'started', reason: 'started' }
+    });
+    return of(game);
+  }
+
+  public stopGame(game: Game, reason: 'no-more-words' | 'reached-amount' | 'reached-minutes' | 'stopped'): Observable<Game> {
+    console.log('stopGame', game, reason);
+    if (['started', 'paused'].indexOf(game.gameState.state) === -1) {
+      return throwError(`Game is not started`);
+    }
+
+    if (game.durationInterval) {
+      clearInterval(game.durationInterval);
+    }
+
+    return this.gameLogEntityService.finishGameLog(game.gameLogEntity, game.durationReferenceDate).pipe(
+      tap((gameLogEntity) => game.gameLogEntity = gameLogEntity),
+      tap((gameLogEntity) => game.gameStateChanged.next({
+        previous: game.gameState,
+        current: game.gameState = { state: 'stopped', reason: reason }
+      })),
+      map((gameLogEntity) => game)
+    );
+  }
+
+  public findWords(mode: string, options: SearchOptions): Observable<SearchResult[]> {
+    return this.findWordsInternal(mode, Object.assign({}, options, {
       limit: options.searchLevelEnabled ? 100 : 1
     })).pipe(
       switchMap((words) => {
@@ -30,18 +271,17 @@ export class GameService {
         const word = options.searchLevelEnabled
           ? words.find((w) => options.searchLevelMinimum <= w.key.answerLevel && w.key.answerLevel <= options.searchLevelMaximum)
           : words[0];
-        if (word) {
-          return of([word]);
-        }
-
-        return this.findGuessWords(mode, Object.assign({}, options, {
+        return word ? of([word]) : this.findWords(mode, Object.assign({}, options, {
           reoccurAfter: words[words.length - 1].key.reoccurAt + '1'
         }));
-      })
+      }),
+      map((searchResults) => searchResults.map((searchResult) => Object.assign(searchResult, {
+        key: Object.assign(searchResult.key, { answerAt: new Date(searchResult.key.answerAt) })
+      })))
     );
   }
 
-  private findGuessWordsInternal(mode: string, options: SearchOptions): Observable<SearchResult[]> {
+  private findWordsInternal(mode: string, options: SearchOptions): Observable<SearchResult[]> {
     if (options.sourceLanguage === options.targetLanguage) {
       return throwError(`Source language and target language is the same, that's too easy, bro.`);
     }
@@ -188,7 +428,7 @@ export class GameService {
                     }, indexKey));
                   }
 
-                  // for searching directly for guessing words in target language, independent of current level
+                  // for searching directly for words in target language, independent of current level
                   emit(assign({
                     searchLanguages: [answerLanguage]
                   }, indexKey));

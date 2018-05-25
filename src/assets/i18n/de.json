@@ -69,6 +69,8 @@
     "cover": "Zudecken",
     "right": "Richtig",
     "wrong": "Falsch",
+    "pause": "Pause",
+    "resume": "Fortsetzen",
     "last-repeat": "Letzte Wiederholung",
     "never": "Nie",
     "current-level": "Aktuelle Stufe",

@@ -158,6 +158,13 @@ h3 {
 
 .flex {
   display: flex;
+}
+
+.inline-flex {
+  display: inline-flex;
+}
+
+.flex, .inline-flex {
   margin-left: -0.5rem;
   margin-right: -0.5rem;
 
@@ -175,6 +182,10 @@ h3 {
 
   &--justify-center {
     justify-content: center;
+  }
+
+  &--justify-space-between {
+    justify-content: space-between;
   }
 
   &--justify-end {
