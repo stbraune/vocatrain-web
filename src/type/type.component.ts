@@ -130,7 +130,7 @@ export class TypeComponent implements OnInit {
     }
 
     if (this.answerState === 'totally-wrong') {
-      return this.solvedWrong();
+      return this.solveWrong();
     }
 
     if ($event.which === 13) {
@@ -146,15 +146,15 @@ export class TypeComponent implements OnInit {
     if (rate === 1) {
       // totally correct
       this.uncoverWord();
-      this.solvedCorrect();
+      this.solveCorrect();
     } else if (rate > 0.8) {
       // partially correct
       this.uncoverWord();
-      this.solvedPartiallyCorrect();
+      this.solvePartiallyCorrect();
     } else {
       // totally wrong
       this.uncoverWord();
-      this.solvedTotallyWrong();
+      this.solveTotallyWrong();
     }
   }
 
@@ -220,14 +220,14 @@ export class TypeComponent implements OnInit {
     if ($event.which === 37 || $event.which === 36) {
       // left, home
       if (this.answerState === 'partially-correct') {
-        this.solvedWrong();
+        this.solveWrong();
       }
     }
 
     if ($event.which === 39 || $event.which === 35) {
       // right, end
       if (this.answerState === 'partially-correct') {
-        this.solvedCorrect();
+        this.solveCorrect();
       }
     }
 
@@ -250,21 +250,23 @@ export class TypeComponent implements OnInit {
     this.gameService.uncoverWord(this.game).subscribe();
   }
 
-  public solvedCorrect() {
-    this.answerState = 'correct';
-    this.gameService.solveWordCorrect(this.game).subscribe();
+  public solveCorrect() {
+    this.gameService.solveWordCorrect(this.game).pipe(
+      tap((game) => this.answerState = 'correct')
+    ).subscribe();
   }
 
-  public solvedPartiallyCorrect() {
+  public solvePartiallyCorrect() {
     this.answerState = 'partially-correct';
   }
 
-  public solvedWrong() {
-    this.answerState = 'wrong';
-    this.gameService.solveWordWrong(this.game).subscribe();
+  public solveWrong() {
+    this.gameService.solveWordWrong(this.game).pipe(
+      tap((game) => this.answerState = 'wrong')
+    ).subscribe();
   }
 
-  public solvedTotallyWrong() {
+  public solveTotallyWrong() {
     this.answerState = 'totally-wrong';
   }
 

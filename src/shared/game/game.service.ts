@@ -68,27 +68,31 @@ export class GameService {
   }
 
   public nextWord(game: Game): Observable<SearchResult> {
-    game.word = undefined;
-    game.wordState = { state: 'undefined', reason: 'next-word' };
+    if (game.gameState.state === 'started') {
+      game.word = undefined;
+      game.wordState = { state: 'undefined', reason: 'next-word' };
 
-    return this.reachedGoal(game).pipe(
-      filter((reachedGoal) => !reachedGoal),
-      switchMap((reachedGoal) => this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 1 }))),
-      switchMap((searchResults) => {
-        if (searchResults.length === 0) {
-          return this.stopGame(game, 'no-more-words').pipe(
-            map((gameLogEntity) => null)
-          );
-        }
+      return this.reachedGoal(game).pipe(
+        filter((reachedGoal) => !reachedGoal),
+        switchMap((reachedGoal) => this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 1 }))),
+        switchMap((searchResults) => {
+          if (searchResults.length === 0) {
+            return this.stopGame(game, 'no-more-words').pipe(
+              map((gameLogEntity) => null)
+            );
+          }
 
-        game.word = searchResults[0];
-        game.wordState = { state: 'covered', reason: 'covered' };
-        return of(game.word);
-      }),
-      catchError((error) => this.stopGame(game, 'no-more-words').pipe(
-        map((gameLogEntity) => null)
-      )),
-    );
+          game.word = searchResults[0];
+          game.wordState = { state: 'covered', reason: 'covered' };
+          return of(game.word);
+        }),
+        catchError((error) => this.stopGame(game, 'no-more-words').pipe(
+          map((gameLogEntity) => null)
+        )),
+      );
+    }
+
+    return throwError(`Cannot get next word in a not started game`);
   }
 
   public coverWord(game: Game): Observable<Game> {
@@ -97,9 +101,10 @@ export class GameService {
         previous: game.wordState,
         current: game.wordState = { state: 'covered', reason: 'by-user' }
       });
+      return of(game);
     }
 
-    return of(game);
+    return throwError(`Cannot cover a covered word or game not started`);
   }
 
   public uncoverWord(game: Game): Observable<Game> {
@@ -108,9 +113,10 @@ export class GameService {
         previous: game.wordState,
         current: game.wordState = { state: 'uncovered', reason: 'by-user' }
       });
+      return of(game);
     }
 
-    return of(game);
+    return throwError(`Cannot uncover a uncovered word or game not started`);
   }
 
   public solveWordCorrect(game: Game): Observable<Game> {
@@ -137,7 +143,7 @@ export class GameService {
       );
     }
 
-    return of(game);
+    return throwError(`Cannot solve covered word or game not started`);
   }
 
   public solveWordWrong(game: Game): Observable<Game> {
@@ -164,7 +170,7 @@ export class GameService {
       );
     }
 
-    return of(game);
+    return throwError(`Cannot solve covered word or game not started`);
   }
 
   private reachedGoal(game: Game): Observable<boolean> {
@@ -190,20 +196,28 @@ export class GameService {
   }
 
   public pauseGame(game: Game): Observable<Game> {
-    game.gameStateChanged.next({
-      previous: game.gameState,
-      current: game.gameState = { state: 'paused', reason: 'paused' }
-    });
-    return of(game);
+    if (game.gameState.state === 'started') {
+      game.gameStateChanged.next({
+        previous: game.gameState,
+        current: game.gameState = { state: 'paused', reason: 'paused' }
+      });
+      return of(game);
+    }
+
+    return throwError(`Cannot pause a paused game`);
   }
 
   public resumeGame(game: Game): Observable<Game> {
-    game.durationReferenceDate = new Date();
-    game.gameStateChanged.next({
-      previous: game.gameState,
-      current: game.gameState = { state: 'started', reason: 'started' }
-    });
-    return of(game);
+    if (game.gameState.state === 'paused') {
+      game.durationReferenceDate = new Date();
+      game.gameStateChanged.next({
+        previous: game.gameState,
+        current: game.gameState = { state: 'started', reason: 'started' }
+      });
+      return of(game);
+    }
+
+    return throwError(`Canont resume a not paused game`);
   }
 
   public stopGame(game: Game, reason: 'no-more-words' | 'reached-amount' | 'reached-minutes' | 'stopped'): Observable<Game> {
@@ -442,7 +456,7 @@ export class GameService {
         }`;
       },
       reduceFunction() {
-        return function(keys, values, rereduce) {
+        return function (keys, values, rereduce) {
           return Math.min.apply(null, values);
         };
       }
@@ -470,7 +484,7 @@ export class GameService {
         }`;
       },
       reduceFunction() {
-        return function(keys, values, rereduce) {
+        return function (keys, values, rereduce) {
           return Math.max.apply(null, values);
         };
       }
