@@ -147,7 +147,7 @@ export class TypeComponent implements OnInit {
       // totally correct
       this.uncoverWord();
       this.solveCorrect();
-    } else if (rate > 0.8) {
+    } else if (rate >= 0.75) {
       // partially correct
       this.uncoverWord();
       this.solvePartiallyCorrect();
