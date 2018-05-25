@@ -53,6 +53,7 @@ export class GameService {
 
         game.durationInterval = setInterval(() => {
           if (game.gameState.state === 'started') {
+            this.gameLogEntityService.pingGameLog(game.gameLogEntity, game.durationReferenceDate);
             const now = new Date();
             game.duration += now.getTime() - game.durationReferenceDate.getTime();
             game.durationReferenceDate = now;

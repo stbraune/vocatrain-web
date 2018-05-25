@@ -65,11 +65,14 @@ export class GameLogEntityService {
     );
   }
 
-  public updateGameLog(gameLogEntity: GameLogEntity, durationReferenceDate: Date): Observable<GameLogEntity> {
+  public pingGameLog(gameLogEntity: GameLogEntity, durationReferenceDate: Date) {
     const now = new Date();
     durationReferenceDate = durationReferenceDate || gameLogEntity.startTime;
     gameLogEntity.endTime = now;
     gameLogEntity.durationInMillis += gameLogEntity.endTime.getTime() - durationReferenceDate.getTime();
+  }
+
+  public updateGameLog(gameLogEntity: GameLogEntity, durationReferenceDate: Date): Observable<GameLogEntity> {
     return this.db.putEntity(gameLogEntity).pipe(
       catchError((error) => {
         console.error(error);
