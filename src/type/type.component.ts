@@ -183,16 +183,16 @@ export class TypeComponent implements OnInit {
     }
 
     const matrix = [];
-    for (let i = 0; i <= b.length; i ++) {
+    for (let i = 0; i <= b.length; i++) {
       matrix[i] = [i];
     }
 
-    for (let j = 0; j <= a.length; j ++) {
+    for (let j = 0; j <= a.length; j++) {
       matrix[0][j] = j;
     }
 
-    for (let i = 1; i <= b.length; i ++) {
-      for (let j = 1; j <= a.length; j ++) {
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
         if (b.charAt(i - 1) === a.charAt(j - 1)) {
           matrix[i][j] = matrix[i - 1][j - 1];
         } else {
@@ -213,6 +213,11 @@ export class TypeComponent implements OnInit {
   }
 
   public onKeyDown($event: KeyboardEvent) {
+    if (this.game && ['started', 'paused'].indexOf(this.game.gameState.state) !== -1 && $event.which === 27) {
+      this.stopGame();
+      return;
+    }
+
     if (!this.game || this.game.gameState.state !== 'started') {
       return;
     }
@@ -293,7 +298,7 @@ export class TypeComponent implements OnInit {
     }
   }
 
-  public stopTyping() {
+  public stopGame() {
     this.gameService.stopGame(this.game, 'stopped').subscribe();
   }
 

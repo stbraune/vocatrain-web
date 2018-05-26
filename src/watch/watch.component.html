@@ -1,5 +1,5 @@
 <h3>
-  {{'type.title' | translate}}
+  {{'watch.title' | translate}}
 </h3>
 
 <mat-card *ngIf="!game || (game.gameState.state !== 'started' && game.gameState.state !== 'paused')" class="margin--bottom">
@@ -9,7 +9,7 @@
   </mat-card-content>
   <mat-card-actions>
     <button class="stretch" mat-button (click)="startGame()">
-      {{'type.start' | translate}}
+      {{'watch.start' | translate}}
     </button>
   </mat-card-actions>
 </mat-card>
@@ -18,18 +18,18 @@
   <mat-card-content>
     <div class="margin--bottom">
       <div class="flex-col flex-col">
-        {{'type.duration' | translate}}: {{formatMillis(game.duration)}}
+        {{'watch.duration' | translate}}: {{formatMillis(game.duration)}}
         <span *ngIf="searchOptions.mode === 'by-time'">/ {{formatMinutes(searchOptions.minutes)}}</span>
         -
-        {{'type.words' | translate}}: {{game.amount}}
+        {{'watch.words' | translate}}: {{game.amount}}
         <span *ngIf="searchOptions.mode === 'by-amount'">/ {{searchOptions.amount}}</span>
       </div>
     </div>
     <div class="flex margin--bottom">
       <div class="flex-col flex-col--grow">
-        <strong>{{'type.last-repeat' | translate}}:</strong>
+        <strong>{{'watch.last-repeat' | translate}}:</strong>
         <span *ngIf="!game.word || game.word.key.answerAt.getTime() === 0; else answerAtOk">
-          {{'type.never' | translate}}
+          {{'watch.never' | translate}}
         </span>
         <ng-template #answerAtOk>
           <span>
@@ -38,7 +38,7 @@
         </ng-template>
       </div>
       <div class="flex-col flex-col--grow align--right">
-        <strong>{{'type.current-level' | translate}}:</strong>
+        <strong>{{'watch.current-level' | translate}}:</strong>
         <span *ngIf="game.word; else answerLevelUnknown">
           {{game.word.key.answerLevel}}
         </span>
@@ -47,22 +47,23 @@
         </ng-template>
       </div>
     </div>
-    <div class="flex margin--bottom">
-      <mat-card class="align--center flex-col flex-col--50 word-card">
+    <div class="flex">
+      <mat-card class="align--center flex-col flex-col--50 word-card"
+        [@watched-left]="game.wordState.state">
         <mat-card-title *ngIf="game.word">
           {{game.word.key.question}}
         </mat-card-title>
         <mat-card-content *ngIf="game.word">
           <p>
-            <strong>{{'type.language' | translate}}:</strong>
+            <strong>{{'watch.language' | translate}}:</strong>
             {{game.word.key.questionLanguage}}
           </p>
           <p *ngIf="game.word.key.tags.length > 0">
-            <strong>{{'type.tags' | translate}}:</strong>
+            <strong>{{'watch.tags' | translate}}:</strong>
             <chips [chips]="game.word.key.tags" mode="read"></chips>
           </p>
           <p *ngIf="game.word.key.meta">
-            <strong>{{'type.meta' | translate}}:</strong>
+            <strong>{{'watch.meta' | translate}}:</strong>
             {{game.word.key.meta}}
           </p>
         </mat-card-content>
@@ -74,17 +75,17 @@
         </mat-card-content>
       </mat-card>
       <mat-card class="align--center flex-col flex-col--50 word-card"
-        [@typed]="answerState" (@typed.start)="typedAnimationStarted()" (@typed.done)="typedAnimationDone()">
+        [@watched-right]="game.wordState.state" (@watched-right.start)="animationStarted()" (@watched-right.done)="animationDone()">
         <mat-card-title *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
           {{game.word.key.answer}}
         </mat-card-title>
         <mat-card-content *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
           <p>
-            <strong>{{'type.language' | translate}}:</strong>
+            <strong>{{'watch.language' | translate}}:</strong>
             {{game.word.key.answerLanguage}}
           </p>
           <p *ngIf="game.word.key.tags.length > 0">
-            <strong>{{'type.tags' | translate}}:</strong>
+            <strong>{{'watch.tags' | translate}}:</strong>
             <chips [chips]="game.word.key.tags" mode="read"></chips>
           </p>
         </mat-card-content>
@@ -96,64 +97,44 @@
         </mat-card-content>
       </mat-card>
     </div>
-    <div>
-      <mat-form-field class="stretch">
-        <input matInput #answerInput
-          placeholder="{{'type.answer' | translate}}"
-          [(ngModel)]="answer"
-          (keypress)="onKeyPress($event)">
-      </mat-form-field>
-    </div>
   </mat-card-content>
   <mat-card-actions>
     <div class="flex flex--align-center flex--justify-space-between">
-      <key [label]="'type.uncover' | translate" class="flex-col flex-col--1" (click)="uncoverWord()">
-        <mat-icon>keyboard_arrow_up</mat-icon>
-      </key>
-      <key [label]="'type.cover' | translate" class="flex-col flex-col--1 margin--left" (click)="coverWord()">
-        <mat-icon>keyboard_arrow_down</mat-icon>
-      </key>
-      <key [label]="'type.wrong' | translate" class="flex-col flex-col--1 margin--left" (click)="solveWrong()">
-        <mat-icon>keyboard_arrow_left</mat-icon>
-      </key>
-      <key [label]="'type.right' | translate" class="flex-col flex-col--1 margin--left" (click)="solveCorrect()">
-        <mat-icon>keyboard_arrow_right</mat-icon>
-      </key>
-      <key *ngIf="game.gameState.state === 'started'" [label]="'type.pause' | translate" class="flex-col flex-col--1 margin--left" (click)="pauseGame()">
+      <key *ngIf="game.gameState.state === 'started'" [label]="'watch.pause' | translate" class="flex-col flex-col--1" (click)="pauseGame()">
         <mat-icon>pause</mat-icon>
       </key>
-      <key *ngIf="game.gameState.state === 'paused'" [label]="'type.resume' | translate" class="flex-col flex-col--1 margin--left" (click)="resumeGame()">
+      <key *ngIf="game.gameState.state === 'paused'" [label]="'watch.resume' | translate" class="flex-col flex-col--1" (click)="resumeGame()">
         <mat-icon>play_arrow</mat-icon>
       </key>
     </div>
   </mat-card-actions>
   <mat-card-actions>
     <button mat-button (click)="stopGame()" class="stretch">
-      {{'type.stop' | translate}}
+      {{'watch.stop' | translate}}
     </button>
   </mat-card-actions>
 </mat-card>
 
 <mat-card *ngIf="game && game.gameState.state === 'stopped'">
   <mat-card-title>
-    {{'type.finished' | translate}}
+    {{'watch.finished' | translate}}
   </mat-card-title>
   <mat-card-content>
     <p *ngIf="game.gameState.reason === 'no-more-words'">
-      {{'type.no-more-words' | translate}}
+      {{'watch.no-more-words' | translate}}
     </p>
     <p *ngIf="game.gameState.reason === 'reached-amount'">
-      {{'type.reached-amount' | translate}}
+      {{'watch.reached-amount' | translate}}
     </p>
     <p *ngIf="game.gameState.reason === 'reached-minutes'">
-      {{'type.reached-minutes' | translate}}
+      {{'watch.reached-minutes' | translate}}
     </p>
     <p>
-      <strong>{{'type.required-duration' | translate}}:</strong>
+      <strong>{{'watch.required-duration' | translate}}:</strong>
       {{formatMillis(game.duration)}}
     </p>
     <p>
-      <strong>{{'type.total-words' | translate}}:</strong>
+      <strong>{{'watch.total-words' | translate}}:</strong>
       {{game.amount}}
     </p>
   </mat-card-content>

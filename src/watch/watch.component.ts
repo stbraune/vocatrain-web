@@ -11,28 +11,39 @@ import { SettingsService } from '../settings';
 import { DateFormatService, GameService, Game, SearchOptions, SearchResult } from '../shared';
 
 @Component({
-  selector: 'guess',
-  templateUrl: './guess.component.html',
-  styleUrls: ['./guess.component.scss'],
+  selector: 'watch',
+  templateUrl: './watch.component.html',
+  styleUrls: ['./watch.component.scss'],
   animations: [
-    trigger('guessed', [
+    trigger('watched-left', [
       state('covered', style({
         backgroundColor: '#424242'
       })),
-      state('correct', style({
-        backgroundColor: '#558B2F'
+      state('uncovered', style({
+        backgroundColor: '#424242'
       })),
-      state('wrong', style({
-        backgroundColor: '#D84315'
+      state('solved', style({
+        backgroundColor: '#9E9E9E'
       })),
-      transition('* => correct', animate('1.5s ease-out')),
-      transition('* => wrong', animate('1.5s ease-out')),
-      transition('correct => *', animate('0.5s 0.2s ease-out')),
-      transition('wrong => *', animate('0.5s 0.2s ease-out'))
+      transition('* => solved', animate('1.5s ease-out')),
+      transition('solved => *', animate('0.5s 0.2s ease-out'))
+    ]),
+    trigger('watched-right', [
+      state('covered', style({
+        backgroundColor: '#424242'
+      })),
+      state('uncovered', style({
+        backgroundColor: '#424242'
+      })),
+      state('solved', style({
+        backgroundColor: '#9E9E9E'
+      })),
+      transition('* => solved', animate('1.5s ease-out')),
+      transition('solved => *', animate('0.5s 0.2s ease-out'))
     ])
   ]
 })
-export class GuessComponent implements OnInit {
+export class WatchComponent implements OnInit {
   public supportedLanguages: string[] = [];
 
   public searchOptions: SearchOptions = {
@@ -46,6 +57,7 @@ export class GuessComponent implements OnInit {
   };
 
   public game: Game;
+  public interval;
 
   public constructor(
     private settingsService: SettingsService,
@@ -67,11 +79,11 @@ export class GuessComponent implements OnInit {
       ];
     });
 
-    this.gameService.getMinimumLevel('guess').subscribe((minLevel) => {
+    this.gameService.getMinimumLevel('watch').subscribe((minLevel) => {
       this.searchOptions.searchLevelMinimum = minLevel;
     });
 
-    this.gameService.getMaximumLevel('guess').subscribe((maxLevel) => {
+    this.gameService.getMaximumLevel('watch').subscribe((maxLevel) => {
       this.searchOptions.searchLevelMaximum = maxLevel;
     });
 
@@ -81,47 +93,48 @@ export class GuessComponent implements OnInit {
   }
 
   public startGame() {
-    this.gameService.startGame('guess', this.searchOptions).pipe(
-      tap((game) => this.game = game)
+    this.gameService.startGame('watch', this.searchOptions).pipe(
+      switchMap((game) => this.gameService.uncoverWord(game)),
+      tap((game) => this.game = game),
+      tap((game) => this.startInterval())
     ).subscribe();
   }
 
+  private startInterval() {
+    if (!this.interval) {
+      this.interval = setInterval(this.intervalFunction(), 5000);
+    }
+  }
+
+  private stopInterval() {
+    if (this.interval) {
+      clearInterval(this.interval);
+      this.interval = undefined;
+    }
+  }
+
+  private intervalFunction() {
+    return () => {
+      this.gameService.solveWordCorrect(this.game).subscribe();
+    };
+  }
+
   public pauseGame() {
-    this.gameService.pauseGame(this.game).subscribe();
+    this.gameService.pauseGame(this.game).pipe(
+      tap((game) => this.stopInterval())
+    ).subscribe();
   }
 
   public resumeGame() {
-    this.gameService.resumeGame(this.game).subscribe();
+    this.gameService.resumeGame(this.game).pipe(
+      tap((game) => this.startInterval())
+    ).subscribe();
   }
 
   public onKeyDown($event: KeyboardEvent) {
     if (this.game && ['started', 'paused'].indexOf(this.game.gameState.state) !== -1 && $event.which === 27) {
       this.stopGame();
       return;
-    }
-
-    if (!this.game || this.game.gameState.state !== 'started') {
-      return;
-    }
-
-    if ($event.which === 37 || $event.which === 36) {
-      // left, home
-      this.solveWrong();
-    }
-
-    if ($event.which === 38 || $event.which === 33) {
-      // up, page up
-      this.uncoverWord();
-    }
-
-    if ($event.which === 39 || $event.which === 35) {
-      // right, end
-      this.solveCorrect();
-    }
-
-    if ($event.which === 40 || $event.which === 34) {
-      // down, page down
-      this.coverWord();
     }
   }
 
@@ -141,16 +154,17 @@ export class GuessComponent implements OnInit {
     this.gameService.solveWordWrong(this.game).subscribe();
   }
 
-  public guessedAnimationStarted(): void {
-    if (['correct', 'wrong'].indexOf(this.game.wordState.reason) !== -1) {
+  public animationStarted(): void {
+    if (['correct'].indexOf(this.game.wordState.reason) !== -1) {
       this.gameService.pauseGame(this.game).subscribe();
     }
   }
 
-  public guessedAnimationDone() {
-    if (['correct', 'wrong'].indexOf(this.game.wordState.reason) !== -1) {
+  public animationDone() {
+    if (['correct'].indexOf(this.game.wordState.reason) !== -1) {
       this.gameService.resumeGame(this.game).pipe(
-        switchMap((game) => this.gameService.nextWord(game))
+        switchMap((game) => this.gameService.nextWord(game)),
+        switchMap((searchResult) => this.gameService.uncoverWord(this.game))
       ).subscribe();
     }
   }

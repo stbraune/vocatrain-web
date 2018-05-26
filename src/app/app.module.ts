@@ -53,6 +53,7 @@ import { SettingsModule } from '../settings';
 import { StatisticsModule } from '../statistics';
 import { GuessModule } from '../guess';
 import { TypeModule } from '../type';
+import { WatchModule } from '../watch/watch.module';
 
 @NgModule({
   declarations: [
@@ -97,6 +98,7 @@ import { TypeModule } from '../type';
     SharedModule.forRoot(),
     GuessModule.forRoot(),
     TypeModule.forRoot(),
+    WatchModule.forRoot(),
     StatisticsModule.forRoot(),
     SettingsModule.forRoot()
   ],

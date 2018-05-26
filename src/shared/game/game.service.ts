@@ -197,6 +197,10 @@ export class GameService {
 
   public pauseGame(game: Game): Observable<Game> {
     if (game.gameState.state === 'started') {
+      this.gameLogEntityService.pingGameLog(game.gameLogEntity, game.durationReferenceDate);
+      const now = new Date();
+      game.duration += now.getTime() - game.durationReferenceDate.getTime();
+      game.durationReferenceDate = now;
       game.gameStateChanged.next({
         previous: game.gameState,
         current: game.gameState = { state: 'paused', reason: 'paused' }
