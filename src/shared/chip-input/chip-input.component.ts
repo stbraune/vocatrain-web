@@ -96,7 +96,6 @@ export class ChipInputComponent {
       // backspace
       if (target.selectionStart === 0 && target.selectionEnd === 0) {
         if (this.chips.length > 0) {
-          console.log($event, target);
           this.chips.pop();
           this.emitChipsChange();
         } else {

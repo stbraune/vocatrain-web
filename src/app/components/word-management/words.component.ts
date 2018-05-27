@@ -183,7 +183,6 @@ export class WordsComponent implements OnInit {
         this.snackBar.open('Saved!', null, {
           duration: 3000
         });
-        console.log('persisted', splittedWordEntities);
 
         wordEntities.reverse().forEach((persistedWordEntity) => {
           const indexOf = this.wordEntities.findIndex((w) => w._id === persistedWordEntity._id);

@@ -188,7 +188,6 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   public onEnterPressed(source: HTMLElement, text: Text) {
     const row = parseInt(source.dataset.row, 10);
     const col = parseInt(source.dataset.col, 10);
-    console.log(row, col, JSON.parse(JSON.stringify(text)));
 
     if (this.isEmpty(text)) {
       // text is totally empty, remove it and save the word
