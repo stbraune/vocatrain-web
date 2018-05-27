@@ -96,7 +96,8 @@ export class WatchComponent implements OnInit {
     this.gameService.startGame('watch', this.searchOptions).pipe(
       switchMap((game) => this.gameService.uncoverWord(game)),
       tap((game) => this.game = game),
-      tap((game) => this.startInterval())
+      tap((game) => this.startInterval()),
+      tap((game) => game.gameStateChanged.subscribe((event) => event.current.state === 'stopped' && this.stopInterval()))
     ).subscribe();
   }
 
@@ -170,7 +171,9 @@ export class WatchComponent implements OnInit {
   }
 
   public stopGame() {
-    this.gameService.stopGame(this.game, 'stopped').subscribe();
+    this.gameService.stopGame(this.game, 'stopped').pipe(
+      tap((game) => this.stopInterval())
+    ).subscribe();
   }
 
   public formatMinutes(minutes: number): string {
