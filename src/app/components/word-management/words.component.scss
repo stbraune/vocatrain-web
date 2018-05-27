@@ -31,10 +31,46 @@
   flex-basis: 5%;
 }
 
+::ng-deep .mat-expansion-panel-header .mat-content {
+  overflow: visible;
+}
+
 .word {
+  position: relative;
+  overflow: visible;
+
+  .buttons {
+    position: relative;
+    white-space: nowrap;
+  }
+
   .open-details-button, google-translate-button {
     opacity: 0;
     transition: opacity 0.4s;
+    position: absolute;
+    bottom: -11px;
+
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 20px;
+  }
+
+  google-translate-button {
+    right: -11px;
+    height: 22px;
+    ::ng-deep .mat-icon-button {
+      font-size: 14px;
+      width: 22px;  
+      height: 22px;
+      line-height: 14px;
+    }
+  }
+
+  .open-details-button {
+    right: -35px;
+    font-size: 14px;
+    width: 22px;
+    height: 22px;
+    line-height: 14px;
   }
 
   &:hover {

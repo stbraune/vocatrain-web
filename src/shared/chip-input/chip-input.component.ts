@@ -47,6 +47,64 @@ export class ChipInputComponent {
     this.inputElement.nativeElement.focus();
   }
 
+  public setValue(value: string) {
+    if (value !== this.value) {
+      this.value = value;
+      this.emitValueChange();
+    }
+  }
+
+  public addChips(...chips: string[]) {
+    const filtered = chips.filter((chip) => this.chips.indexOf(chip) === -1).filter((chip) => this.isAllowed(chip));
+    if (filtered.length > 0) {
+      this.chips.push(...filtered);
+      this.emitChipsChange();
+    }
+  }
+
+  public popChip() {
+    if (this.chips.length > 0) {
+      this.chips.pop();
+      this.emitChipsChange();
+    }
+  }
+
+  public removeChips(...chips: string[]) {
+    chips.forEach((chip) => {
+      const index = this.chips.indexOf(chip);
+      if (index !== -1) {
+        this.chips.splice(index, 1);
+      }
+    });
+    this.emitChipsChange();
+  }
+
+  public toggleChip(chip: string) {
+    if (!this.isAllowed(chip)) {
+      return;
+    }
+
+    const index = this.chips.indexOf(chip);
+    if (index === -1) {
+      this.chips.push(chip);
+    } else {
+      this.chips.splice(index, 1);
+    }
+    this.emitChipsChange();
+  }
+
+  public deleteChip(chip: string) {
+    const index = this.chips.indexOf(chip);
+    if (index !== -1) {
+      this.chips.splice(index, 1);
+      this.emitChipsChange();
+    }
+  }
+
+  public isAllowed(chip: string) {
+    return this.allowedChips === undefined || this.allowedChips.indexOf(chip) !== -1;
+  }
+
   public onKeyDown($event: KeyboardEvent) {
     this.chips = this.chips || [];
 
@@ -83,11 +141,8 @@ export class ChipInputComponent {
       // tab
       const result = this.parseChips(this.value);
       if (result.success) {
-        this.chips.push(...result.chips.filter((chip) => this.chips.indexOf(chip) === -1));
-        this.emitChipsChange();
-
-        this.value = result.value;
-        this.emitValueChange();
+        this.addChips(...result.chips);
+        this.setValue(result.value);
         $event.preventDefault();
       }
     }
@@ -96,8 +151,7 @@ export class ChipInputComponent {
       // backspace
       if (target.selectionStart === 0 && target.selectionEnd === 0) {
         if (this.chips.length > 0) {
-          this.chips.pop();
-          this.emitChipsChange();
+          this.popChip();
         } else {
           this.backspacePressed.emit();
           $event.preventDefault();
@@ -115,11 +169,8 @@ export class ChipInputComponent {
       // enter, space
       const result = this.parseChips(this.value);
       if (result.success) {
-        this.chips.push(...result.chips.filter((chip) => this.chips.indexOf(chip) === -1));
-        this.emitChipsChange();
-
-        this.value = result.value;
-        this.emitValueChange();
+        this.addChips(...result.chips);
+        this.setValue(result.value);
         $event.preventDefault();
       } else if ($event.which === 13) {
         this.enterPressed.emit();
@@ -135,13 +186,13 @@ export class ChipInputComponent {
 
     const matches = [];
     const regex = XRegExp(`([${this.signs}][\\pL-\\d]+)\\s*`, 'g');
-    const sanitized = XRegExp.replace(value, regex, (match) => {
+    const sanitized: string = XRegExp.replace(value, regex, (match) => {
       matches.push(match);
       return ``;
     });
 
     if (matches) {
-      const chips = matches.map((match) => match.substr(1))
+      const chips = matches.map((match) => <string>match.substr(1))
         .map((match) => match.trim())
         .filter((match) => !!match)
         .filter((match) => this.isAllowed(match))
@@ -158,18 +209,6 @@ export class ChipInputComponent {
     }
 
     return { value, chips: [], success: false };
-  }
-
-  private isAllowed(chip: string) {
-    return this.allowedChips === undefined || this.allowedChips.indexOf(chip) !== -1;
-  }
-
-  public deleteChip(chip: string) {
-    const index = this.chips.indexOf(chip);
-    if (index !== -1) {
-      this.chips.splice(index, 1);
-      this.emitChipsChange();
-    }
   }
 
   public emitChipsChange() {

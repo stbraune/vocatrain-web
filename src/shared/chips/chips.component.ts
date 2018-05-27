@@ -12,6 +12,9 @@ export class ChipsComponent {
   @Output()
   public chipsChange = new EventEmitter<string[]>();
 
+  @Output()
+  public chipClicked = new EventEmitter<string>();
+
   @Input()
   public mode: 'read' | 'update' = 'update';
 
@@ -25,6 +28,10 @@ export class ChipsComponent {
       this.chips.splice(index, 1);
       this.emitChipsChange();
     }
+  }
+
+  public onChipClicked(chip: string) {
+    this.chipClicked.emit(chip);
   }
 
   private emitChipsChange() {

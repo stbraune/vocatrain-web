@@ -27,7 +27,7 @@ import { DateFormatService } from './date-format';
 import { GoogleTranslateService, GoogleTranslateButtonComponent } from './google-translate';
 
 import { ChipInputComponent } from './chip-input';
-import { ChipsComponent } from './chips';
+import { ChipsComponent, ChipComponent } from './chips';
 import { KeyComponent } from './key';
 
 import { WordEntityService } from './words';
@@ -64,6 +64,7 @@ import { GameService } from './game';
   declarations: [
     GoogleTranslateButtonComponent,
     ChipInputComponent,
+    ChipComponent,
     ChipsComponent,
     KeyComponent,
     SearchOptionsComponent
@@ -71,6 +72,7 @@ import { GameService } from './game';
   exports: [
     GoogleTranslateButtonComponent,
     ChipInputComponent,
+    ChipComponent,
     ChipsComponent,
     KeyComponent,
     SearchOptionsComponent

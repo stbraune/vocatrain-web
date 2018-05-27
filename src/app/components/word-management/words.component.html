@@ -66,16 +66,18 @@
           <ng-container *ngFor="let text of wordEntity.texts">
             <ng-container *ngFor="let lang of supportedLanguages">
               <div class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal word">
-                {{text.words[lang] && text.words[lang].value}}
-                <google-translate-button [from]="lang" [to]="supportedLanguages" [text]="text.words[lang].value">
-                </google-translate-button>
-                <button mat-icon-button (click)="openWordEntityDetails($event, wordEntity)" class="open-details-button">
-                  <mat-icon>code</mat-icon>
-                </button>
+                <span>{{text.words[lang] && text.words[lang].value}}</span>
+                <span class="buttons">
+                  <google-translate-button [from]="lang" [to]="supportedLanguages" [text]="text.words[lang].value">
+                  </google-translate-button>
+                  <button mat-icon-button (click)="openWordEntityDetails($event, wordEntity)" [matTooltip]="'words.show-details' | translate" class="open-details-button">
+                    <mat-icon [inline]="true">code</mat-icon>
+                  </button>
+                </span>
               </div>
             </ng-container>
             <div class="flex-col flex-col--17 align--center overflow--hidden word-wrap--break-word white-space--normal">
-              <chips [mode]="'read'" [(chips)]="text.tags"></chips>
+              <chips [chips]="text.tags" mode="read"></chips>
             </div>
           </ng-container>
         </div>

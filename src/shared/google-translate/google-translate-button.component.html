@@ -1,5 +1,5 @@
 <button *ngIf="translateConfigured" mat-icon-button (click)="showSuggestions($event)" [matTooltip]="'google-translate-button.tooltip' | translate">
-  <mat-icon>remove_red_eye</mat-icon>
+  <mat-icon [inline]="true">remove_red_eye</mat-icon>
 </button>
 
 <ng-template #selectLanguageBottomSheetTemplate>
@@ -15,6 +15,12 @@
 
 <ng-template #selectResultBottomSheetTemplate>
   <mat-list>
+    <mat-list-item>
+      <button mat-button class="stretch" (click)="onTranslationClicked(toAlternative(result))">
+        {{result.text}}
+        <mat-icon [title]="'google-translate-button.select-translation' | translate">done</mat-icon>
+      </button>
+    </mat-list-item>
     <mat-list-item *ngFor="let alternative of result.alternatives">
       <button mat-button class="stretch" (click)="onTranslationClicked(alternative)">
         {{alternative.text}}

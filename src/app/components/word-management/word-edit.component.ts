@@ -96,6 +96,13 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
     });
   }
 
+  public onChipClicked(chip: string) {
+    const chipInputComponents = this.chipInputComponents.toArray();
+    if (chipInputComponents.length > 0) {
+      chipInputComponents[0].toggleChip(chip);
+    }
+  }
+
   public onDeleteText(text: Text) {
     const index = this.editedWordEntity.texts.indexOf(text);
     if (index !== -1) {

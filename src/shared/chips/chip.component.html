@@ -1,0 +1,8 @@
+<mat-chip class="chip mat-basic-chip" (click)="onChipClicked(chip)"
+  [class.chip--read]="mode === 'read'"
+  [style.cursor]="chipClicked.observers.length > 0 ? 'pointer' : 'default'">
+  {{chip}}
+  <button *ngIf="mode === 'update'" mat-icon-button (click)="deleteChip($event, chip)" tabindex="-1">
+    <mat-icon>delete</mat-icon>
+  </button>
+</mat-chip>

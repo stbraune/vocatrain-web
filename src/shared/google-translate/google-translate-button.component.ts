@@ -72,6 +72,13 @@ export class GoogleTranslateButtonComponent {
     });
   }
 
+  public toAlternative(result: GoogleTranslateResult): GoogleTranslateAlternative  {
+    return {
+      text: result.text,
+      score: result.confidence
+    };
+  }
+
   public onTranslationClicked(alternative: GoogleTranslateAlternative) {
     this.translationSelected.emit(Object.assign({}, alternative, {
       language: this.selectedResultLanguage
