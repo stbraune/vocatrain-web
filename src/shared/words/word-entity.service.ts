@@ -1,11 +1,15 @@
 import { Injectable } from '@angular/core';
 
 import { Observable, pipe } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 
 import * as uuidv4 from 'uuid/v4';
 
-import { Database, DatabaseService, DatabaseRunFulltextQueryOptions } from '../database';
+import {
+  Database, DatabaseService,
+  DatabaseFetchOptions, DatabaseQueryResult,
+  DatabaseRunFulltextQueryOptions, DatabaseFulltextQueryResult
+} from '../database';
 import { SettingsService } from '../../settings';
 import { WordEntity } from './word-entity';
 
@@ -38,16 +42,7 @@ export class WordEntityService {
     limit: number,
     sort?: string,
     descending?: boolean
-  }): Observable<{
-    total_rows?: number,
-    rows?: {
-      doc?: WordEntity,
-      id?: string,
-      score?: number,
-      key?: string,
-      value?: any
-    }[]
-  }> {
+  }): Observable<DatabaseFulltextQueryResult<WordEntity> | DatabaseQueryResult<WordEntity, string, {}>> {
     if (options.query) {
       return this.searchWordEntities({
         q: options.query,
@@ -95,6 +90,44 @@ export class WordEntityService {
       descending: options && options.descending,
       include_docs: true
     });
+  }
+
+  public getDuplicateWordEntities(options: Partial<DatabaseFetchOptions<[string, string]>>) {
+    return this.getDuplicateWordEntitiesInternal(Object.assign({}, options, {
+      group: true,
+      limit: undefined
+    })).pipe(
+      map((result) => result.rows.filter((row) => row.value > 1)),
+      map((rows) => rows.map((row) => row.key)),
+      switchMap((keys) => this.getDuplicateWordEntitiesInternal(Object.assign({}, options, {
+        reduce: false,
+        keys: keys,
+        startkey: undefined,
+        endkey: undefined,
+        include_docs: true
+      })))
+    );
+  }
+
+  private getDuplicateWordEntitiesInternal(options: Partial<DatabaseFetchOptions<[string, string]>>) {
+    return this.db.executeQuery<[string, string], {}, number>(Object.assign({
+      designDocument: 'words-index',
+      viewName: 'by-lang',
+      mapFunction(emit) {
+        return function (doc) {
+          if (doc._id.substr(0, 'word_'.length) === 'word_') {
+            doc.texts.forEach(function (text) {
+              Object.keys(text.words).forEach(function (lang) {
+                emit([lang, text.words[lang].value]);
+              });
+            });
+          }
+        };
+      },
+      reduceFunction() {
+        return '_count';
+      }
+    }, options));
   }
 
   public getWordEntitiesFields(): Observable<string[]> {

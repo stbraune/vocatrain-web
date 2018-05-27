@@ -29,6 +29,8 @@
     "title": "Vokabeln",
     "search": "Suche...",
     "search-help": "Verfügbare Felder:",
+    "sort-by": "Nach {{col}} sortieren",
+    "filter-duplicates": "Nach Duplikaten auf {{lang}} filtern",
     "tags": "Tags",
     "edit-word": {
       "title": "Vokabel bearbeiten",

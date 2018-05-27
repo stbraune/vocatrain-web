@@ -32,17 +32,26 @@
       <div class="flex flex--no-margin flex--align-center stretch">
         <ng-container *ngFor="let lang of supportedLanguages">
           <div class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal flex flex--no-margin flex--align-center"
-            [class.cursor--pointer]="query === ''"
+            [class.cursor--pointer]="query === '' && !duplicatesFiltered"
             (click)="sortBy(lang)">
-            <span>{{lang | translate}}</span>
+            <mat-checkbox
+              [(ngModel)]="duplicatesFilter[lang]"
+              (ngModelChange)="onDuplicatesFilterChanged(lang)"
+              [matTooltip]="'words.filter-duplicates' | translate:{lang: (lang | translate)}"
+              [disabled]="query !== ''"
+              (click)="$event.stopPropagation()">
+              {{lang | translate}}
+            </mat-checkbox>
             <mat-icon *ngIf="sorting.property === lang && !sorting.descending">arrow_upward</mat-icon>
             <mat-icon *ngIf="sorting.property === lang && sorting.descending">arrow_downward</mat-icon>
           </div>
         </ng-container>
         <div class="flex-col flex-col--17 align--center overflow--hidden word-wrap--break-word white-space--normal flex flex--no-margin flex--align-center flex--justify-center"
-          [class.cursor--pointer]="query === ''"
+          [class.cursor--pointer]="query === '' && !duplicatesFiltered"
           (click)="sortBy('tags')">
-          <span>{{'words.tags' | translate}}</span>
+          <span>
+            {{'words.tags' | translate}}
+          </span>
           <mat-icon *ngIf="sorting.property === 'tags' && !sorting.descending">arrow_upward</mat-icon>
           <mat-icon *ngIf="sorting.property === 'tags' && sorting.descending">arrow_downward</mat-icon>
         </div>
@@ -60,6 +69,9 @@
                 {{text.words[lang] && text.words[lang].value}}
                 <google-translate-button [from]="lang" [to]="supportedLanguages" [text]="text.words[lang].value">
                 </google-translate-button>
+                <button mat-icon-button (click)="openWordEntityDetails($event, wordEntity)" class="open-details-button">
+                  <mat-icon>code</mat-icon>
+                </button>
               </div>
             </ng-container>
             <div class="flex-col flex-col--17 align--center overflow--hidden word-wrap--break-word white-space--normal">
@@ -101,3 +113,7 @@
     </button>
   </li>
 </ul>
+
+<ng-template #wordDetailsDialogContentTemplate>
+  <pre>{{wordEntityDetails | json}}</pre>
+</ng-template>

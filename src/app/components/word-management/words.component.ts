@@ -1,10 +1,17 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 
 import { Observable, Subject, forkJoin } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
-import { WordTypeEntityService, WordEntityService, WordTypeEntity, WordEntity } from '../../../shared';
+import {
+  WordTypeEntityService,
+  WordEntityService,
+  WordTypeEntity,
+  WordEntity,
+  DatabaseFulltextQueryResult,
+  DatabaseQueryResult
+} from '../../../shared';
 import { SettingsService } from '../../../settings';
 
 import { WordAddDialogComponent } from './word-add-dialog.component';
@@ -19,6 +26,11 @@ export class WordsComponent implements OnInit {
   public wordEntities: WordEntity[] = [];
   public wordEntitiesPerPage = 50;
   public wordEntitiesNextKey: any;
+  public wordEntityDetails: WordEntity;
+
+  @ViewChild('wordDetailsDialogContentTemplate')
+  public wordDetailsDialogContentTemplate: TemplateRef<void>;
+
   public wordTypeEntities: WordTypeEntity[] = [];
 
   public emptyWordEntity: WordEntity = {
@@ -31,6 +43,9 @@ export class WordsComponent implements OnInit {
       }
     ]
   };
+
+  public duplicatesFilter: { [lang: string]: boolean } = {};
+  public duplicatesFiltered = false;
 
   public query = '';
   public queryAvailable = false;
@@ -75,6 +90,14 @@ export class WordsComponent implements OnInit {
       });
   }
 
+  public onDuplicatesFilterChanged(lang) {
+    Object.keys(this.duplicatesFilter)
+      .filter((l) => l !== lang)
+      .forEach((l) => this.duplicatesFilter[l] = false);
+    this.duplicatesFiltered = Object.keys(this.duplicatesFilter).some((l) => this.duplicatesFilter[l]);
+    this.reloadWordEntities();
+  }
+
   private loadWordTypeEntities() {
     this.wordTypeEntityService.getWordTypeEntities().subscribe((wordTypeEntities) => {
       this.wordTypeEntities = wordTypeEntities;
@@ -95,22 +118,40 @@ export class WordsComponent implements OnInit {
   }
 
   public loadWordEntities() {
-    this.wordEntityService.getWordEntities({
+
+    this.getWordEntitiesQuery().subscribe((result) => {
+      const rows = <{key?: any, doc?: WordEntity}[]>result.rows;
+      if (result.rows.length === this.wordEntitiesPerPage + 1) {
+        this.wordEntitiesNextKey = rows[this.wordEntitiesPerPage].key
+          || (this.wordEntities.length + this.wordEntitiesPerPage);
+        this.wordEntities.push(...rows.slice(0, this.wordEntitiesPerPage).map((row) => row.doc));
+      } else {
+        this.wordEntitiesNextKey = undefined;
+        this.wordEntities.push(...rows.map((row) => row.doc));
+      }
+    }, (error) => {
+      console.error(error);
+    });
+  }
+
+  private getWordEntitiesQuery(): Observable<
+      DatabaseFulltextQueryResult<WordEntity>
+    | DatabaseQueryResult<WordEntity, {}, {}>
+  > {
+    if (this.duplicatesFiltered) {
+      return this.wordEntityService.getDuplicateWordEntities({
+        startkey: this.wordEntitiesNextKey || [Object.keys(this.duplicatesFilter).find((lang) => this.duplicatesFilter[lang]), undefined],
+        endkey: [Object.keys(this.duplicatesFilter).find((lang) => this.duplicatesFilter[lang]), '\uffff'],
+        limit: this.wordEntitiesPerPage + 1
+      });
+    }
+
+    return this.wordEntityService.getWordEntities({
       query: this.query,
       startkey: this.wordEntitiesNextKey,
       limit: this.wordEntitiesPerPage + 1,
       sort: this.sorting.property,
       descending: this.sorting.descending
-    }).subscribe((result) => {
-      if (result.rows.length === this.wordEntitiesPerPage + 1) {
-        this.wordEntitiesNextKey = result.rows[this.wordEntitiesPerPage].key || (this.wordEntities.length + this.wordEntitiesPerPage);
-        this.wordEntities.push(...result.rows.slice(0, this.wordEntitiesPerPage).map((row) => row.doc));
-      } else {
-        this.wordEntitiesNextKey = undefined;
-        this.wordEntities.push(...result.rows.map((row) => row.doc));
-      }
-    }, (error) => {
-      console.error(error);
     });
   }
 
@@ -142,7 +183,7 @@ export class WordsComponent implements OnInit {
   }
 
   public sortBy(property: string) {
-    if (this.query !== '') {
+    if (this.query !== '' || this.duplicatesFiltered) {
       return;
     }
 
@@ -164,6 +205,12 @@ export class WordsComponent implements OnInit {
     }, (error) => {
       console.error(error);
     });
+  }
+
+  public openWordEntityDetails($event: MouseEvent, wordEntity: WordEntity) {
+    $event.stopPropagation();
+    this.wordEntityDetails = wordEntity;
+    this.dialog.open(this.wordDetailsDialogContentTemplate);
   }
 
   public saveWordEntity(wordEntity: WordEntity) {

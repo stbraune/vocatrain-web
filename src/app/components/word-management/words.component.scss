@@ -32,13 +32,13 @@
 }
 
 .word {
-  google-translate-button {
+  .open-details-button, google-translate-button {
     opacity: 0;
     transition: opacity 0.4s;
   }
 
   &:hover {
-    google-translate-button {
+    .open-details-button, google-translate-button {
       opacity: 1;
     }
   }

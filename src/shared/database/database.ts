@@ -139,9 +139,9 @@ export class Database<TEntity extends DatabaseEntity> {
 
   public executeQuery<TKey, TValue = {}, TReduce = {}>(
     options: DatabaseExecuteQueryOptions<TEntity, TKey, TValue, TReduce>
-  ): Observable<DatabaseQueryResult<TEntity, TKey, TValue>> {
+  ): Observable<DatabaseQueryResult<TEntity, TKey, TValue | TReduce>> {
     return this.getQuery(options).pipe(
-      switchMap((designDocument) => this.runQuery(options))
+      switchMap((designDocument) => this.runQuery<TKey, TValue, TReduce>(options))
     );
   }
 
@@ -176,10 +176,10 @@ export class Database<TEntity extends DatabaseEntity> {
 
   public runQuery<TKey, TValue = {}, TReduce = {}>(
     options: DatabaseRunQueryOptions<TKey>
-  ): Observable<DatabaseQueryResult<TEntity, TKey, TValue>> {
+  ): Observable<DatabaseQueryResult<TEntity, TKey, TValue | TReduce>> {
     return from(this._database.query(`${options.designDocument}/${options.viewName}`,
       sanitize(options, 'designDocument', 'viewName'))).pipe(
-        map((result: DatabaseQueryResult<TEntity, TKey, TValue>) => options.include_docs
+        map((result: DatabaseQueryResult<TEntity, TKey, TValue | TReduce>) => options.include_docs
           ? Object.assign(result, {
             rows: result.rows.map((row) => Object.assign(row, {
               doc: this.deserializeEntity(row.doc)
