@@ -46,7 +46,7 @@ $accent: map-get($candy-app-theme, accent);
 
 body {
   margin: 0;
-  zoom: 1.2;
+  // zoom: 1.2;
   font-family: Roboto,Helvetica Neue Light,Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;
 }
 
@@ -102,10 +102,6 @@ h3 {
     padding-left: 0;
     padding-right: 0;
   }
-}
-
-.stretch {
-  width: 100%;
 }
 
 .overflow {
@@ -227,11 +223,48 @@ h3 {
   }
 }
 
+@media(min-width: 600px) {
+  .stretch {
+    width: 100%;
+  }
+}
+
 @media(max-width: 599px) {
-  .flex {
+  .word-card {
+    min-height: initial !important;
+  }
+
+  .sm-hide {
+    display: none !important;
+  }
+
+  .mat-checkbox-layout {
+    white-space: initial !important;
+  }
+
+  .flex, .inline-flex {
     flex-direction: column;
+    margin-left: 0;
+    margin-right: 0;
+
+    &--align-center {
+      align-items: initial;
+    }
+
+    &--align-center.flex--row,
+    &--align-center.inline-flex--row {
+      align-items: center;
+    }
+
+    &--row {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
   
     .flex-col {
+      margin-left: 0;
+      margin-right: 0;
+      margin-bottom: 0.5em;
       &--50 { flex-basis: 100%; }
     }
   }

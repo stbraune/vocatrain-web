@@ -1,24 +1,28 @@
 <div class="panel">
   <div class="form">
     <mat-radio-group [(ngModel)]="searchOptions.mode" (ngModelChange)="onPropertyChanged()" class="flex flex--align-center">
-      <mat-radio-button #radioModeTime class="flex-col" value="by-time">
-      </mat-radio-button>
-      <mat-form-field class="flex-col--1 margin--right">
-        <input matInput type="number"
-          placeholder="{{'search-options.mode.time' | translate}}"
-          [(ngModel)]="searchOptions.minutes"
-          (ngModelChange)="onPropertyChanged()"
-          (focus)="setMode('by-time')">
-      </mat-form-field>
-      <mat-radio-button #radioModeWords class="flex-col align--right" value="by-amount">
-      </mat-radio-button>
-      <mat-form-field class="flex-col--1 margin--right">
-        <input matInput type="number"
-          placeholder="{{'search-options.mode.words' | translate}}"
-          [(ngModel)]="searchOptions.amount"
-          (ngModelChange)="onPropertyChanged()"
-          (focus)="setMode('by-amount')">
-      </mat-form-field>
+      <div class="flex-col flex-col--1 flex flex--row flex--align-center">
+        <mat-radio-button #radioModeTime class="flex-col" value="by-time">
+        </mat-radio-button>
+        <mat-form-field class="flex-col--1 margin--right">
+          <input matInput type="number"
+            placeholder="{{'search-options.mode.time' | translate}}"
+            [(ngModel)]="searchOptions.minutes"
+            (ngModelChange)="onPropertyChanged()"
+            (focus)="setMode('by-time')">
+        </mat-form-field>
+      </div>
+      <div class="flex-col flex-col--1 flex flex--row flex--align-center">
+        <mat-radio-button #radioModeWords class="flex-col align--right" value="by-amount">
+        </mat-radio-button>
+        <mat-form-field class="flex-col--1 margin--right">
+          <input matInput type="number"
+            placeholder="{{'search-options.mode.words' | translate}}"
+            [(ngModel)]="searchOptions.amount"
+            (ngModelChange)="onPropertyChanged()"
+            (focus)="setMode('by-amount')">
+        </mat-form-field>
+      </div>
     </mat-radio-group>
     
     <div class="flex">

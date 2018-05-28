@@ -12,23 +12,23 @@
         {{('statistics.mode.' + total.key[0]) | translate}}
       </mat-card-subtitle>
       <mat-card-content>
-        <p class="flex">
+        <p class="flex flex--row">
           <em class="flex-col flex-col--1">{{'statistics.total-duration' | translate}}</em>
           <span class="flex-col flex-col--1">{{formatSeconds(total.value.durationInMillis / 1000)}}</span>
         </p>
-        <p class="flex">
+        <p class="flex flex--row">
           <em class="flex-col flex-col--1">{{'statistics.correct-words' | translate}}</em>
           <span class="flex-col flex-col--1">{{total.value.countCorrect}} ({{percent(total.value.countCorrect, total.value.countTotal)}}%)</span>
         </p>
-        <p class="flex">
+        <p class="flex flex--row">
           <em class="flex-col flex-col--1">{{'statistics.wrong-words' | translate}}</em>
           <span class="flex-col flex-col--1">{{total.value.countWrong}} ({{percent(total.value.countWrong, total.value.countTotal)}}%)</span>
         </p>
-        <p class="flex">
+        <p class="flex flex--row">
           <em class="flex-col flex-col--1">{{'statistics.total-words' | translate}}</em>
           <span class="flex-col flex-col--1">{{total.value.countTotal}}</span>
         </p>
-        <p class="flex">
+        <p class="flex flex--row">
           <em class="flex-col flex-col--1">{{'statistics.average-per-word' | translate}}</em>
           <span class="flex-col flex-col--1">{{formatSeconds(total.value.durationInMillis / total.value.countTotal / 1000)}}</span>
         </p>
@@ -45,23 +45,23 @@
         {{('statistics.mode.' + total.key[0]) | translate}}
       </mat-card-subtitle>
       <mat-card-content>
-        <p class="flex">
+        <p class="flex flex--row">
           <em class="flex-col flex-col--1">{{'statistics.total-duration' | translate}}</em>
           <span class="flex-col flex-col--1">{{formatSeconds(total.value.durationInMillis / 1000)}}</span>
         </p>
-        <p class="flex">
+        <p class="flex flex--row">
           <em class="flex-col flex-col--1">{{'statistics.correct-words' | translate}}</em>
           <span class="flex-col flex-col--1">{{total.value.countCorrect}} ({{percent(total.value.countCorrect, total.value.countTotal)}}%)</span>
         </p>
-        <p class="flex">
+        <p class="flex flex--row">
           <em class="flex-col flex-col--1">{{'statistics.wrong-words' | translate}}</em>
           <span class="flex-col flex-col--1">{{total.value.countWrong}} ({{percent(total.value.countWrong, total.value.countTotal)}}%)</span>
         </p>
-        <p class="flex">
+        <p class="flex flex--row">
           <em class="flex-col flex-col--1">{{'statistics.total-words' | translate}}</em>
           <span class="flex-col flex-col--1">{{total.value.countTotal}}</span>
         </p>
-        <p class="flex">
+        <p class="flex flex--row">
           <em class="flex-col flex-col--1">{{'statistics.average-per-word' | translate}}</em>
           <span class="flex-col flex-col--1">{{formatSeconds(total.value.durationInMillis / total.value.countTotal / 1000)}}</span>
         </p>

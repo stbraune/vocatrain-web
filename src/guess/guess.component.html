@@ -25,7 +25,7 @@
         <span *ngIf="searchOptions.mode === 'by-amount'">/ {{searchOptions.amount}}</span>
       </div>
     </div>
-    <div class="flex margin--bottom">
+    <div class="flex margin--bottom sm-hide">
       <div class="flex-col flex-col--grow">
         <strong>{{'guess.last-repeat' | translate}}:</strong>
         <span *ngIf="!game.word || game.word.key.answerAt.getTime() === 0; else answerAtOk">
@@ -98,7 +98,7 @@
     </div>
   </mat-card-content>
   <mat-card-actions>
-    <div class="flex flex--align-center flex--justify-space-between">
+    <div class="flex flex--row flex--align-center flex--justify-space-between">
       <key [label]="'guess.uncover' | translate" class="flex-col flex-col--1" (click)="uncoverWord()">
         <mat-icon>keyboard_arrow_up</mat-icon>
       </key>

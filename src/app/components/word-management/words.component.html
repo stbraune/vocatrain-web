@@ -2,34 +2,38 @@
   <h3 class="flex-col padding--right margin--0">
     {{'words.title' | translate}}
   </h3>
-  <div class="flex-col flex-col--1 padding--left">
-    <mat-form-field *ngIf="queryAvailable" class="stretch mat-input--no-margin" floatLabel="never">
-      <input matInput
-        placeholder="{{'words.search' | translate}}"
-        [(ngModel)]="query"
-        (ngModelChange)="onQueryChanged()">
-      <span matSuffix>
-        <button mat-icon-button (click)="onHelpQuery()" matTooltip="{{'words.search-help' | translate}} {{queryHelpFields.join(', ')}}">
-          <mat-icon>help</mat-icon>
+  <div class="flex-col flex-col--1">
+    <div class="flex flex--no-margin flex--align-center flex--row">
+      <div class="flex-col flex-col--1 padding--left">
+        <mat-form-field *ngIf="queryAvailable" class="stretch mat-input--no-margin" floatLabel="never">
+          <input matInput
+            placeholder="{{'words.search' | translate}}"
+            [(ngModel)]="query"
+            (ngModelChange)="onQueryChanged()">
+          <span matSuffix>
+            <button mat-icon-button (click)="onHelpQuery()" matTooltip="{{'words.search-help' | translate}} {{queryHelpFields.join(', ')}}">
+              <mat-icon>help</mat-icon>
+            </button>
+            <button mat-icon-button (click)="onClearQuery()">
+              <mat-icon>clear</mat-icon>
+            </button>
+          </span>
+        </mat-form-field>
+      </div>
+      <div class="flex-col padding--left">
+        <button mat-button (click)="createWordEntity()" class="stretch">
+          <mat-icon>add</mat-icon>
+          {{'actions.create' | translate}}
         </button>
-        <button mat-icon-button (click)="onClearQuery()">
-          <mat-icon>clear</mat-icon>
-        </button>
-      </span>
-    </mat-form-field>
-  </div>
-  <div class="flex-col padding--left">
-    <button mat-button (click)="createWordEntity()" class="stretch">
-      <mat-icon>add</mat-icon>
-      {{'actions.create' | translate}}
-    </button>
+      </div>
+    </div>
   </div>
 </div>
 
 <ul class="ul--nostyle">
-  <li class="header-row">
+  <li class="header-row sm-hide">
     <div class="header-wrapper">
-      <div class="flex flex--no-margin flex--align-center stretch">
+      <div class="flex flex--row flex--no-margin flex--align-center stretch">
         <ng-container *ngFor="let lang of supportedLanguages">
           <div class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal flex flex--no-margin flex--align-center"
             [class.cursor--pointer]="query === '' && !duplicatesFiltered"
@@ -46,7 +50,7 @@
             <mat-icon *ngIf="sorting.property === lang && sorting.descending">arrow_downward</mat-icon>
           </div>
         </ng-container>
-        <div class="flex-col flex-col--17 align--center overflow--hidden word-wrap--break-word white-space--normal flex flex--no-margin flex--align-center flex--justify-center"
+        <div class="flex-col flex-col--17 align--center overflow--hidden word-wrap--break-word white-space--normal flex flex--no-margin flex--align-center flex--justify-center sm-hide"
           [class.cursor--pointer]="query === '' && !duplicatesFiltered"
           (click)="sortBy('tags')">
           <span>
@@ -64,10 +68,10 @@
       <mat-expansion-panel-header>
         <div class="flex flex--no-margin flex--align-center stretch">
           <ng-container *ngFor="let text of wordEntity.texts">
-            <ng-container *ngFor="let lang of supportedLanguages">
-              <div class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal word">
-                <span>{{text.words[lang] && text.words[lang].value}}</span>
-                <span class="buttons">
+            <ng-container *ngFor="let lang of supportedLanguages; let i=index">
+              <div class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal word" [class.sm-hide]="i > 0">
+                {{text.words[lang] && text.words[lang].value}}
+                <span class="buttons sm-hide">
                   <google-translate-button [from]="lang" [to]="supportedLanguages" [text]="text.words[lang].value">
                   </google-translate-button>
                   <button mat-icon-button (click)="openWordEntityDetails($event, wordEntity)" [matTooltip]="'words.show-details' | translate" class="open-details-button">
@@ -76,7 +80,7 @@
                 </span>
               </div>
             </ng-container>
-            <div class="flex-col flex-col--17 align--center overflow--hidden word-wrap--break-word white-space--normal">
+            <div class="flex-col flex-col--17 align--center overflow--hidden word-wrap--break-word white-space--normal sm-hide">
               <chips [chips]="text.tags" mode="read"></chips>
             </div>
           </ng-container>
@@ -91,7 +95,7 @@
           (wordSaved)="saveWordEntity($event)">
         </word-edit>
         
-        <div class="flex">
+        <div class="flex flex--row">
           <div class="flex-col flex-col--grow">
             <button mat-button (click)="deleteWordEntity(wordEntity)">
               <mat-icon>delete</mat-icon>

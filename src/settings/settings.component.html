@@ -19,7 +19,7 @@
   <mat-card-content>
     <ul class="ul--nostyle">
       <li *ngFor="let language of appSettings.userLanguages">
-        <div class="flex flex--align-center">
+        <div class="flex flex--align-center flex--row">
           <div class="flex-col flex-col--1 overflow--hiden word-wrap--break-word white-space--normal">
             {{language.iso | translate}} ({{language.iso}})
           </div>
@@ -31,7 +31,7 @@
         </div>
       </li>
       <li>
-        <div class="flex flex--align-center">
+        <div class="flex flex--align-center flex--row">
           <div class="flex-col flex-col--1 flex flex--column flex--no-margin">
             <mat-form-field>
               <input matInput [(ngModel)]="language" (keyup)="onLanguageKeyUp($event)">
