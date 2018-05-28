@@ -1,0 +1,9 @@
+CACHE MANIFEST
+assets/i18n/de.json
+assets/i18n/en.json
+favicon.ico
+index.html
+main.js
+polyfills.js
+runtime.js
+styles.css
