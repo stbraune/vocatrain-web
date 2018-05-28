@@ -1,3 +1,3 @@
-export * from './guess.component';
-export * from './guess.routing.module';
-export * from './guess.module';
+export * from './watch.component';
+export * from './watch.routing.module';
+export * from './watch.module';

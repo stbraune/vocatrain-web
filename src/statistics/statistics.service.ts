@@ -186,6 +186,7 @@ export class StatisticsService {
     return zip(this.queryAllGameModes(), this.queryAllLanguages()).pipe(
       switchMap(([modes, langs]) => this.wordEntityDatabase.executeQuery<
         [string, string, number],
+        number,
         number
         >({
           designDocument: 'word-stats',
