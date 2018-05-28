@@ -72,7 +72,7 @@ export class SettingsComponent implements OnInit {
   public onSaveDatabaseSettings() {
     this.settingsService.validateDatabaseSettings(this.databaseSettings).subscribe((result) => {
       this.databaseSettingsValidation = {};
-      this.settingsService.setDatabaseSettings(this.databaseSettings);
+      this.settingsService.setDatabaseSettings(this.databaseSettings).subscribe();
       this.onSettingsSaved();
     }, (error) => {
       this.databaseSettingsValidation = error;
