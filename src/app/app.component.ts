@@ -16,6 +16,7 @@ import { SettingsService } from '../settings';
 })
 export class AppComponent implements OnInit {
   public synchronizationEnabled = false;
+  public sidenavOpened = true;
 
   public constructor(
     private translateService: TranslateService,

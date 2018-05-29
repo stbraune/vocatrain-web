@@ -2,7 +2,53 @@
   margin: 0 2rem 0 0;
 }
 
-.body {
-  margin: 1rem auto;
-  max-width: 900px;
+@media(min-width: 600px) {
+  .body {
+    margin: 1rem auto;
+    max-width: 900px;
+  }
+
+  .app-navbar {
+    padding: 0.8rem 1rem;
+    margin-bottom: 1rem;
+  }
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.app-navbar {
+  position: fixed;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 12px;
+
+  .right {
+    margin-bottom: 0;
+  }
+}
+
+.app-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+
+  .mat-button {
+    line-height: 48px;
+    text-align: left;
+  }
+}
+
+.sidenav-container {
+  margin-top: 56px;
+  flex: 1 0 auto;
 }
