@@ -19,7 +19,9 @@
             "assets": [
               "src/assets",
               "src/manifest.json",
-              "src/vocatrain.manifest",
+              "src/appcache.manifest",
+              "src/material-icons.css",
+              "src/material-icons.woff2",
               "src/favicon.ico"
             ],
             "styles": [

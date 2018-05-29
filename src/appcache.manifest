@@ -1,4 +1,7 @@
 CACHE MANIFEST
+#v3
+material-icons.css
+material-icons.woff2
 assets/i18n/de.json
 assets/i18n/en.json
 favicon.ico
@@ -7,3 +10,6 @@ main.js
 polyfills.js
 runtime.js
 styles.css
+
+NETWORK:
+*
