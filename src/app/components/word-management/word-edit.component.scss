@@ -14,3 +14,9 @@
     flex-grow: 0.3;
   }
 }
+
+@media(min-width: 600px) {
+  .word-input {
+    padding: 0 0.5em;
+  }
+}

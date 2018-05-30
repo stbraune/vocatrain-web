@@ -1,12 +1,12 @@
-<div class="flex flex--no-margin flex--align-center margin--bottom">
-  <div class="flex-col padding--right margin--0">
+<div class="flex flex--no-margin flex--align-center">
+  <div class="flex-col padding--right margin--0 sm-hide">
     <h3>
       {{'words.title' | translate}}
     </h3>
   </div>
   <div class="flex-col flex-col--1">
     <div class="flex flex--no-margin flex--align-center flex--row">
-      <div class="flex-col flex-col--1 padding--left">
+      <div class="flex-col flex-col--1 padding--left search-container">
         <mat-form-field *ngIf="queryAvailable" class="stretch mat-input--no-margin" floatLabel="never">
           <input matInput
             placeholder="{{'words.search' | translate}}"

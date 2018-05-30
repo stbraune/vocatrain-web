@@ -142,12 +142,6 @@ h3 {
   }
 }
 
-.key {
-  display: inline-flex;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 8px;
-}
-
 .flex {
   display: flex;
 }
@@ -229,23 +223,43 @@ h3 {
   }
 }
 
-
 @media(max-width: 599px) {
   h3 {
     margin-left: 0.5rem;
     margin-right: 0.5rem;
   }
 
+  .mat-card-actions {
+    .mat-button {
+      min-height: 50px;
+    }
+  }
+
+  .mat-checkbox-layout {
+    white-space: initial !important;
+  }
+
+  .mat-card-actions {
+    display: flex !important;
+    flex-direction: column;
+  }
+
   .word-card {
-    min-height: initial !important;
+    min-height: 160px !important;
+  }
+
+  key.key-button {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 25%;
   }
 
   .sm-hide {
     display: none !important;
   }
 
-  .mat-checkbox-layout {
-    white-space: initial !important;
+  .sm-show {
+    display: initial !important;
   }
 
   .flex, .inline-flex {

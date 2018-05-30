@@ -32,6 +32,12 @@
   align-items: center;
   padding: 12px;
 
+  .app-navbar-mobile {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
   .right {
     margin-bottom: 0;
   }
@@ -50,5 +56,15 @@
 
 .sidenav-container {
   margin-top: 56px;
+  padding-top: 1rem;
   flex: 1 0 auto;
+}
+
+.synchronization-enabled {
+  color: white;
+  transition: color 0.25s;
+}
+
+.synchronization-running {
+  color: #669643;
 }

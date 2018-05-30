@@ -1,4 +1,4 @@
-<h3>
+<h3 class="sm-hide">
   {{'type.title' | translate}}
 </h3>
 
@@ -59,7 +59,7 @@
           </p>
           <p *ngIf="game.word.key.tags.length > 0">
             <strong>{{'type.tags' | translate}}:</strong>
-            <chips [chips]="game.word.key.tags" mode="read"></chips>
+            <chips [chips]="game.word.key.tags" mode="read" class="margin--left"></chips>
           </p>
           <p *ngIf="game.word.key.meta">
             <strong>{{'type.meta' | translate}}:</strong>
@@ -85,7 +85,7 @@
           </p>
           <p *ngIf="game.word.key.tags.length > 0">
             <strong>{{'type.tags' | translate}}:</strong>
-            <chips [chips]="game.word.key.tags" mode="read"></chips>
+            <chips [chips]="game.word.key.tags" mode="read" class="margin--left"></chips>
           </p>
         </mat-card-content>
         <mat-card-content *ngIf="!game.word || game.wordState.state === 'undefined' || game.wordState.state === 'covered'" class="align--center">
@@ -96,8 +96,8 @@
         </mat-card-content>
       </mat-card>
     </div>
-    <div>
-      <mat-form-field class="stretch">
+    <div class="flex flex--column flex--no-margin">
+      <mat-form-field>
         <input matInput #answerInput
           placeholder="{{'type.answer' | translate}}"
           [(ngModel)]="answer"
@@ -107,23 +107,27 @@
   </mat-card-content>
   <mat-card-actions>
     <div class="flex flex--row flex--align-center flex--justify-space-between">
-      <key [label]="'type.uncover' | translate" class="flex-col flex-col--1" (click)="uncoverWord()">
-        <mat-icon>keyboard_arrow_up</mat-icon>
-      </key>
-      <key [label]="'type.cover' | translate" class="flex-col flex-col--1 margin--left" (click)="coverWord()">
-        <mat-icon>keyboard_arrow_down</mat-icon>
-      </key>
-      <key [label]="'type.wrong' | translate" class="flex-col flex-col--1 margin--left" (click)="solveWrong()">
-        <mat-icon>keyboard_arrow_left</mat-icon>
-      </key>
-      <key [label]="'type.right' | translate" class="flex-col flex-col--1 margin--left" (click)="solveCorrect()">
-        <mat-icon>keyboard_arrow_right</mat-icon>
-      </key>
-      <key *ngIf="game.gameState.state === 'started'" [label]="'type.pause' | translate" class="flex-col flex-col--1 margin--left" (click)="pauseGame()">
+      <key *ngIf="game.gameState.state === 'started'" [label]="'type.pause' | translate" class="key-button flex-col flex-col--1" (click)="pauseGame()">
         <mat-icon>pause</mat-icon>
       </key>
-      <key *ngIf="game.gameState.state === 'paused'" [label]="'type.resume' | translate" class="flex-col flex-col--1 margin--left" (click)="resumeGame()">
+      <key *ngIf="game.gameState.state === 'paused'" [label]="'type.resume' | translate" class="key-button flex-col flex-col--1" (click)="resumeGame()">
         <mat-icon>play_arrow</mat-icon>
+      </key>
+      <key *ngIf="game.word && game.wordState.state === 'covered' && answerState === 'undefined'" [label]="'type.uncover' | translate" class="key-button flex-col flex-col--1 margin--left" (click)="uncoverWord()">
+        <mat-icon class="sm-hide">keyboard_arrow_up</mat-icon>
+        <mat-icon class="lg-hide">pageview</mat-icon>
+      </key>
+      <key *ngIf="game.word && game.wordState.state === 'uncovered' && answerState === 'undefined'" [label]="'type.cover' | translate" class="key-button flex-col flex-col--1 margin--left" (click)="coverWord()">
+        <mat-icon class="sm-hide">keyboard_arrow_down</mat-icon>
+        <mat-icon class="lg-hide">pageview</mat-icon>
+      </key>
+      <key *ngIf="game.word && game.wordState.state === 'uncovered' && answerState === 'partially-correct'" [label]="'type.wrong' | translate" class="key-button flex-col flex-col--1 margin--left" (click)="solveWrong()">
+        <mat-icon class="sm-hide">keyboard_arrow_left</mat-icon>
+        <mat-icon class="lg-hide">block</mat-icon>
+      </key>
+      <key *ngIf="game.word && game.wordState.state === 'uncovered' && answerState === 'partially-correct'" [label]="'type.right' | translate" class="key-button flex-col flex-col--1 margin--left" (click)="solveCorrect()">
+        <mat-icon class="sm-hide">keyboard_arrow_right</mat-icon>
+        <mat-icon class="lg-hide">check</mat-icon>
       </key>
     </div>
   </mat-card-actions>

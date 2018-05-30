@@ -1,6 +1,9 @@
 {
   "app": {
-    "title": "VocaTrain"
+    "title": "VocaTrain",
+    "sync-failed": "Verbindung verloren.",
+    "sync-broken": "Synchronisation fehlgeschlagen. Gehe offline...",
+    "sync-broken-ok": "Ok"
   },
   "nav": {
     "guess": {

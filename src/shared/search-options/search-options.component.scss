@@ -4,3 +4,27 @@
     flex-direction: column;
   }
 }
+
+@media(max-width: 599px) {
+  .target-input {
+    flex: initial;
+    flex-basis: 120px;
+    min-width: 120px;
+    flex-grow: 1;
+  }
+
+  .language-select {
+    flex: initial;
+    flex-basis: 120px;
+    min-width: 120px;
+    flex-grow: 1;
+  }
+
+  .level-select {
+    flex: initial;
+    flex-basis: 120px;
+    min-width: 120px;
+    flex-grow: 1;
+    margin-left: 1rem;
+  }
+}

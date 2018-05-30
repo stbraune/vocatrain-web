@@ -1,10 +1,10 @@
 <div class="panel">
   <div class="form">
     <mat-radio-group [(ngModel)]="searchOptions.mode" (ngModelChange)="onPropertyChanged()" class="flex flex--align-center">
-      <div class="flex-col flex-col--1 flex flex--row flex--align-center">
+      <div class="flex-col flex-col--1 inline-flex inline-flex--row inline-flex--align-center">
         <mat-radio-button #radioModeTime class="flex-col" value="by-time">
         </mat-radio-button>
-        <mat-form-field class="flex-col--1 margin--right">
+        <mat-form-field class="flex-col--1 target-input">
           <input matInput type="number"
             placeholder="{{'search-options.mode.time' | translate}}"
             [(ngModel)]="searchOptions.minutes"
@@ -12,10 +12,10 @@
             (focus)="setMode('by-time')">
         </mat-form-field>
       </div>
-      <div class="flex-col flex-col--1 flex flex--row flex--align-center">
+      <div class="flex-col flex-col--1 inline-flex inline-flex--row inline-flex--align-center">
         <mat-radio-button #radioModeWords class="flex-col align--right" value="by-amount">
         </mat-radio-button>
-        <mat-form-field class="flex-col--1 margin--right">
+        <mat-form-field class="flex-col--1 target-input">
           <input matInput type="number"
             placeholder="{{'search-options.mode.words' | translate}}"
             [(ngModel)]="searchOptions.amount"
@@ -25,8 +25,8 @@
       </div>
     </mat-radio-group>
     
-    <div class="flex">
-      <mat-form-field class="flex-col flex-col--1">
+    <div class="flex flex--row">
+      <mat-form-field class="flex-col flex-col--1 language-select">
         <mat-select #typeSelect placeholder="{{'search-options.source-language' | translate}}" [(ngModel)]="searchOptions.sourceLanguage" (ngModelChange)="onPropertyChanged()">
           <mat-option
             *ngFor="let supportedLanguage of supportedLanguages"
@@ -41,7 +41,7 @@
         <mat-icon *ngIf="searchOptions.searchLanguagesDirection === 'both' || searchOptions.searchLanguagesDirection === 'stt'">keyboard_arrow_right</mat-icon>
       </button>
         
-      <mat-form-field class="flex-col flex-col--1">
+      <mat-form-field class="flex-col flex-col--1 language-select">
         <mat-select #typeSelect placeholder="{{'search-options.target-language' | translate}}" [(ngModel)]="searchOptions.targetLanguage" (ngModelChange)="onPropertyChanged()">
           <mat-option
             *ngFor="let supportedLanguage of supportedLanguages"
@@ -52,16 +52,16 @@
       </mat-form-field>
     </div>
 
-    <div class="flex flex--align-center">
+    <div class="flex flex--row flex--align-center">
       <mat-checkbox class="flex-col" [(ngModel)]="searchOptions.searchLevelEnabled" (ngModelChange)="onPropertyChanged()"></mat-checkbox>
-      <mat-form-field class="flex-col flex-col--1">
+      <mat-form-field class="flex-col flex-col--1 level-select">
         <input matInput type="number"
           [placeholder]="'search-options.min-level' | translate"
           [(ngModel)]="searchOptions.searchLevelMinimum"
           (ngModelChange)="onPropertyChanged()">
       </mat-form-field>
   
-      <mat-form-field class="flex-col flex-col--1">
+      <mat-form-field class="flex-col flex-col--1 level-select">
         <input matInput type="number"
           [placeholder]="'search-options.max-level' | translate"
           [(ngModel)]="searchOptions.searchLevelMaximum"

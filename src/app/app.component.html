@@ -3,12 +3,30 @@
     <mat-icon>filter_9_plus</mat-icon>
     {{'app.title' | translate}}
   </a>
-  <span class="lg-hide">
+  <span class="lg-hide app-navbar-mobile">
     <button mat-icon-button (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
-    <span>
-      {{'app.title' | translate}}
+    <span routerLink="/guess" routerLinkActive="sm-show" class="sm-hide">
+      {{'nav.guess.title' | translate}}
+    </span>
+    <span routerLink="/type" routerLinkActive="sm-show" class="sm-hide">
+      {{'nav.type.title' | translate}}
+    </span>
+    <span routerLink="/watch" routerLinkActive="sm-show" class="sm-hide">
+      {{'nav.watch.title' | translate}}
+    </span>
+    <span routerLink="/words" routerLinkActive="sm-show" class="sm-hide">
+      {{'nav.words.title' | translate}}
+    </span>
+    <span routerLink="/word-types" routerLinkActive="sm-show" class="sm-hide">
+      {{'nav.word-types.title' | translate}}
+    </span>
+    <span routerLink="/statistics" routerLinkActive="sm-show" class="sm-hide">
+      {{'nav.statistics.title' | translate}}
+    </span>
+    <span routerLink="/settings" routerLinkActive="sm-show" class="sm-hide">
+      {{'nav.settings.title' | translate}}
     </span>
   </span>
   
@@ -33,8 +51,8 @@
 
   <div class="align--right flex-col flex-col--grow right">
     <button mat-icon-button (click)="toggleSynchronization()">
-      <mat-icon *ngIf="!isSyncing()">cloud_off</mat-icon>
-      <mat-icon *ngIf="isSyncing()">cloud</mat-icon>
+      <mat-icon *ngIf="!synchronizationEnabled()">cloud_off</mat-icon>
+      <mat-icon *ngIf="synchronizationEnabled()" class="synchronization-enabled" [class.synchronization-running]="synchronizationRunning()">cloud</mat-icon>
     </button>
     <button mat-button routerLink="/settings" class="sm-hide">
       <mat-icon>settings</mat-icon>

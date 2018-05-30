@@ -96,3 +96,10 @@
     }
   }
 }
+
+@media(max-width: 599px) {
+  .search-container {
+    display: flex;
+    flex-direction: column;
+  }
+}

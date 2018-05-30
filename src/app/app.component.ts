@@ -15,8 +15,9 @@ import { SettingsService } from '../settings';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  public synchronizationEnabled = false;
   public sidenavOpened = false;
+  public syncing = false;
+  public syncingTimeout;
 
   public constructor(
     private translateService: TranslateService,
@@ -34,8 +35,7 @@ export class AppComponent implements OnInit {
     ).subscribe();
 
     this.settingsService.databaseSettingsChanged.subscribe((databaseSettings) => {
-      this.synchronizationEnabled = databaseSettings.remote.enableSynchronization;
-      if (this.synchronizationEnabled) {
+      if (databaseSettings.remote.enableSynchronization) {
         this.databaseService.enableSyncing();
       } else {
         this.databaseService.disableSyncing();
@@ -45,20 +45,32 @@ export class AppComponent implements OnInit {
     this.databaseService.synchronizationSubject.subscribe((event) => {
       if (event.type === 'error') {
         console.error(event);
-        this.snackBar.open('Sync failed. Going offline', undefined, { duration: 3000 });
-        this.databaseService.disableSyncing();
+        this.translateService.get('app.sync-failed').subscribe((text) => {
+          this.snackBar.open(text, undefined, { duration: 3000 });
+        });
       } else {
-        this.snackBar.open('Synced!', undefined, { duration: 250 });
+        if (this.syncingTimeout) {
+          clearTimeout(this.syncingTimeout);
+        }
+
+        this.syncing = true;
+        this.syncingTimeout = setTimeout(() => this.syncing = false, 500);
       }
     }, (error) => {
       console.error(error);
-      this.snackBar.open('Sync broken!', 'Ok');
+      this.translateService.get(['app.sync-broken', 'app.sync-broken-ok']).subscribe((texts) => {
+        this.snackBar.open(texts['app.sync-broken'], texts['app.sync-broken-ok']);
+      });
       this.databaseService.disableSyncing();
     });
   }
 
-  public isSyncing() {
+  public synchronizationEnabled() {
     return this.databaseService.isSyncing();
+  }
+
+  public synchronizationRunning() {
+    return this.syncing;
   }
 
   public toggleSynchronization() {

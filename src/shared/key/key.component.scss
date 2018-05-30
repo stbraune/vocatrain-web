@@ -1,3 +1,14 @@
 :host {
   display: inline-block;
 }
+
+.key {
+  display: inline-flex;
+}
+
+@media(min-width: 600px) {
+  .key {
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+  }
+}

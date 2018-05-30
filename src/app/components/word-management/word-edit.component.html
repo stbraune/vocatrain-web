@@ -29,7 +29,7 @@
           <div #chipInputWrapper
             [attr.data-row]="w"
             [attr.data-col]="l"
-            class="flex-col flex-col--1 padding--left-05 padding--right-05">
+            class="flex-col flex-col--1">
             <chip-input
               [(value)]="text.words[lang].value"
               [(chips)]="text.tags"
@@ -48,7 +48,7 @@
         <div #chipInputWrapper
           [attr.data-row]="w"
           [attr.data-col]="supportedLanguages.length"
-          class="flex-col flex-col--1 flex-col--grow padding--left-05 padding--right-05">
+          class="flex-col flex-col--1 flex-col--grow">
           <chip-input
             [(value)]="text.meta"
             [(chips)]="text.tags"

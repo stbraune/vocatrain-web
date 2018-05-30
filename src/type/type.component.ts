@@ -60,7 +60,7 @@ export class TypeComponent implements OnInit {
   public game: Game;
 
   public answer = '';
-  public answerState: 'undefined' | 'correct' | 'partially-correct' | 'wrong' | 'totally-wrong';
+  public answerState: 'undefined' | 'correct' | 'partially-correct' | 'wrong' | 'totally-wrong' = 'undefined';
 
   public _answerInputElement: ElementRef;
 

@@ -1,4 +1,4 @@
-<h3>
+<h3 class="sm-hide">
   {{'watch.title' | translate}}
 </h3>
 
@@ -60,7 +60,7 @@
           </p>
           <p *ngIf="game.word.key.tags.length > 0">
             <strong>{{'watch.tags' | translate}}:</strong>
-            <chips [chips]="game.word.key.tags" mode="read"></chips>
+            <chips [chips]="game.word.key.tags" mode="read" class="margin--left"></chips>
           </p>
           <p *ngIf="game.word.key.meta">
             <strong>{{'watch.meta' | translate}}:</strong>
@@ -86,7 +86,7 @@
           </p>
           <p *ngIf="game.word.key.tags.length > 0">
             <strong>{{'watch.tags' | translate}}:</strong>
-            <chips [chips]="game.word.key.tags" mode="read"></chips>
+            <chips [chips]="game.word.key.tags" mode="read" class="margin--left"></chips>
           </p>
         </mat-card-content>
         <mat-card-content *ngIf="!game.word || game.wordState.state === 'undefined' || game.wordState.state === 'covered'" class="align--center">
@@ -100,10 +100,10 @@
   </mat-card-content>
   <mat-card-actions>
     <div class="flex flex--row flex--align-center flex--justify-space-between">
-      <key *ngIf="game.gameState.state === 'started'" [label]="'watch.pause' | translate" class="flex-col flex-col--1" (click)="pauseGame()">
+      <key *ngIf="game.gameState.state === 'started'" [label]="'watch.pause' | translate" class="key-button flex-col flex-col--1" (click)="pauseGame()">
         <mat-icon>pause</mat-icon>
       </key>
-      <key *ngIf="game.gameState.state === 'paused'" [label]="'watch.resume' | translate" class="flex-col flex-col--1" (click)="resumeGame()">
+      <key *ngIf="game.gameState.state === 'paused'" [label]="'watch.resume' | translate" class="key-button flex-col flex-col--1" (click)="resumeGame()">
         <mat-icon>play_arrow</mat-icon>
       </key>
     </div>
