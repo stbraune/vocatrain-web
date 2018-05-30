@@ -128,8 +128,8 @@ export class StatisticsService {
         designDocument: 'game-log-stats',
         viewName: 'totals',
         mapFunction(emit) {
-          return function (doc) {
-            function normalizeDate(d: Date) {
+          return `function (doc) {
+            function normalizeDate(d) {
               return new Date(d.getTime()
                 - (d.getUTCHours() * 60 * 60 * 1000)
                 - (d.getUTCMinutes() * 60 * 1000)
@@ -149,10 +149,10 @@ export class StatisticsService {
                   countTotal: doc.countTotal
                 });
             }
-          };
+          }`;
         },
         reduceFunction() {
-          return function (keys, values, rereduce) {
+          return `function (keys, values, rereduce) {
             return {
               durationInMillis: sum(values.map(function (value) {
                 return value.durationInMillis;
@@ -167,7 +167,7 @@ export class StatisticsService {
                 return value.countTotal;
               }))
             };
-          };
+          }`;
         },
         group_level: options.group_level,
         startkey: options.descending ? endkey : startkey,
@@ -251,7 +251,7 @@ export class StatisticsService {
       designDocument: 'game-modes',
       viewName: 'all',
       mapFunction(emit) {
-        return function (doc) {
+        return `function (doc) {
           if (doc._id.substr(0, 'word_'.length) === 'word_') {
             doc.texts.filter(function (text) {
               return text && text.words;
@@ -265,7 +265,7 @@ export class StatisticsService {
               });
             });
           }
-        };
+        }`;
       },
       reduceFunction: () => '_count',
       group: true
@@ -279,7 +279,7 @@ export class StatisticsService {
       designDocument: 'languages',
       viewName: 'all',
       mapFunction(emit) {
-        return function (doc) {
+        return `function (doc) {
           if (doc._id.substr(0, 'word_'.length) === 'word_') {
             doc.texts.filter(function (text) {
               return text && text.words;
@@ -289,7 +289,7 @@ export class StatisticsService {
               });
             });
           }
-        };
+        }`;
       },
       reduceFunction: () => '_count',
       group: true

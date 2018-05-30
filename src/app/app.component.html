@@ -51,8 +51,8 @@
 
   <div class="align--right flex-col flex-col--grow right">
     <button mat-icon-button (click)="toggleSynchronization()">
-      <mat-icon *ngIf="!synchronizationEnabled()">cloud_off</mat-icon>
-      <mat-icon *ngIf="synchronizationEnabled()" class="synchronization-enabled" [class.synchronization-running]="synchronizationRunning()">cloud</mat-icon>
+      <mat-icon *ngIf="!synchronizationEnabled">cloud_off</mat-icon>
+      <mat-icon *ngIf="synchronizationEnabled" class="synchronization-enabled" [class.synchronization-running]="synchronizationRunning">cloud</mat-icon>
     </button>
     <button mat-button routerLink="/settings" class="sm-hide">
       <mat-icon>settings</mat-icon>

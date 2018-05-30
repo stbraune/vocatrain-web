@@ -16,7 +16,8 @@ import { SettingsService } from '../settings';
 })
 export class AppComponent implements OnInit {
   public sidenavOpened = false;
-  public syncing = false;
+  public _synchronizationEnabled = false;
+  public _synchronizationRunning = false;
   public syncingTimeout;
 
   public constructor(
@@ -43,8 +44,14 @@ export class AppComponent implements OnInit {
     });
 
     this.databaseService.synchronizationSubject.subscribe((event) => {
+      console.log('ev', event);
       if (event.type === 'error') {
         console.error(event);
+        this._synchronizationEnabled = false;
+        this._synchronizationRunning = false;
+        if (this.syncingTimeout) {
+          clearTimeout(this.syncingTimeout);
+        }
         this.translateService.get('app.sync-failed').subscribe((text) => {
           this.snackBar.open(text, undefined, { duration: 3000 });
         });
@@ -53,8 +60,9 @@ export class AppComponent implements OnInit {
           clearTimeout(this.syncingTimeout);
         }
 
-        this.syncing = true;
-        this.syncingTimeout = setTimeout(() => this.syncing = false, 500);
+        this._synchronizationEnabled = true;
+        this._synchronizationRunning = true;
+        this.syncingTimeout = setTimeout(() => this._synchronizationRunning = false, 500);
       }
     }, (error) => {
       console.error(error);
@@ -65,12 +73,12 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public synchronizationEnabled() {
-    return this.databaseService.isSyncing();
+  public get synchronizationEnabled() {
+    return this._synchronizationEnabled && this.databaseService.isSyncing();
   }
 
-  public synchronizationRunning() {
-    return this.syncing;
+  public get synchronizationRunning() {
+    return this._synchronizationRunning;
   }
 
   public toggleSynchronization() {

@@ -114,7 +114,7 @@ export class WordEntityService {
       designDocument: 'words-index',
       viewName: 'by-lang',
       mapFunction(emit) {
-        return function (doc) {
+        return `function (doc) {
           if (doc._id.substr(0, 'word_'.length) === 'word_') {
             doc.texts.forEach(function (text) {
               Object.keys(text.words).forEach(function (lang) {
@@ -122,7 +122,7 @@ export class WordEntityService {
               });
             });
           }
-        };
+        }`;
       },
       reduceFunction() {
         return '_count';

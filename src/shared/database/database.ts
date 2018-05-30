@@ -153,6 +153,7 @@ export class Database<TEntity extends DatabaseEntity> {
     const reduceFunction = options.reduceFunction && options.reduceFunction();
     const reduceFunctionString = typeof reduceFunction === 'function' ? reduceFunction.toString() : reduceFunction;
     return this.getDesignDocument(options.designDocument).pipe(
+      tap((designDocument) => console.log('ddoc', designDocument)),
       switchMap((designDocument) => any(
         {
           if: () => !designDocument.views,

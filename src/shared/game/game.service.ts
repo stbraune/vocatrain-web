@@ -460,9 +460,9 @@ export class GameService {
         }`;
       },
       reduceFunction() {
-        return function (keys, values, rereduce) {
+        return `function (keys, values, rereduce) {
           return Math.min.apply(null, values);
-        };
+        }`;
       }
     }).pipe(
       map((result) => result.rows.length > 0 ? result.rows[0].value : 0)
@@ -488,9 +488,9 @@ export class GameService {
         }`;
       },
       reduceFunction() {
-        return function (keys, values, rereduce) {
+        return `function (keys, values, rereduce) {
           return Math.max.apply(null, values);
-        };
+        }`;
       }
     }).pipe(
       map((result) => result.rows.length > 0 ? result.rows[0].value : 0)
