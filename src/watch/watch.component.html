@@ -17,35 +17,36 @@
 <mat-card *ngIf="game && (game.gameState.state === 'started' || game.gameState.state === 'paused')">
   <mat-card-content>
     <div class="margin--bottom">
-      <div class="flex-col flex-col">
-        {{'watch.duration' | translate}}: {{formatMillis(game.duration)}}
-        <span *ngIf="searchOptions.mode === 'by-time'">/ {{formatMinutes(searchOptions.minutes)}}</span>
-        -
-        {{'watch.words' | translate}}: {{game.amount}}
-        <span *ngIf="searchOptions.mode === 'by-amount'">/ {{searchOptions.amount}}</span>
-      </div>
+      <strong>{{'guess.duration' | translate}}:</strong>
+      <span>
+        {{formatMillis(game.duration)}}
+      </span>
+      <span *ngIf="searchOptions.mode === 'by-time'"> / {{formatMinutes(searchOptions.minutes)}}</span>
+      -
+      <strong>{{'guess.words' | translate}}:</strong>
+      <span>
+        {{game.amount}}
+      </span>
+      <span *ngIf="searchOptions.mode === 'by-amount'"> / {{searchOptions.amount}}</span>
     </div>
-    <div class="flex margin--bottom sm-hide">
-      <div class="flex-col flex-col--grow">
-        <strong>{{'watch.last-repeat' | translate}}:</strong>
-        <span *ngIf="!game.word || game.word.key.answerAt.getTime() === 0; else answerAtOk">
-          {{'watch.never' | translate}}
+    <div class="margin--bottom">
+      <strong>{{'guess.last-repeat' | translate}}:</strong>
+      <span *ngIf="!game.word || game.word.key.answerAt.getTime() === 0; else answerAtOk">
+        {{'guess.never' | translate}}
+      </span>
+      <ng-template #answerAtOk>
+        <span>
+          {{game.word.key.answerAt | date:'dd.MM.yy H:mm'}}
         </span>
-        <ng-template #answerAtOk>
-          <span>
-            {{game.word.key.answerAt | date:'dd.MM.yy H:mm'}}
-          </span>
-        </ng-template>
-      </div>
-      <div class="flex-col flex-col--grow align--right">
-        <strong>{{'watch.current-level' | translate}}:</strong>
-        <span *ngIf="game.word; else answerLevelUnknown">
-          {{game.word.key.answerLevel}}
-        </span>
-        <ng-template #answerLevelUnknown>
-          ?
-        </ng-template>
-      </div>
+      </ng-template>
+      -
+      <strong>{{'guess.current-level' | translate}}:</strong>
+      <span *ngIf="game.word; else answerLevelUnknown">
+        {{game.word.key.answerLevel}}
+      </span>
+      <ng-template #answerLevelUnknown>
+        ?
+      </ng-template>
     </div>
     <div class="flex">
       <mat-card class="align--center flex-col flex-col--50 word-card"
@@ -106,12 +107,10 @@
       <key *ngIf="game.gameState.state === 'paused'" [label]="'watch.resume' | translate" class="key-button flex-col flex-col--1" (click)="resumeGame()">
         <mat-icon>play_arrow</mat-icon>
       </key>
+      <key *ngIf="game.gameState.state === 'paused'" [label]="'watch.stop' | translate" class="key-button flex-col flex-col--1" (click)="stopGame()">
+        <mat-icon>stop</mat-icon>
+      </key>
     </div>
-  </mat-card-actions>
-  <mat-card-actions>
-    <button mat-button (click)="stopGame()" class="stretch">
-      {{'watch.stop' | translate}}
-    </button>
   </mat-card-actions>
 </mat-card>
 
