@@ -10,7 +10,7 @@ import {
   DatabaseFetchOptions, DatabaseQueryResult,
   DatabaseRunFulltextQueryOptions, DatabaseFulltextQueryResult
 } from '../database';
-import { SettingsService } from '../../settings';
+import { SettingsService } from '../settings';
 import { WordEntity } from './word-entity';
 
 declare const Document: any;

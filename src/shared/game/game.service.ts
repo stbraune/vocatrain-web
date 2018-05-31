@@ -46,6 +46,7 @@ export class GameService {
 
     return this.gameLogEntityService.startGameLog(mode).pipe(
       tap((gameLogEntity) => game.gameLogEntity = gameLogEntity),
+      switchMap((gameLogEntity) => this.nextWord(game)),
       tap((gameLogEntity) => {
         if (game.durationInterval) {
           clearInterval(game.durationInterval);
@@ -62,7 +63,6 @@ export class GameService {
           }
         }, 500);
       }),
-      switchMap((gameLogEntity) => this.nextWord(game)),
       map((searchResult) => game)
     );
   }

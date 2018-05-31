@@ -7,8 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { pipe, Observable, throwError, of } from 'rxjs';
 import { switchMap, catchError, map, tap, filter } from 'rxjs/operators';
 
-import { SettingsService } from '../settings';
-import { DateFormatService, GameService, Game, SearchOptions, SearchResult } from '../shared';
+import { SettingsService, DateFormatService, GameService, Game, SearchOptions, SearchResult, LoadingIndicatorService } from '../shared';
 
 import * as XRegExp from 'xregexp/xregexp-all';
 
@@ -77,6 +76,7 @@ export class TypeComponent implements OnInit {
   }
 
   public constructor(
+    private loadingIndicatorService: LoadingIndicatorService,
     private settingsService: SettingsService,
     private gameService: GameService,
     private dateFormatService: DateFormatService,
@@ -110,18 +110,33 @@ export class TypeComponent implements OnInit {
   }
 
   public startGame() {
+    this.loadingIndicatorService.notifyLoading();
     this.gameService.startGame('type', this.searchOptions).pipe(
       tap((game) => this.game = game),
       tap((game) => this.focusAnswerInput())
-    ).subscribe();
+    ).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public pauseGame() {
-    this.gameService.pauseGame(this.game).subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.pauseGame(this.game).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public resumeGame() {
-    this.gameService.resumeGame(this.game).subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.resumeGame(this.game).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public onKeyPress($event: KeyboardEvent) {
@@ -206,12 +221,6 @@ export class TypeComponent implements OnInit {
     return matrix[b.length][a.length];
   }
 
-  public nextWord() {
-    return this.gameService.nextWord(this.game).pipe(
-      tap((searchResult) => this.answerState = 'undefined')
-    );
-  }
-
   public onKeyDown($event: KeyboardEvent) {
     if (this.game && ['started', 'paused'].indexOf(this.game.gameState.state) !== -1 && $event.which === 27) {
       this.stopGame();
@@ -248,17 +257,32 @@ export class TypeComponent implements OnInit {
   }
 
   public coverWord() {
-    this.gameService.coverWord(this.game).subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.coverWord(this.game).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public uncoverWord() {
-    this.gameService.uncoverWord(this.game).subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.uncoverWord(this.game).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public solveCorrect() {
+    this.loadingIndicatorService.notifyLoading();
     this.gameService.solveWordCorrect(this.game).pipe(
       tap((game) => this.answerState = 'correct')
-    ).subscribe();
+    ).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public solvePartiallyCorrect() {
@@ -266,9 +290,14 @@ export class TypeComponent implements OnInit {
   }
 
   public solveWrong() {
+    this.loadingIndicatorService.notifyLoading();
     this.gameService.solveWordWrong(this.game).pipe(
       tap((game) => this.answerState = 'wrong')
-    ).subscribe();
+    ).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public solveTotallyWrong() {
@@ -277,18 +306,28 @@ export class TypeComponent implements OnInit {
 
   public typedAnimationStarted(): void {
     if (['correct', 'wrong'].indexOf(this.game.wordState.reason) !== -1) {
-      this.gameService.pauseGame(this.game).subscribe();
+      this.loadingIndicatorService.notifyLoading();
+      this.gameService.pauseGame(this.game).subscribe((game) => {
+        this.loadingIndicatorService.notifyFinished();
+      }, (error) => {
+        this.loadingIndicatorService.notifyFinished();
+      });
     }
   }
 
   public typedAnimationDone() {
     if (['correct', 'wrong'].indexOf(this.game.wordState.reason) !== -1) {
+      this.loadingIndicatorService.notifyLoading();
       this.gameService.resumeGame(this.game).pipe(
         switchMap((game) => this.gameService.nextWord(game)),
         tap((searchResult) => this.answerState = 'undefined'),
         tap((searchResult) => this.answer = ''),
         tap((searchResult) => this.focusAnswerInput())
-      ).subscribe();
+      ).subscribe((game) => {
+        this.loadingIndicatorService.notifyFinished();
+      }, (error) => {
+        this.loadingIndicatorService.notifyFinished();
+      });
     }
   }
 
@@ -299,7 +338,12 @@ export class TypeComponent implements OnInit {
   }
 
   public stopGame() {
-    this.gameService.stopGame(this.game, 'stopped').subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.stopGame(this.game, 'stopped').subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public formatMinutes(minutes: number): string {

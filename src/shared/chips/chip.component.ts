@@ -9,6 +9,9 @@ export class ChipComponent {
   @Input()
   public chip = '';
 
+  @Input()
+  public chipClickable = undefined;
+
   @Output()
   public chipDeleteClicked = new EventEmitter<string>();
 

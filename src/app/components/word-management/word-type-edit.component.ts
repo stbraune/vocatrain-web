@@ -1,5 +1,5 @@
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
-import { WordTypeEntityService, WordTypeEntity } from '../../../shared';
+import { WordTypeEntityService, WordTypeEntity, LoadingIndicatorService } from '../../../shared';
 import { MatSnackBar } from '@angular/material';
 
 @Component({
@@ -23,6 +23,7 @@ export class WordTypeEditComponent {
   public wordTypeSaved = new EventEmitter<WordTypeEntity>();
 
   public constructor(
+    private loadingIndicatorService: LoadingIndicatorService,
     private wordTypeEntityService: WordTypeEntityService,
     private snackBar: MatSnackBar
   ) {
@@ -46,10 +47,13 @@ export class WordTypeEditComponent {
 
   public onDelete() {
     if (this.wordTypeEntity._id) {
+      this.loadingIndicatorService.notifyLoading();
       this.wordTypeEntityService.deleteWordTypeEntity(this.wordTypeEntity).subscribe((result) => {
+        this.loadingIndicatorService.notifyFinished();
         this.snackBar.open('Entry deleted', null, { duration: 3000 });
         this.wordTypeDeleted.emit();
       }, (error) => {
+        this.loadingIndicatorService.notifyFinished();
         this.snackBar.open('Error!', 'Ok', { panelClass: 'error' });
       });
     }
@@ -61,11 +65,14 @@ export class WordTypeEditComponent {
 
 
   public onSave() {
+    this.loadingIndicatorService.notifyLoading();
     this.wordTypeEntityService.putWordEntity(this.wordTypeEntity).subscribe((wordTypeEntity) => {
+      this.loadingIndicatorService.notifyFinished();
       this.editWordTypeTag = '';
       this.wordTypeSaved.emit(wordTypeEntity);
       this.snackBar.open('Saved!', null, { duration: 3000 });
     }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
       console.error(error);
       this.snackBar.open('Error!', 'Ok', { panelClass: 'error' });
     });

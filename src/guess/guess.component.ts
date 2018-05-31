@@ -7,8 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { pipe, Observable, throwError, of } from 'rxjs';
 import { switchMap, catchError, map, tap, filter } from 'rxjs/operators';
 
-import { SettingsService } from '../settings';
-import { DateFormatService, GameService, Game, SearchOptions, SearchResult } from '../shared';
+import { SettingsService, DateFormatService, GameService, Game, SearchOptions, SearchResult, LoadingIndicatorService } from '../shared';
 
 @Component({
   selector: 'guess',
@@ -48,6 +47,7 @@ export class GuessComponent implements OnInit {
   public game: Game;
 
   public constructor(
+    private loadingIndicatorService: LoadingIndicatorService,
     private settingsService: SettingsService,
     private gameService: GameService,
     private dateFormatService: DateFormatService,
@@ -81,17 +81,32 @@ export class GuessComponent implements OnInit {
   }
 
   public startGame() {
+    this.loadingIndicatorService.notifyLoading();
     this.gameService.startGame('guess', this.searchOptions).pipe(
       tap((game) => this.game = game)
-    ).subscribe();
+    ).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public pauseGame() {
-    this.gameService.pauseGame(this.game).subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.pauseGame(this.game).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public resumeGame() {
-    this.gameService.resumeGame(this.game).subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.resumeGame(this.game).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public onKeyDown($event: KeyboardEvent) {
@@ -126,37 +141,72 @@ export class GuessComponent implements OnInit {
   }
 
   public coverWord() {
-    this.gameService.coverWord(this.game).subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.coverWord(this.game).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public uncoverWord() {
-    this.gameService.uncoverWord(this.game).subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.uncoverWord(this.game).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public solveCorrect() {
-    this.gameService.solveWordCorrect(this.game).subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.solveWordCorrect(this.game).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public solveWrong() {
-    this.gameService.solveWordWrong(this.game).subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.solveWordWrong(this.game).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public guessedAnimationStarted(): void {
     if (['correct', 'wrong'].indexOf(this.game.wordState.reason) !== -1) {
-      this.gameService.pauseGame(this.game).subscribe();
+      this.loadingIndicatorService.notifyLoading();
+      this.gameService.pauseGame(this.game).subscribe((game) => {
+        this.loadingIndicatorService.notifyFinished();
+      }, (error) => {
+        this.loadingIndicatorService.notifyFinished();
+      });
     }
   }
 
   public guessedAnimationDone() {
     if (['correct', 'wrong'].indexOf(this.game.wordState.reason) !== -1) {
+      this.loadingIndicatorService.notifyLoading();
       this.gameService.resumeGame(this.game).pipe(
         switchMap((game) => this.gameService.nextWord(game))
-      ).subscribe();
+      ).subscribe((game) => {
+        this.loadingIndicatorService.notifyFinished();
+      }, (error) => {
+        this.loadingIndicatorService.notifyFinished();
+      });
     }
   }
 
   public stopGame() {
-    this.gameService.stopGame(this.game, 'stopped').subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.stopGame(this.game, 'stopped').subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public formatMinutes(minutes: number): string {

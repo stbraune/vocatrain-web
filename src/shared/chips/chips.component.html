@@ -1,11 +1,7 @@
-<chip *ngFor="let chip of chips" [chip]="chip" [mode]="mode" (chipClicked)="onChipClicked($event)" (chipDeleteClicked)="deleteChip($event)">
+<chip *ngFor="let chip of chips"
+  [chip]="chip"
+  [chipClickable]="chipClicked.observers.length > 0"
+  [mode]="mode"
+  (chipClicked)="onChipClicked($event)"
+  (chipDeleteClicked)="deleteChip($event)">
 </chip>
-
-<!-- <mat-chip *ngFor="let chip of chips" class="chips__chip mat-basic-chip" (click)="onChipClicked(chip)"
-  [class.chips__chip--read]="mode === 'read'"
-  [style.cursor]="chipClicked.observers.length > 0 ? 'pointer' : 'default'">
-  {{chip}}
-  <button *ngIf="mode === 'update'" mat-icon-button (click)="deleteChip($event, chip)" tabindex="-1">
-    <mat-icon>delete</mat-icon>
-  </button>
-</mat-chip> -->

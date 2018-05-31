@@ -15,8 +15,8 @@ import { MatSnackBar, MatSelect } from '@angular/material';
 
 import { Observable ,  Subject } from 'rxjs';
 
-import { GoogleTranslateService, GoogleTranslateAlternative, ChipInputComponent } from '../../../shared';
-import { WordTypeEntityService, WordEntityService, WordTypeEntity, WordEntity, Text } from '../../../shared';
+import { GoogleTranslateAlternative, ChipInputComponent } from '../../../shared';
+import { WordTypeEntity, WordEntity, Text } from '../../../shared';
 
 @Component({
   selector: 'word-edit',
@@ -52,11 +52,7 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
 
   private deferredNavigate: { row: number, col: number, dir: 'up' | 'right' | 'down' | 'left' };
 
-  public constructor(
-    private wordEntityService: WordEntityService,
-    private googleTranslateService: GoogleTranslateService,
-    private snackBar: MatSnackBar
-  ) {
+  public constructor() {
   }
 
   public ngOnChanges(changes: SimpleChanges) {

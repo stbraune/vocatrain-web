@@ -73,6 +73,7 @@
             <ng-container *ngFor="let lang of supportedLanguages; let i=index">
               <div class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal word" [class.sm-hide]="i > 0">
                 {{text.words[lang] && text.words[lang].value}}
+                <chips *ngIf="i === 0" [chips]="text.tags" mode="read" class="lg-hide"></chips>
                 <span class="buttons sm-hide">
                   <google-translate-button [from]="lang" [to]="supportedLanguages" [text]="text.words[lang].value">
                   </google-translate-button>

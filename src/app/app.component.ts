@@ -6,8 +6,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { pipe } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 
-import { DatabaseService } from '../shared';
-import { SettingsService } from '../settings';
+import { DatabaseService, LoadingIndicatorService } from '../shared';
+import { SettingsService } from '../shared';
 
 @Component({
   selector: 'app-root',
@@ -19,9 +19,11 @@ export class AppComponent implements OnInit {
   public _synchronizationEnabled = false;
   public _synchronizationRunning = false;
   public syncingTimeout;
+  public loadingIndicatorVisible;
 
   public constructor(
     private translateService: TranslateService,
+    private loadingIndicatorService: LoadingIndicatorService,
     private databaseService: DatabaseService,
     private settingsService: SettingsService,
     private snackBar: MatSnackBar
@@ -70,6 +72,40 @@ export class AppComponent implements OnInit {
         this.snackBar.open(texts['app.sync-broken'], texts['app.sync-broken-ok']);
       });
       this.databaseService.disableSyncing();
+    });
+
+    let loadingIndicatorStartTimeout;
+    let loadingIndicatorStopTimeout;
+    this.loadingIndicatorService.startedLoading.subscribe((loadingStack) => {
+      if (loadingIndicatorStartTimeout) {
+        clearTimeout(loadingIndicatorStartTimeout);
+      }
+
+      if (loadingIndicatorStopTimeout) {
+        clearTimeout(loadingIndicatorStopTimeout);
+      }
+
+      loadingIndicatorStartTimeout = setTimeout(() => {
+        if (this.loadingIndicatorService.isLoading()) {
+          this.loadingIndicatorVisible = true;
+        }
+      }, 500);
+    });
+
+    this.loadingIndicatorService.finishedLoading.subscribe((loadingStack) => {
+      if (loadingIndicatorStartTimeout) {
+        clearTimeout(loadingIndicatorStartTimeout);
+      }
+
+      if (loadingIndicatorStopTimeout) {
+        clearTimeout(loadingIndicatorStopTimeout);
+      }
+
+      loadingIndicatorStopTimeout = setTimeout(() => {
+        if (!this.loadingIndicatorService.isLoading()) {
+          this.loadingIndicatorVisible = false;
+        }
+      }, 500);
     });
   }
 

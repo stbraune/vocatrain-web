@@ -10,9 +10,10 @@ import {
   WordTypeEntity,
   WordEntity,
   DatabaseFulltextQueryResult,
-  DatabaseQueryResult
+  DatabaseQueryResult,
+  LoadingIndicatorService
 } from '../../../shared';
-import { SettingsService } from '../../../settings';
+import { SettingsService } from '../../../shared';
 
 import { WordAddDialogComponent } from './word-add-dialog.component';
 import { WordEditComponent } from './word-edit.component';
@@ -65,6 +66,7 @@ export class WordsComponent implements OnInit {
   public supportedLanguages: string[] = [];
 
   public constructor(
+    private loadingIndicatorService: LoadingIndicatorService,
     private settingsService: SettingsService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
@@ -99,8 +101,13 @@ export class WordsComponent implements OnInit {
   }
 
   private loadWordTypeEntities() {
+    this.loadingIndicatorService.notifyLoading();
     this.wordTypeEntityService.getWordTypeEntities().subscribe((wordTypeEntities) => {
+      this.loadingIndicatorService.notifyFinished();
       this.wordTypeEntities = wordTypeEntities;
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+      console.error(error);
     });
   }
 
@@ -118,8 +125,9 @@ export class WordsComponent implements OnInit {
   }
 
   public loadWordEntities() {
-
+    this.loadingIndicatorService.notifyLoading();
     this.getWordEntitiesQuery().subscribe((result) => {
+      this.loadingIndicatorService.notifyFinished();
       const rows = <{key?: any, doc?: WordEntity}[]>result.rows;
       if (result.rows.length === this.wordEntitiesPerPage + 1) {
         this.wordEntitiesNextKey = rows[this.wordEntitiesPerPage].key
@@ -130,6 +138,7 @@ export class WordsComponent implements OnInit {
         this.wordEntities.push(...rows.map((row) => row.doc));
       }
     }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
       console.error(error);
     });
   }
@@ -160,9 +169,12 @@ export class WordsComponent implements OnInit {
       return;
     }
 
+    this.loadingIndicatorService.notifyLoading();
     this.wordEntityService.getWordEntitiesFields().subscribe((queryFields) => {
+      this.loadingIndicatorService.notifyFinished();
       this.queryHelpFields.push(...queryFields);
     }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
       console.error(error);
     });
   }
@@ -225,8 +237,10 @@ export class WordsComponent implements OnInit {
       splittedWordEntities[0]._rev = wordEntity._rev;
     }
 
+    this.loadingIndicatorService.notifyLoading();
     forkJoin(splittedWordEntities.map((w) => this.wordEntityService.putWordEntity(w)))
       .subscribe((wordEntities) => {
+        this.loadingIndicatorService.notifyFinished();
         this.snackBar.open('Saved!', null, {
           duration: 3000
         });
@@ -240,6 +254,7 @@ export class WordsComponent implements OnInit {
           }
         });
       }, (error) => {
+        this.loadingIndicatorService.notifyFinished();
         console.error(error);
         this.snackBar.open('Error!', 'Ok', {
           panelClass: 'error'
@@ -248,13 +263,16 @@ export class WordsComponent implements OnInit {
   }
 
   public deleteWordEntity(wordEntity: WordEntity) {
+    this.loadingIndicatorService.notifyLoading();
     this.wordEntityService.deleteWordEntity(wordEntity).subscribe((result) => {
+      this.loadingIndicatorService.notifyFinished();
       this.snackBar.open('Entry deleted', null, { duration: 3000 });
       const indexOf = this.wordEntities.findIndex((w) => w._id === wordEntity._id);
       if (indexOf !== -1) {
         this.wordEntities.splice(indexOf, 1);
       }
     }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
       console.error(error);
       this.snackBar.open('Error!', 'Ok', { panelClass: 'error' });
     });

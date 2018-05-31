@@ -3,9 +3,7 @@ import { MatSnackBar } from '@angular/material';
 
 import { TranslateService } from '@ngx-translate/core';
 
-import { SettingsService } from './settings.service';
-import { AppSettings } from './app-settings';
-import { DatabaseSettings } from './database-settings';
+import { AppSettings, DatabaseSettings, SettingsService, LoadingIndicatorService } from '../shared';
 
 @Component({
   selector: 'settings',
@@ -23,6 +21,7 @@ export class SettingsComponent implements OnInit {
   } = {};
 
   public constructor(
+    private loadingIndicatorService: LoadingIndicatorService,
     private settingsService: SettingsService,
     private translateService: TranslateService,
     private snackBar: MatSnackBar
@@ -70,11 +69,14 @@ export class SettingsComponent implements OnInit {
   }
 
   public onSaveDatabaseSettings() {
+    this.loadingIndicatorService.notifyLoading();
     this.settingsService.validateDatabaseSettings(this.databaseSettings).subscribe((result) => {
+      this.loadingIndicatorService.notifyFinished();
       this.databaseSettingsValidation = {};
       this.settingsService.setDatabaseSettings(this.databaseSettings).subscribe();
       this.onSettingsSaved();
     }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
       this.databaseSettingsValidation = error;
     });
   }

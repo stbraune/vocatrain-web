@@ -20,7 +20,7 @@ PouchDB
 import { DatabaseEntity } from './database-entity';
 import { Database } from './database';
 import { DatabaseOptions } from './database-options';
-import { SettingsService, DatabaseSettings } from '../../settings';
+import { SettingsService, DatabaseSettings } from '../settings';
 
 @Injectable()
 export class DatabaseService {

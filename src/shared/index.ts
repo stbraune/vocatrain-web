@@ -1,6 +1,8 @@
+export * from './settings';
 export * from './database';
 export * from './date-format';
 export * from './google-translate';
+export * from './loading-indicator';
 
 export * from './chip-input';
 export * from './chips';

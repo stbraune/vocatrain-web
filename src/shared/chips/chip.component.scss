@@ -10,6 +10,21 @@
   cursor: default;
 
   &--read {
-    padding: 0 12px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  &--clickable {
+    cursor: pointer;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+}
+
+@media(max-width: 599px) {
+  .chip {
+    &--clickable {
+      padding: 7px 14px;
+    }
   }
 }

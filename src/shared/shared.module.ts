@@ -20,8 +20,6 @@ import {
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { SettingsModule } from '../settings';
-
 import { DatabaseService } from './database';
 import { DateFormatService } from './date-format';
 import { GoogleTranslateService, GoogleTranslateButtonComponent } from './google-translate';
@@ -36,6 +34,8 @@ import { WordTypeEntityService } from './word-types';
 import { SearchOptionsComponent } from './search-options';
 import { GameLogEntityService } from './game-log';
 import { GameService } from './game';
+import { LoadingIndicatorService } from './loading-indicator';
+import { SettingsService } from './settings';
 
 @NgModule({
   imports: [
@@ -58,8 +58,7 @@ import { GameService } from './game';
     MatInputModule,
     MatListModule,
     MatSelectModule,
-    MatTooltipModule,
-    SettingsModule
+    MatTooltipModule
   ],
   declarations: [
     GoogleTranslateButtonComponent,
@@ -89,7 +88,9 @@ export class SharedModule {
         WordEntityService,
         WordTypeEntityService,
         GameService,
-        GameLogEntityService
+        GameLogEntityService,
+        LoadingIndicatorService,
+        SettingsService
       ]
     };
   }

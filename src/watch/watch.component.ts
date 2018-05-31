@@ -7,8 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { pipe, Observable, throwError, of } from 'rxjs';
 import { switchMap, catchError, map, tap, filter } from 'rxjs/operators';
 
-import { SettingsService } from '../settings';
-import { DateFormatService, GameService, Game, SearchOptions, SearchResult } from '../shared';
+import { SettingsService, DateFormatService, GameService, Game, SearchOptions, SearchResult, LoadingIndicatorService } from '../shared';
 
 @Component({
   selector: 'watch',
@@ -60,6 +59,7 @@ export class WatchComponent implements OnInit {
   public interval;
 
   public constructor(
+    private loadingIndicatorService: LoadingIndicatorService,
     private settingsService: SettingsService,
     private gameService: GameService,
     private dateFormatService: DateFormatService,
@@ -93,12 +93,17 @@ export class WatchComponent implements OnInit {
   }
 
   public startGame() {
+    this.loadingIndicatorService.notifyLoading();
     this.gameService.startGame('watch', this.searchOptions).pipe(
       switchMap((game) => this.gameService.uncoverWord(game)),
       tap((game) => this.game = game),
       tap((game) => this.startInterval()),
       tap((game) => game.gameStateChanged.subscribe((event) => event.current.state === 'stopped' && this.stopInterval()))
-    ).subscribe();
+    ).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   private startInterval() {
@@ -116,20 +121,35 @@ export class WatchComponent implements OnInit {
 
   private intervalFunction() {
     return () => {
-      this.gameService.solveWordCorrect(this.game).subscribe();
+      this.loadingIndicatorService.notifyLoading();
+      this.gameService.solveWordCorrect(this.game).subscribe((game) => {
+        this.loadingIndicatorService.notifyFinished();
+      }, (error) => {
+        this.loadingIndicatorService.notifyFinished();
+      });
     };
   }
 
   public pauseGame() {
+    this.loadingIndicatorService.notifyLoading();
     this.gameService.pauseGame(this.game).pipe(
       tap((game) => this.stopInterval())
-    ).subscribe();
+    ).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public resumeGame() {
+    this.loadingIndicatorService.notifyLoading();
     this.gameService.resumeGame(this.game).pipe(
       tap((game) => this.startInterval())
-    ).subscribe();
+    ).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public onKeyDown($event: KeyboardEvent) {
@@ -140,40 +160,75 @@ export class WatchComponent implements OnInit {
   }
 
   public coverWord() {
-    this.gameService.coverWord(this.game).subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.coverWord(this.game).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public uncoverWord() {
-    this.gameService.uncoverWord(this.game).subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.uncoverWord(this.game).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public solveCorrect() {
-    this.gameService.solveWordCorrect(this.game).subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.solveWordCorrect(this.game).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public solveWrong() {
-    this.gameService.solveWordWrong(this.game).subscribe();
+    this.loadingIndicatorService.notifyLoading();
+    this.gameService.solveWordWrong(this.game).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public animationStarted(): void {
     if (['correct'].indexOf(this.game.wordState.reason) !== -1) {
-      this.gameService.pauseGame(this.game).subscribe();
+      this.loadingIndicatorService.notifyLoading();
+      this.gameService.pauseGame(this.game).subscribe((game) => {
+        this.loadingIndicatorService.notifyFinished();
+      }, (error) => {
+        this.loadingIndicatorService.notifyFinished();
+      });
     }
   }
 
   public animationDone() {
     if (['correct'].indexOf(this.game.wordState.reason) !== -1) {
+      this.loadingIndicatorService.notifyLoading();
       this.gameService.resumeGame(this.game).pipe(
         switchMap((game) => this.gameService.nextWord(game)),
         switchMap((searchResult) => this.gameService.uncoverWord(this.game))
-      ).subscribe();
+      ).subscribe((game) => {
+        this.loadingIndicatorService.notifyFinished();
+      }, (error) => {
+        this.loadingIndicatorService.notifyFinished();
+      });
     }
   }
 
   public stopGame() {
+    this.loadingIndicatorService.notifyLoading();
     this.gameService.stopGame(this.game, 'stopped').pipe(
       tap((game) => this.stopInterval())
-    ).subscribe();
+    ).subscribe((game) => {
+      this.loadingIndicatorService.notifyFinished();
+    }, (error) => {
+      this.loadingIndicatorService.notifyFinished();
+    });
   }
 
   public formatMinutes(minutes: number): string {

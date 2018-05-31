@@ -87,7 +87,10 @@
       </button>
     </nav>
   </mat-sidenav>
-  <mat-sidenav-content>
+  <mat-sidenav-content class="sidenav-content">
+    <div *ngIf="loadingIndicatorVisible" class="loading-indicator">
+      <mat-spinner></mat-spinner>
+    </div>
     <section class="body">
       <router-outlet>
       </router-outlet>

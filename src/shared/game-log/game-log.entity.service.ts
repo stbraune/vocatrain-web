@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { Observable, throwError, pipe, of } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { Observable, throwError, pipe, of, forkJoin } from 'rxjs';
+import { tap, catchError, switchMap } from 'rxjs/operators';
 
 import { GameLogEntity } from './game-log.entity';
 import { DatabaseService, Database } from '../database';
@@ -21,6 +21,24 @@ export class GameLogEntityService {
         return gameLogEntity;
       }
     });
+
+    this.db.executeQuery<number>({
+      designDocument: 'game-logs',
+      viewName: 'with-nothing',
+      mapFunction(emit) {
+        return `function(doc) {
+          if (doc._id.substr(0, 'game-log_'.length) === 'game-log_') {
+            if (doc.countTotal < 5) {
+              emit(doc.countTotal);
+            }
+          }
+        }`;
+      },
+      include_docs: true
+    }).pipe(
+      tap((result) => console.log('deleting', result)),
+      switchMap((result) => forkJoin(result.rows.map((row) => this.db.removeEntity(row.doc))))
+    ).subscribe();
   }
 
   public getDatabase(): Database<GameLogEntity> {

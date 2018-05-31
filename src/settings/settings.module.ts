@@ -14,7 +14,7 @@ import {
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { SettingsService } from './settings.service';
+import { SharedModule } from '../shared';
 import { SettingsComponent } from './settings.component';
 import { SettingsRoutingModule } from './settings.routing.module';
 
@@ -34,6 +34,7 @@ import { SettingsRoutingModule } from './settings.routing.module';
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
+    SharedModule,
     SettingsRoutingModule
   ],
   declarations: [
@@ -44,9 +45,7 @@ export class SettingsModule {
   public static forRoot(): ModuleWithProviders {
     return {
       ngModule: SettingsModule,
-      providers: [
-        SettingsService
-      ]
+      providers: []
     };
   }
 }
