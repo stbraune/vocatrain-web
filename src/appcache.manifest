@@ -1,9 +1,18 @@
 CACHE MANIFEST
-#v201805311320
+#v201805311420
 material-icons.css
 material-icons.woff2
 assets/i18n/de.json
 assets/i18n/en.json
+assets/img/icons/LICENSE/LICENSE.CC_BY_NC_3.txt
+assets/img/icons/LICENSE/LICENSE.txt
+assets/img/icons/mipmap-mdpi/ic_launcher.png
+assets/img/icons/mipmap-hdpi/ic_launcher.png
+assets/img/icons/mipmap-xhdpi/ic_launcher.png
+assets/img/icons/mipmap-xxhdpi/ic_launcher.png
+assets/img/icons/mipmap-xxxhdpi/ic_launcher.png
+assets/img/icons/playstore/icon.png
+assets/img/icons/icon.svg
 favicon.ico
 index.html
 main.js

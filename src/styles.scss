@@ -258,6 +258,12 @@ h3 {
     display: none !important;
   }
 
+  .stretch {
+    &--sm {
+      width: 100%;
+    }
+  }
+
   .sm-show {
     display: initial !important;
   }

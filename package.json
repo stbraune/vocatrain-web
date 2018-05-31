@@ -6,7 +6,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build --prod",
-    "dist": "npm run build && http-server dist/ --cors",
+    "dist": "npm run build && http-server -c10 --cors dist/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"

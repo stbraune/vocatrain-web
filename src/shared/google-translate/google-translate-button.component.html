@@ -16,13 +16,13 @@
 <ng-template #selectResultBottomSheetTemplate>
   <mat-list>
     <mat-list-item>
-      <button mat-button class="stretch" (click)="onTranslationClicked(toAlternative(result))">
+      <button mat-button class="stretch stretch--sm" (click)="onTranslationClicked(toAlternative(result))">
         {{result.text}}
         <mat-icon [title]="'google-translate-button.select-translation' | translate">done</mat-icon>
       </button>
     </mat-list-item>
     <mat-list-item *ngFor="let alternative of result.alternatives">
-      <button mat-button class="stretch" (click)="onTranslationClicked(alternative)">
+      <button mat-button class="stretch stretch--sm" (click)="onTranslationClicked(alternative)">
         {{alternative.text}}
         <mat-icon [title]="'google-translate-button.select-translation' | translate">done</mat-icon>
       </button>

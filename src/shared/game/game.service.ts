@@ -47,11 +47,12 @@ export class GameService {
     return this.gameLogEntityService.startGameLog(mode).pipe(
       tap((gameLogEntity) => game.gameLogEntity = gameLogEntity),
       switchMap((gameLogEntity) => this.nextWord(game)),
-      tap((gameLogEntity) => {
+      tap((searchResult) => {
         if (game.durationInterval) {
           clearInterval(game.durationInterval);
         }
 
+        game.durationReferenceDate = new Date();
         game.durationInterval = setInterval(() => {
           if (game.gameState.state === 'started') {
             this.gameLogEntityService.pingGameLog(game.gameLogEntity, game.durationReferenceDate);
