@@ -36,7 +36,6 @@ export class GameLogEntityService {
       },
       include_docs: true
     }).pipe(
-      tap((result) => console.log('deleting', result)),
       switchMap((result) => forkJoin(result.rows.map((row) => this.db.removeEntity(row.doc))))
     ).subscribe();
   }

@@ -46,7 +46,6 @@ export class AppComponent implements OnInit {
     });
 
     this.databaseService.synchronizationSubject.subscribe((event) => {
-      console.log('ev', event);
       if (event.type === 'error') {
         console.error(event);
         this._synchronizationEnabled = false;

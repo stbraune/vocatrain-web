@@ -158,7 +158,6 @@ export class StatisticsComponent implements OnInit {
         const wrong = texts['statistics.wrong'];
         const total = texts['statistics.total'];
         this.statisticsService.getTotalsPerDay({ mode: mode, startDate: then, endDate: now }).subscribe((result) => {
-          console.log('r', mode, result);
           this.wordsPerDays.push(...result
             .map((r) => ({
               key: r.key[0],
