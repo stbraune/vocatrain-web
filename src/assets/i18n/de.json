@@ -63,7 +63,7 @@
     "to": "nach",
     "level": "Stufe ",
     "words-per-day": "Wörter pro Tag",
-    "date-format": "dd.MM.yyyy",
+    "date-format": "d.M.",
     "correct": "Richtig",
     "wrong": "Falsch",
     "total": "Gesamt"

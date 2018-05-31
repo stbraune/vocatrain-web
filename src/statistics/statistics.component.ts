@@ -149,7 +149,7 @@ export class StatisticsComponent implements OnInit {
   private loadTotalsPerDay(mode: string) {
     const now = new Date();
     const then = new Date(now);
-    then.setDate(then.getDate() - 30);
+    then.setDate(then.getDate() - 7);
     this.translateService.get(['statistics.date-format', 'statistics.correct', 'statistics.wrong', 'statistics.total'])
       .subscribe((texts) => {
         this.loadingIndicatorService.notifyLoading();
@@ -158,12 +158,14 @@ export class StatisticsComponent implements OnInit {
         const wrong = texts['statistics.wrong'];
         const total = texts['statistics.total'];
         this.statisticsService.getTotalsPerDay({ mode: mode, startDate: then, endDate: now }).subscribe((result) => {
+          console.log('r', mode, result);
           this.wordsPerDays.push(...result
             .map((r) => ({
               key: r.key[0],
               value: [
                 {
-                  name: this.formatDateShort(new Date(<string>r.key[1]), dateFormatString),
+                  name: this.formatDateShort(new Date(<string>r.key[1]), dateFormatString)
+                    + ` (${Math.round(r.value.durationInMillis / 60000)}m)`,
                   series: [
                     {
                       name: correct,
