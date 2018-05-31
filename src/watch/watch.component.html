@@ -60,7 +60,7 @@
           </p>
           <p *ngIf="game.word.key.tags.length > 0">
             <strong>{{'watch.tags' | translate}}:</strong>
-            <chips [chips]="game.word.key.tags" mode="read" class="margin--left"></chips>
+            <chips [chips]="game.word.key.tags" mode="read"></chips>
           </p>
           <p *ngIf="game.word.key.meta">
             <strong>{{'watch.meta' | translate}}:</strong>
@@ -86,7 +86,7 @@
           </p>
           <p *ngIf="game.word.key.tags.length > 0">
             <strong>{{'watch.tags' | translate}}:</strong>
-            <chips [chips]="game.word.key.tags" mode="read" class="margin--left"></chips>
+            <chips [chips]="game.word.key.tags" mode="read"></chips>
           </p>
         </mat-card-content>
         <mat-card-content *ngIf="!game.word || game.wordState.state === 'undefined' || game.wordState.state === 'covered'" class="align--center">

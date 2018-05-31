@@ -374,7 +374,7 @@ export class GameService {
 
                   const answerLevel = (answerWord.games && answerWord.games[mode] && answerWord.games[mode].level) || 0;
                   const answerThen = new Date((answerWord.games && answerWord.games[mode] && answerWord.games[mode].date)
-                    || createdAt.getTime());
+                    || new Date(doc.createdAt));
 
                   const requiredLanguage = getRequiredLanguage(answerLevel, mod, sourceLanguage, targetLanguage);
                   const requiredDistance = getRequiredDistance(answerLevel, mod);

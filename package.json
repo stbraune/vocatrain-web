@@ -6,7 +6,11 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build --prod",
-    "dist": "npm run build && http-server -c10 --cors dist/",
+    "build:appcache": "node ./gen-appcache-manifest.js",
+    "dist:build": "npm run build",
+    "dist:appcache": "npm run build:appcache",
+    "dist:serve": "http-server -c10 --cors dist/",
+    "dist": "npm run dist:build && npm run dist:appcache && npm run dist:serve",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
