@@ -74,11 +74,10 @@ export class GameService {
       game.wordState = { state: 'undefined', reason: 'next-word' };
 
       return this.reachedGoal(game).pipe(
-        filter((reachedGoal) => !reachedGoal),
-        switchMap((reachedGoal) => this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 1 }))),
+        switchMap((reachedGoal) => reachedGoal ? of([]) : this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 1 }))),
         switchMap((searchResults) => {
           if (searchResults.length === 0) {
-            return this.stopGame(game, 'no-more-words').pipe(
+            return ['started', 'paused'].indexOf(game.gameState.state) === -1 ? of(null) : this.stopGame(game, 'no-more-words').pipe(
               map((gameLogEntity) => null)
             );
           }
@@ -86,10 +85,7 @@ export class GameService {
           game.word = searchResults[0];
           game.wordState = { state: 'covered', reason: 'covered' };
           return of(game.word);
-        }),
-        catchError((error) => this.stopGame(game, 'no-more-words').pipe(
-          map((gameLogEntity) => null)
-        )),
+        })
       );
     }
 

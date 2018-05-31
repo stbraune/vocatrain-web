@@ -56,6 +56,11 @@ export class AppComponent implements OnInit {
         this.translateService.get('app.sync-failed').subscribe((text) => {
           this.snackBar.open(text, undefined, { duration: 3000 });
         });
+
+        setTimeout(() => {
+          this.databaseService.disableSyncing();
+          this.databaseService.enableSyncing();
+        }, 1000);
       } else {
         if (this.syncingTimeout) {
           clearTimeout(this.syncingTimeout);
@@ -85,9 +90,10 @@ export class AppComponent implements OnInit {
       }
 
       loadingIndicatorStartTimeout = setTimeout(() => {
-        if (this.loadingIndicatorService.isLoading()) {
+        if (this.loadingIndicatorService.isLoading() && !this.loadingIndicatorVisible) {
           this.loadingIndicatorVisible = true;
         }
+        loadingIndicatorStartTimeout = null;
       }, 500);
     });
 
@@ -101,9 +107,10 @@ export class AppComponent implements OnInit {
       }
 
       loadingIndicatorStopTimeout = setTimeout(() => {
-        if (!this.loadingIndicatorService.isLoading()) {
+        if (!this.loadingIndicatorService.isLoading() && this.loadingIndicatorVisible) {
           this.loadingIndicatorVisible = false;
         }
+        loadingIndicatorStopTimeout = null;
       }, 500);
     });
   }
