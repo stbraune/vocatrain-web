@@ -14,7 +14,7 @@
 .project
 .classpath
 .c9/
-*.launch
+*.launcH
 .settings/
 *.sublime-workspace
 
@@ -42,3 +42,5 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+stdio.out

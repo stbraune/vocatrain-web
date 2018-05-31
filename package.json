@@ -9,11 +9,14 @@
     "build:appcache": "node ./gen-appcache-manifest.js",
     "dist:build": "npm run build",
     "dist:appcache": "npm run build:appcache",
-    "dist:serve": "http-server -c10 --cors dist/",
+    "dist:serve": "http-server -c10 -p 8200 --cors dist/",
     "dist": "npm run dist:build && npm run dist:appcache && npm run dist:serve",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "service:install": "node bin/winser -i -a --startcmd C:\\Users\\stbraune\\AppData\\Roaming\\nvm\\v8.9.1\\npm.cmd --set \"AppParameters run dist:serve\"",
+    "service:uninstall": "node bin/winser -r -x -s",
+    "service:reinstall": "npm run service:uninstall && npm run service:install"
   },
   "private": true,
   "dependencies": {
@@ -52,6 +55,7 @@
     "@types/jasmine": "~2.8.3",
     "@types/jasminewd2": "~2.0.2",
     "@types/node": "^6.0.107",
+    "async": "^2.6.1",
     "codelyzer": "^4.0.1",
     "http-server": "^0.11.1",
     "jasmine-core": "~2.8.0",
@@ -62,6 +66,7 @@
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
     "protractor": "~5.1.2",
+    "stdio": "^0.2.7",
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",
     "typescript": "2.7.2"
