@@ -158,6 +158,16 @@ h3 {
     flex-wrap: wrap;
   }
 
+  &--row {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  &--row-reverse {
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+  }
+
   &--column {
     flex-direction: column;
   }
@@ -245,7 +255,7 @@ h3 {
   }
 
   .word-card {
-    min-height: 160px !important;
+    min-height: 100px !important;
   }
 
   key.key-button {
@@ -273,6 +283,16 @@ h3 {
     margin-left: 0;
     margin-right: 0;
 
+    &--row {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  
+    &--row-reverse {
+      flex-direction: row-reverse;
+      flex-wrap: wrap;
+    }
+
     &--align-center {
       align-items: initial;
     }
@@ -280,11 +300,6 @@ h3 {
     &--align-center.flex--row,
     &--align-center.inline-flex--row {
       align-items: center;
-    }
-
-    &--row {
-      flex-direction: row;
-      flex-wrap: wrap;
     }
   
     .flex-col {

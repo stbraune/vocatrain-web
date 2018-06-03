@@ -26,7 +26,8 @@ export class SettingsService {
         { iso: 'de', enabled: true },
         { iso: 'en', enabled: true }
       ],
-      backendUrl: ''
+      backendUrl: '',
+      lefthandMode: false
     });
     this.appSettingsChanged.next(this.getAppSettings());
 

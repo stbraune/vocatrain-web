@@ -50,7 +50,8 @@
     </div>
     <div class="flex">
       <mat-card class="align--center flex-col flex-col--50 word-card"
-        [@watched-left]="game.wordState.state">
+        [@watched-left]="game.wordState.state"
+        (click)="solveCorrect()">
         <mat-card-title *ngIf="game.word">
           {{game.word.key.question}}
         </mat-card-title>
@@ -70,13 +71,14 @@
         </mat-card-content>
         <mat-card-content *ngIf="!game.word" class="align--center">
           <div class="display--inline-block">
-            <mat-spinner>
+            <mat-spinner diameter="50">
             </mat-spinner>
           </div>
         </mat-card-content>
       </mat-card>
       <mat-card class="align--center flex-col flex-col--50 word-card"
-        [@watched-right]="game.wordState.state" (@watched-right.start)="animationStarted()" (@watched-right.done)="animationDone()">
+        [@watched-right]="game.wordState.state" (@watched-right.start)="animationStarted()" (@watched-right.done)="animationDone()"
+        (click)="solveCorrect()">
         <mat-card-title *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
           {{game.word.key.answer}}
         </mat-card-title>
@@ -92,7 +94,7 @@
         </mat-card-content>
         <mat-card-content *ngIf="!game.word || game.wordState.state === 'undefined' || game.wordState.state === 'covered'" class="align--center">
           <div class="display--inline-block">
-            <mat-spinner>
+            <mat-spinner diameter="50">
             </mat-spinner>
           </div>
         </mat-card-content>
@@ -100,7 +102,7 @@
     </div>
   </mat-card-content>
   <mat-card-actions>
-    <div class="flex flex--row flex--align-center flex--justify-space-between">
+    <div class="flex flex--align-center flex--justify-space-between" [class.flex--row]="!lefthandMode" [class.flex--row-reverse]="lefthandMode">
       <key *ngIf="game.gameState.state === 'started'" [label]="'watch.pause' | translate" class="key-button flex-col flex-col--1" (click)="pauseGame()">
         <mat-icon>pause</mat-icon>
       </key>
@@ -109,6 +111,10 @@
       </key>
       <key *ngIf="game.gameState.state === 'paused'" [label]="'watch.stop' | translate" class="key-button flex-col flex-col--1" (click)="stopGame()">
         <mat-icon>stop</mat-icon>
+      </key>
+      <key *ngIf="game.gameState.state === 'started' && game.word && game.wordState.state === 'uncovered'" [label]="'watch.right' | translate" class="key-button flex-col flex-col--1 margin--left" (click)="solveCorrect()">
+        <mat-icon class="sm-hide">keyboard_arrow_right</mat-icon>
+        <mat-icon class="lg-hide">check</mat-icon>
       </key>
     </div>
   </mat-card-actions>

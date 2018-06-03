@@ -55,6 +55,7 @@ import {
 })
 export class WatchComponent implements OnInit {
   public supportedLanguages: string[] = [];
+  public lefthandMode = false;
 
   public searchOptions: SearchOptions = {
     mode: 'by-time',
@@ -88,6 +89,7 @@ export class WatchComponent implements OnInit {
         this.supportedLanguages.length > 0 && this.supportedLanguages[0],
         this.supportedLanguages.length > 1 && this.supportedLanguages[1]
       ];
+      this.lefthandMode = appSettings.lefthandMode;
     });
 
     this.gameService.getMinimumLevel('watch').subscribe((minLevel) => {
@@ -129,7 +131,7 @@ export class WatchComponent implements OnInit {
 
   private intervalFunction() {
     return () => {
-      this.gameService.solveWordCorrect(this.game).pipe(observeLoading()).subscribe();
+      this.solveCorrect();
     };
   }
 
@@ -164,6 +166,8 @@ export class WatchComponent implements OnInit {
 
   public solveCorrect() {
     this.gameService.solveWordCorrect(this.game).pipe(observeLoading()).subscribe();
+    this.stopInterval();
+    this.startInterval();
   }
 
   public solveWrong() {

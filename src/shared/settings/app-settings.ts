@@ -5,4 +5,5 @@ export interface AppSettings {
     enabled: boolean
   }[];
   backendUrl: string;
+  lefthandMode: boolean;
 }

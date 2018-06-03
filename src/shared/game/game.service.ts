@@ -73,7 +73,8 @@ export class GameService {
       game.word = undefined;
       game.wordState = { state: 'undefined', reason: 'next-word' };
 
-      return this.reachedGoal(game).pipe(
+      return this.pauseGame(game).pipe(
+        switchMap(() => this.reachedGoal(game)),
         switchMap((reachedGoal) => reachedGoal ? of([]) : this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 1 }))),
         switchMap((searchResults) => {
           if (searchResults.length === 0) {
@@ -85,7 +86,8 @@ export class GameService {
           game.word = searchResults[0];
           game.wordState = { state: 'covered', reason: 'covered' };
           return of(game.word);
-        })
+        }),
+        tap(() => this.resumeGame(game))
       );
     }
 
@@ -129,14 +131,15 @@ export class GameService {
       translatedWord.games[game.mode].level++;
       translatedWord.games[game.mode].date = new Date();
 
-      return this.db.putEntity(game.word.doc).pipe(
+      return this.pauseGame(game).pipe(
+        switchMap(() => this.db.putEntity(game.word.doc)),
         switchMap((wordEntity) => this.gameLogEntityService.incrementCorrect(game.gameLogEntity, game.durationReferenceDate)),
         tap((gameLogEntity) => game.gameLogEntity = gameLogEntity),
         tap((gameLogEntity) => game.wordStateChanged.next({
           previous: game.wordState,
           current: game.wordState = { state: 'solved', reason: 'correct' }
         })),
-        map((gameLogEntity) => game)
+        switchMap(() => this.resumeGame(game))
       );
     }
 
@@ -156,14 +159,15 @@ export class GameService {
       translatedWord.games[game.mode].level = 0;
       translatedWord.games[game.mode].date = new Date();
 
-      return this.db.putEntity(game.word.doc).pipe(
+      return this.pauseGame(game).pipe(
+        switchMap(() => this.db.putEntity(game.word.doc)),
         switchMap((wordEntity) => this.gameLogEntityService.incrementWrong(game.gameLogEntity, game.durationReferenceDate)),
         tap((gameLogEntity) => game.gameLogEntity = gameLogEntity),
         tap((gameLogEntity) => game.wordStateChanged.next({
           previous: game.wordState,
           current: game.wordState = { state: 'solved', reason: 'wrong' }
         })),
-        map((gameLogEntity) => game)
+        switchMap(() => this.resumeGame(game))
       );
     }
 
@@ -193,6 +197,10 @@ export class GameService {
   }
 
   public pauseGame(game: Game): Observable<Game> {
+    if (game.gameState.state === 'paused') {
+      return of(game);
+    }
+
     if (game.gameState.state === 'started') {
       this.gameLogEntityService.pingGameLog(game.gameLogEntity, game.durationReferenceDate);
       const now = new Date();
@@ -209,6 +217,10 @@ export class GameService {
   }
 
   public resumeGame(game: Game): Observable<Game> {
+    if (game.gameState.state === 'started') {
+      return of(game);
+    }
+
     if (game.gameState.state === 'paused') {
       game.durationReferenceDate = new Date();
       game.gameStateChanged.next({

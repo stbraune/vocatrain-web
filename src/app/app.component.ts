@@ -22,6 +22,7 @@ export class AppComponent implements OnInit {
   public _synchronizationFailedToastShown = false;
   public syncingTimeout;
   public loadingIndicatorVisible;
+  public lefthandMode = false;
 
   private _printedConflicts = false;
 
@@ -37,6 +38,7 @@ export class AppComponent implements OnInit {
   public ngOnInit(): void {
     this.translateService.setDefaultLang(this.settingsService.defaultLanguage);
     this.settingsService.appSettingsChanged.pipe(
+      tap((appSettings) => this.lefthandMode = appSettings.lefthandMode),
       map((appSettings) => appSettings.appLanguage),
       switchMap((appLanguage) => this.translateService.use(appLanguage))
     ).subscribe();
@@ -120,7 +122,7 @@ export class AppComponent implements OnInit {
           this.loadingIndicatorVisible = true;
         }
         loadingIndicatorStartTimeout = null;
-      }, 500);
+      }, 750);
     });
 
     this.loadingIndicatorService.finishedLoading.subscribe((loadingStack) => {
@@ -137,8 +139,14 @@ export class AppComponent implements OnInit {
           this.loadingIndicatorVisible = false;
         }
         loadingIndicatorStopTimeout = null;
-      }, 500);
+      }, 750);
     });
+  }
+
+  public toggleLefthandMode() {
+    const appSettings = this.settingsService.getAppSettings();
+    appSettings.lefthandMode = !appSettings.lefthandMode;
+    this.settingsService.setAppSettings(appSettings);
   }
 
   public get synchronizationEnabled() {

@@ -44,6 +44,7 @@ import {
 })
 export class GuessComponent implements OnInit {
   public supportedLanguages: string[] = [];
+  public lefthandMode = false;
 
   public searchOptions: SearchOptions = {
     mode: 'by-time',
@@ -76,6 +77,7 @@ export class GuessComponent implements OnInit {
         this.supportedLanguages.length > 0 && this.supportedLanguages[0],
         this.supportedLanguages.length > 1 && this.supportedLanguages[1]
       ];
+      this.lefthandMode = appSettings.lefthandMode;
     });
 
     this.gameService.getMinimumLevel('guess').subscribe((minLevel) => {
@@ -134,6 +136,42 @@ export class GuessComponent implements OnInit {
     if ($event.which === 40 || $event.which === 34) {
       // down, page down
       this.coverWord();
+    }
+  }
+
+  public tapWord($event: MouseEvent) {
+    const gameStarted = this.game.gameState.state === 'started';
+    const wordCovered = this.game.wordState.state === 'covered';
+    const wordUncovered = this.game.wordState.state === 'uncovered';
+
+    if (!gameStarted) {
+      return;
+    }
+
+    const targetElement = <HTMLElement>$event.target;
+    const upperHalf = $event.offsetY < targetElement.clientHeight / 2;
+    const leftHalf = $event.offsetX < targetElement.clientWidth / 2;
+
+    if (wordUncovered) {
+      if (upperHalf) {
+        this.coverWord();
+      } else {
+        if (leftHalf) {
+          if (this.lefthandMode) {
+            this.solveCorrect();
+          } else {
+            this.solveWrong();
+          }
+        } else {
+          if (this.lefthandMode) {
+            this.solveWrong();
+          } else {
+            this.solveCorrect();
+          }
+        }
+      }
+    } else {
+      this.uncoverWord();
     }
   }
 

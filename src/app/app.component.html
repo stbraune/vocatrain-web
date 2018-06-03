@@ -8,13 +8,31 @@
       <mat-icon>menu</mat-icon>
     </button>
     <span routerLink="/guess" routerLinkActive="sm-show" class="margin--left sm-hide">
-      {{'nav.guess.title' | translate}}
+      <span class="inline-flex inline-flex--row inline-flex--align-center inline-flex--no-margin">
+        {{'nav.guess.title' | translate}}
+        <button mat-icon-button (click)="toggleLefthandMode()">
+          <mat-icon *ngIf="lefthandMode">subdirectory_arrow_left</mat-icon>
+          <mat-icon *ngIf="!lefthandMode">subdirectory_arrow_right</mat-icon>
+        </button>
+      </span>
     </span>
     <span routerLink="/type" routerLinkActive="sm-show" class="margin--left sm-hide">
-      {{'nav.type.title' | translate}}
+      <span class="inline-flex inline-flex--row inline-flex--align-center inline-flex--no-margin">
+        {{'nav.type.title' | translate}}
+        <button mat-icon-button (click)="toggleLefthandMode()">
+          <mat-icon *ngIf="lefthandMode">subdirectory_arrow_left</mat-icon>
+          <mat-icon *ngIf="!lefthandMode">subdirectory_arrow_right</mat-icon>
+        </button>
+      </span>
     </span>
     <span routerLink="/watch" routerLinkActive="sm-show" class="margin--left sm-hide">
-      {{'nav.watch.title' | translate}}
+      <span class="inline-flex inline-flex--row inline-flex--align-center inline-flex--no-margin">
+        {{'nav.watch.title' | translate}}
+        <button mat-icon-button (click)="toggleLefthandMode()">
+          <mat-icon *ngIf="lefthandMode">subdirectory_arrow_left</mat-icon>
+          <mat-icon *ngIf="!lefthandMode">subdirectory_arrow_right</mat-icon>
+        </button>
+      </span>
     </span>
     <span routerLink="/words" routerLinkActive="sm-show" class="margin--left sm-hide">
       {{'nav.words.title' | translate}}

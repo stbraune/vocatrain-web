@@ -11,12 +11,13 @@
           <input matInput
             placeholder="{{'words.search' | translate}}"
             [(ngModel)]="query"
-            (ngModelChange)="onQueryChanged()">
+            (ngModelChange)="onQueryChanged()"
+            [disabled]="duplicatesFiltered">
           <span matSuffix>
-            <button mat-icon-button (click)="onHelpQuery()" matTooltip="{{'words.search-help' | translate}} {{queryHelpFields.join(', ')}}">
+            <button mat-icon-button (click)="onHelpQuery()" matTooltip="{{'words.search-help' | translate}} {{queryHelpFields.join(', ')}}" [disabled]="duplicatesFiltered">
               <mat-icon>help</mat-icon>
             </button>
-            <button mat-icon-button (click)="onClearQuery()">
+            <button mat-icon-button (click)="onClearQuery()" [disabled]="duplicatesFiltered">
               <mat-icon>clear</mat-icon>
             </button>
           </span>
@@ -115,7 +116,7 @@
       </ng-template>
     </mat-expansion-panel>
   </li>
-  <li *ngIf="wordEntitiesNextKey !== undefined" class="margin--top">
+  <li *ngIf="wordEntitiesNextKey !== undefined" class="margin--top flex flex--col">
     <button mat-button class="stretch" (click)="loadWordEntities()">
       <mat-icon>refresh</mat-icon>
       {{'actions.more' | translate}}

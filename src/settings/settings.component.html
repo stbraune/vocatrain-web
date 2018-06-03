@@ -11,6 +11,9 @@
       <mat-form-field>
         <input matInput [(ngModel)]="appSettings.appLanguage" [placeholder]="'settings.app-language' | translate">
       </mat-form-field>
+      <mat-checkbox class="flex-col" [(ngModel)]="appSettings.lefthandMode">
+        {{'settings.lefthand-mode' | translate}}
+      </mat-checkbox>
     </div>
   </mat-card-content>
   <mat-card-subtitle>

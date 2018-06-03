@@ -56,6 +56,7 @@ import * as XRegExp from 'xregexp/xregexp-all';
 })
 export class TypeComponent implements OnInit {
   public supportedLanguages: string[] = [];
+  public lefthandMode = false;
 
   public searchOptions: SearchOptions = {
     mode: 'by-time',
@@ -71,6 +72,7 @@ export class TypeComponent implements OnInit {
 
   public answer = '';
   public answerState: 'undefined' | 'correct' | 'partially-correct' | 'wrong' | 'totally-wrong' = 'undefined';
+  public uncoveredCurrentWord = false;
 
   public _answerInputElement: ElementRef;
 
@@ -105,6 +107,7 @@ export class TypeComponent implements OnInit {
         this.supportedLanguages.length > 0 && this.supportedLanguages[0],
         this.supportedLanguages.length > 1 && this.supportedLanguages[1]
       ];
+      this.lefthandMode = appSettings.lefthandMode;
     });
 
     this.gameService.getMinimumLevel('type').subscribe((minLevel) => {
@@ -139,10 +142,6 @@ export class TypeComponent implements OnInit {
   public onKeyPress($event: KeyboardEvent) {
     if (!this.game || this.game.gameState.state !== 'started') {
       return;
-    }
-
-    if (this.answerState === 'totally-wrong') {
-      return this.solveWrong();
     }
 
     if ($event.which === 13) {
@@ -228,6 +227,10 @@ export class TypeComponent implements OnInit {
       return;
     }
 
+    if (this.answerState === 'totally-wrong') {
+      return this.solveWrong();
+    }
+
     if ($event.which === 37 || $event.which === 36) {
       // left, home
       if (this.answerState === 'partially-correct') {
@@ -253,19 +256,57 @@ export class TypeComponent implements OnInit {
     }
   }
 
+  public tapWord($event: MouseEvent) {
+    const gameStarted = this.game.gameState.state === 'started';
+    const wordCovered = this.game.wordState.state === 'covered';
+    const wordUncovered = this.game.wordState.state === 'uncovered';
+
+    if (!gameStarted) {
+      return;
+    }
+
+    const targetElement = <HTMLElement>$event.target;
+    const upperHalf = $event.offsetY < targetElement.clientHeight / 2;
+    const leftHalf = $event.offsetX < targetElement.clientWidth / 2;
+
+    if (wordUncovered) {
+      if (leftHalf) {
+        if (this.lefthandMode) {
+          this.solveCorrect();
+        } else {
+          this.solveWrong();
+        }
+      } else {
+        if (this.lefthandMode) {
+          this.solveWrong();
+        } else {
+          this.solveCorrect();
+        }
+      }
+    }
+  }
+
   public coverWord() {
     this.gameService.coverWord(this.game).pipe(observeLoading()).subscribe();
   }
 
   public uncoverWord() {
+    this.uncoveredCurrentWord = true;
     this.gameService.uncoverWord(this.game).pipe(observeLoading()).subscribe();
   }
 
   public solveCorrect() {
-    this.gameService.solveWordCorrect(this.game).pipe(
-      observeLoading(),
-      tap((game) => this.answerState = 'correct')
-    ).subscribe();
+    if (this.uncoveredCurrentWord) {
+      this.gameService.solveWordCorrect(this.game).pipe(
+        observeLoading(),
+        tap((game) => this.answerState = 'correct')
+      ).subscribe();
+    } else {
+      this.gameService.solveWordCorrect(this.game).pipe(
+        observeLoading(),
+        tap((game) => this.answerState = 'partially-correct')
+      ).subscribe();
+    }
   }
 
   public solvePartiallyCorrect() {

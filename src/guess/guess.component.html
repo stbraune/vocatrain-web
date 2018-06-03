@@ -69,13 +69,14 @@
         </mat-card-content>
         <mat-card-content *ngIf="!game.word" class="align--center">
           <div class="display--inline-block">
-            <mat-spinner>
+            <mat-spinner diameter="50">
             </mat-spinner>
           </div>
         </mat-card-content>
       </mat-card>
       <mat-card class="align--center flex-col flex-col--50 word-card"
-        [@guessed]="game.wordState.reason" (@guessed.start)="guessedAnimationStarted()" (@guessed.done)="guessedAnimationDone()">
+        [@guessed]="game.wordState.reason" (@guessed.start)="guessedAnimationStarted()" (@guessed.done)="guessedAnimationDone()"
+        (click)="tapWord($event)">
         <mat-card-title *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
           {{game.word.key.answer}}
         </mat-card-title>
@@ -91,7 +92,7 @@
         </mat-card-content>
         <mat-card-content *ngIf="!game.word || game.wordState.state === 'undefined' || game.wordState.state === 'covered'" class="align--center">
           <div class="display--inline-block">
-            <mat-spinner>
+            <mat-spinner diameter="50">
             </mat-spinner>
           </div>
         </mat-card-content>
@@ -99,7 +100,7 @@
     </div>
   </mat-card-content>
   <mat-card-actions>
-    <div class="flex flex--row flex--align-center flex--justify-space-between">
+    <div class="flex flex--align-center flex--justify-space-between" [class.flex--row]="!lefthandMode" [class.flex--row-reverse]="lefthandMode">
       <key *ngIf="game.gameState.state === 'started'" [label]="'guess.pause' | translate" class="key-button flex-col flex-col--1" (click)="pauseGame()">
         <mat-icon>pause</mat-icon>
       </key>
