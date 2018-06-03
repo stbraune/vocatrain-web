@@ -425,14 +425,12 @@ export class GameService {
                     return;
                   }
 
-                  const answerHash = calculateHash(answerWord.value);
-
                   const createdAt = normalizeDate(new Date(doc.createdAt));
-                  createdAt.setTime(createdAt.getTime() + (answerHash / 1000000));
 
+                  const answerHash = calculateHash(answerWord.value);
                   const answerLevel = (answerWord.games && answerWord.games[mode] && answerWord.games[mode].level) || 0;
                   const answerThen = new Date((answerWord.games && answerWord.games[mode] && answerWord.games[mode].date)
-                    || new Date(doc.createdAt));
+                    || (doc.createdAt.getTime() + (answerHash / 1000000)));
 
                   const requiredLanguage = getRequiredLanguage(answerLevel, mod, sourceLanguage, targetLanguage);
                   const requiredDistance = getRequiredDistance(answerLevel, mod);
