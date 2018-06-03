@@ -155,7 +155,8 @@ export class GameService {
 
       const saveWord = () => {
         const observable = this.db.putEntity(game.word.doc).pipe(
-          tap(() => this.gameLogEntityService.incrementCorrect(game.gameLogEntity, game.durationReferenceDate))
+          switchMap(() => this.gameLogEntityService.incrementCorrect(game.gameLogEntity, game.durationReferenceDate)),
+          tap((gameLogEntity) => game.gameLogEntity = gameLogEntity)
         );
         if (game.nextWord) {
           return of(game.gameLogEntity);
@@ -166,7 +167,6 @@ export class GameService {
 
       return this.pauseGame(game).pipe(
         switchMap(() => saveWord()),
-        tap((gameLogEntity) => game.gameLogEntity = gameLogEntity),
         tap(() => game.wordStateChanged.next({
           previous: game.wordState,
           current: game.wordState = { state: 'solved', reason: 'correct' }
@@ -193,7 +193,8 @@ export class GameService {
 
       const saveWord = () => {
         const observable = this.db.putEntity(game.word.doc).pipe(
-          tap(() => this.gameLogEntityService.incrementWrong(game.gameLogEntity, game.durationReferenceDate))
+          switchMap(() => this.gameLogEntityService.incrementWrong(game.gameLogEntity, game.durationReferenceDate)),
+          tap((gameLogEntity) => game.gameLogEntity = gameLogEntity)
         );
         if (game.nextWord) {
           return of(game.gameLogEntity);
@@ -204,7 +205,6 @@ export class GameService {
 
       return this.pauseGame(game).pipe(
         switchMap(() => saveWord()),
-        tap((gameLogEntity) => game.gameLogEntity = gameLogEntity),
         tap((gameLogEntity) => game.wordStateChanged.next({
           previous: game.wordState,
           current: game.wordState = { state: 'solved', reason: 'wrong' }
