@@ -276,6 +276,10 @@ export class GameService {
   }
 
   public stopGame(game: Game, reason: 'no-more-words' | 'reached-amount' | 'reached-minutes' | 'stopped'): Observable<Game> {
+    if (game.gameState.state === 'stopped') {
+      return of(game);
+    }
+
     if (['started', 'paused'].indexOf(game.gameState.state) === -1) {
       return throwError(`Game is not started`);
     }
@@ -421,7 +425,10 @@ export class GameService {
                     return;
                   }
 
-                  const createdAt = normalizeDate(new Date(doc.createdAt))
+                  const answerHash = calculateHash(answerWord.value);
+
+                  const createdAt = normalizeDate(new Date(doc.createdAt));
+                  createdAt.setTime(createdAt.getTime() + (answerHash / 1000000));
 
                   const answerLevel = (answerWord.games && answerWord.games[mode] && answerWord.games[mode].level) || 0;
                   const answerThen = new Date((answerWord.games && answerWord.games[mode] && answerWord.games[mode].date)
@@ -442,7 +449,7 @@ export class GameService {
 
                   const indexKey = {
                     reoccurAt: reoccurAt,
-                    answerHash: calculateHash(answerWord.value),
+                    answerHash: answerHash,
                     answerLevel: answerLevel,
                     answerLanguage: answerLanguage,
                     answerAt: answerThen,
