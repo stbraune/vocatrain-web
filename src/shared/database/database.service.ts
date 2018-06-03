@@ -30,7 +30,14 @@ export class DatabaseService {
   private _remote: any;
   private _sync: any;
 
-  public synchronizationSubject = new Subject<any>();
+  public synchronizationSubject = new Subject<{
+    type: 'change' | 'paused' | 'active' | 'complete' | 'error',
+    change?: any,
+    info?: any,
+    error?: any
+  }>();
+
+  public databaseOpened = new Subject<Database<DatabaseEntity>>();
 
   public constructor(
     private httpClient: HttpClient,
@@ -47,7 +54,9 @@ export class DatabaseService {
     // for using the couchdb proxy handler
     options.couchLuceneUrl = options.couchLuceneUrl || `${this._settings.fti.couchDbLuceneUrl}/${this._settings.fti.databaseName}`;
     options.debugging = true;
-    return new Database<T>(this.getLocalDatabase(), options, this.httpClient);
+    const database = new Database<T>(this.getLocalDatabase(), options, this.httpClient);
+    this.databaseOpened.next(database);
+    return database;
   }
 
   private getLocalDatabase(): any {

@@ -15,7 +15,7 @@ export class GameLogEntityService {
   ) {
     this.db = this.databaseService.openDatabase({
       name: 'game-log',
-      deserialize: (gameLogEntity) => {
+      deserializeItem: (gameLogEntity) => {
         gameLogEntity.startTime = gameLogEntity.startTime && new Date(gameLogEntity.startTime);
         gameLogEntity.endTime = gameLogEntity.endTime && new Date(gameLogEntity.endTime);
         return gameLogEntity;

@@ -1,3 +1,7 @@
+export function clone<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}
+
 export function any(...actions: {
   if: () => boolean,
   then: () => void

@@ -17,9 +17,13 @@ import { SettingsService } from '../shared';
 export class AppComponent implements OnInit {
   public sidenavOpened = false;
   public _synchronizationEnabled = false;
+  public _synchronizationEnabledUser = false;
   public _synchronizationRunning = false;
+  public _synchronizationFailedToastShown = false;
   public syncingTimeout;
   public loadingIndicatorVisible;
+
+  private _printedConflicts = false;
 
   public constructor(
     private translateService: TranslateService,
@@ -39,9 +43,27 @@ export class AppComponent implements OnInit {
 
     this.settingsService.databaseSettingsChanged.subscribe((databaseSettings) => {
       if (databaseSettings.remote.enableSynchronization) {
+        this._synchronizationEnabledUser = true;
         this.databaseService.enableSyncing();
       } else {
+        this._synchronizationEnabledUser = false;
         this.databaseService.disableSyncing();
+      }
+    });
+
+    this.databaseService.databaseOpened.subscribe((database) => {
+      console.log('Opened connection to database', database.getOptions().name, database.getDatabase());
+      if (!this._printedConflicts) {
+        this._printedConflicts = true;
+        database.getConflicts(true).subscribe((conflicts) => {
+          if (conflicts.rows.length > 0) {
+            console.warn('All conflicts (maybe something to handle somewhere)', conflicts);
+          } else {
+            console.log('No conflicts in the database, hooray!');
+          }
+        }, (error) => {
+          console.error('Error while getting all conflicts in the database', error);
+        });
       }
     });
 
@@ -50,18 +72,22 @@ export class AppComponent implements OnInit {
         console.error(event);
         this._synchronizationEnabled = false;
         this._synchronizationRunning = false;
-        if (this.syncingTimeout) {
-          clearTimeout(this.syncingTimeout);
+
+        if (!this._synchronizationFailedToastShown) {
+          this._synchronizationFailedToastShown = true;
+          this.translateService.get('app.sync-failed').subscribe((text) => {
+            this.snackBar.open(text, undefined, { duration: 3000 });
+          });
         }
-        this.translateService.get('app.sync-failed').subscribe((text) => {
-          this.snackBar.open(text, undefined, { duration: 3000 });
-        });
 
         setTimeout(() => {
-          this.databaseService.disableSyncing();
-          this.databaseService.enableSyncing();
+          if (this._synchronizationEnabledUser) {
+            this.databaseService.disableSyncing();
+            this.databaseService.enableSyncing();
+          }
         }, 1000);
       } else {
+        this._synchronizationFailedToastShown = false;
         if (this.syncingTimeout) {
           clearTimeout(this.syncingTimeout);
         }
@@ -125,8 +151,10 @@ export class AppComponent implements OnInit {
 
   public toggleSynchronization() {
     if (this.databaseService.isSyncing()) {
+      this._synchronizationEnabledUser = false;
       this.databaseService.disableSyncing();
     } else {
+      this._synchronizationEnabledUser = true;
       this.databaseService.enableSyncing();
     }
   }

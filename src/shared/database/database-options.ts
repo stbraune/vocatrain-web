@@ -1,7 +1,8 @@
 export interface DatabaseOptions<T> {
   name: string;
-  deserialize?: (item: T) => T;
-  serialize?: (item: T) => T;
+  serializeItem?: (item: T) => T;
+  deserializeItem?: (item: T) => T;
+  reconcileItem?: (conflictingItem: T, winningItem: T) => T;
   couchLuceneUrl?: string;
   debugging?: boolean;
 }

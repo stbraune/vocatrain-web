@@ -13,7 +13,12 @@ export class WordTypeEntityService {
     private databaseService: DatabaseService
   ) {
     this.db = this.databaseService.openDatabase({
-      name: 'word-type'
+      name: 'word-type',
+      reconcileItem(conflictingItem, winningItem) {
+        console.log('merging', conflictingItem, winningItem);
+        conflictingItem.title = `${conflictingItem.title} (${winningItem.title})`;
+        return conflictingItem;
+      }
     });
   }
 
@@ -25,7 +30,7 @@ export class WordTypeEntityService {
     return this.db.putEntity(wordTypeEntity, wordTypeEntity.title);
   }
 
-  public deleteWordTypeEntity(wordTypeEntity: WordTypeEntity): Observable<boolean> {
+  public deleteWordTypeEntity(wordTypeEntity: WordTypeEntity): Observable<WordTypeEntity> {
     return this.db.removeEntity(wordTypeEntity);
   }
 }

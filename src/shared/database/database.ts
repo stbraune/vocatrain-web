@@ -2,7 +2,7 @@
 import { EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable, from, of, throwError } from 'rxjs';
+import { Observable, from, of, throwError, forkJoin } from 'rxjs';
 import { tap, map, switchMap, catchError } from 'rxjs/operators';
 
 import * as uuidv4 from 'uuid/v4';
@@ -23,7 +23,7 @@ import { DatabaseRunFulltextQueryOptions } from './database-run-fulltext-query-o
 import { DatabaseExecuteFulltextQueryOptions } from './database-execute-fulltext-query-options';
 import { DatabaseFulltextQueryResult } from './database-fulltext-query-result';
 
-import { any, sanitize } from './utils';
+import { any, sanitize, clone } from './utils';
 
 export class Database<TEntity extends DatabaseEntity> {
   public entitySaved = new EventEmitter<TEntity>();
@@ -35,10 +35,39 @@ export class Database<TEntity extends DatabaseEntity> {
     private _httpClient: HttpClient
   ) {
     if (_options.debugging) {
-      this._database.on('error', function(error) {
+      this._database.on('error', function (error) {
         console.error(`An unexpected error occurred in database for ${this._options.name}`, error);
       });
     }
+
+    if (_options.reconcileItem) {
+      this.mergeConflicts().subscribe();
+    }
+  }
+
+  private mergeConflicts() {
+    return this.getConflicts().pipe(
+      tap((conflicts) => conflicts.rows.forEach((row, index) => forkJoin<TEntity>(
+        this.getEntityById(row.id),
+        ...row.key.map((rev) => this.getEntityById(row.id, { rev }))
+      ).pipe(
+        switchMap(([winningItem, ...conflictingItems]) => this.mergeConflict(winningItem, conflictingItems)),
+        tap((result) => console.log(`Auto-resolved conflicts in database for ${this._options.name}`, result))
+      ).subscribe()))
+    );
+  }
+
+  private mergeConflict(winningItem: TEntity, conflictingItems: TEntity[]) {
+    const newWinningItem = conflictingItems.reduce((previousWinningItem, conflictingItem) => {
+      return this._options.reconcileItem(conflictingItem, previousWinningItem);
+    }, winningItem);
+
+    const itemsToRemove = conflictingItems.filter((conflictingItem) => conflictingItem !== newWinningItem);
+    if (winningItem !== newWinningItem) {
+      itemsToRemove.push(winningItem);
+    }
+
+    return forkJoin<TEntity>(this.putEntity(newWinningItem), ...itemsToRemove.map((itemToRemove) => this.removeEntity(itemToRemove)));
   }
 
   public getDatabase() {
@@ -51,6 +80,10 @@ export class Database<TEntity extends DatabaseEntity> {
 
   public getPrefix(): string {
     return `${this._options.name}_`;
+  }
+
+  public getOptions(): DatabaseOptions<TEntity> {
+    return Object.assign({}, this._options);
   }
 
   public getEntities(options?: any): Observable<TEntity[]> {
@@ -67,13 +100,23 @@ export class Database<TEntity extends DatabaseEntity> {
     }));
   }
 
-  public getEntityById(id: string): Observable<TEntity> {
-    const observable: Observable<TEntity> = from(this._database.get(id));
-    if (this._options.deserialize) {
-      return observable.pipe(map((item: TEntity) => this.deserializeEntity(item)));
-    }
+  public getConflicts(all?: boolean) {
+    return this.executeQuery<string[]>({
+      designDocument: 'conflicting-documents',
+      viewName: all ? 'all' : this._options.name,
+      mapFunction: (emit) => {
+        return `function(doc) {
+          if (` + (all ? '' : `doc._id.substr(0, '${this._options.name}'.length) === '${this._options.name}' && `) + `doc._conflicts) {
+            emit(doc._conflicts);
+          }
+        }`;
+      }
+    });
+  }
 
-    return observable;
+  public getEntityById(id: string, options: any = {}): Observable<TEntity> {
+    const observable: Observable<TEntity> = from(this._database.get(id, options));
+    return observable.pipe(map((item: TEntity) => this.deserializeEntity(item)));
   }
 
   public postEntity(item: TEntity, id?: string): Observable<TEntity> {
@@ -84,6 +127,7 @@ export class Database<TEntity extends DatabaseEntity> {
     item.updatedAt = item.createdAt = now;
 
     return this.putDocument(this.serializeEntity(item)).pipe(
+      this.handleConflict(item),
       tap((persistedItem) => persistedItem.transient = transient),
       tap((persistedItem) => this.entitySaved.emit(persistedItem))
     );
@@ -98,25 +142,43 @@ export class Database<TEntity extends DatabaseEntity> {
     item.createdAt = item.createdAt || item.updatedAt;
 
     return this.putDocument(this.serializeEntity(item)).pipe(
+      this.handleConflict(item),
       tap((persistedItem) => persistedItem.transient = transient),
-      tap((persistedItem) => this.entitySaved.emit(persistedItem))
+      tap((persistedItem) => this.entitySaved.emit(persistedItem)),
     );
+  }
+
+  private handleConflict(item: TEntity) {
+    return <T>(source: Observable<T>) => source.pipe(catchError((error) => (error.status === 409 && this._options.reconcileItem)
+      ? this.getEntityById(item._id).pipe(
+        map((winningItem) => ({ winningItem, mergedItem: this._options.reconcileItem(item, winningItem) })),
+        tap((result) => result.mergedItem._rev = result.winningItem._rev),
+        switchMap((result) => this.putEntity(result.mergedItem))
+      ) : throwError(error)));
   }
 
   private putDocument<T extends DatabaseDocument>(document: T): Observable<T> {
     return from(this._database.put(document)).pipe(
       switchMap((result: { ok: boolean, id: string, rev: string }) => result.ok ? of(Object.assign(document, {
         _id: result.id,
-        _rev: result.rev
+        _rev: result.rev,
+        _deleted: document._deleted && result.ok
       })) : throwError(`Error while putting document: ${document._id}: ${JSON.stringify(document)}`))
     );
   }
 
-  public removeEntity(item: TEntity): Observable<boolean> {
-    return from(this._database.remove(item)).pipe(map((result: any) => {
-      this.entityRemoved.emit(item);
-      return result.ok;
-    }));
+  public removeEntity(item: TEntity): Observable<TEntity> {
+    return this.removeDocument(this.serializeEntity(item));
+  }
+
+  private removeDocument<T extends DatabaseDocument>(document: T): Observable<T> {
+    return from(this._database.remove(document)).pipe(
+      switchMap((result: { ok: boolean, id: string, rev: string }) => result.ok ? of(Object.assign(document, {
+        _id: result.id,
+        _rev: result.rev,
+        _deleted: result.ok
+      })) : throwError(`Error while deleting document: ${document._id}: ${JSON.stringify(document)}`))
+    );
   }
 
   private deserializeEntity(item: TEntity): TEntity {
@@ -126,7 +188,7 @@ export class Database<TEntity extends DatabaseEntity> {
 
     item.createdAt = new Date(item.createdAt);
     item.updatedAt = new Date(item.updatedAt);
-    return this._options.deserialize ? this._options.deserialize(item) : item;
+    return this._options.deserializeItem ? this._options.deserializeItem(item) : item;
   }
 
   private serializeEntity(item: TEntity): TEntity {
@@ -134,7 +196,7 @@ export class Database<TEntity extends DatabaseEntity> {
       return item;
     }
 
-    return this._options.serialize ? this._options.serialize(item) : item;
+    return this._options.serializeItem ? this._options.serializeItem(item) : item;
   }
 
   public executeQuery<TKey, TValue = {}, TReduce = {}>(
