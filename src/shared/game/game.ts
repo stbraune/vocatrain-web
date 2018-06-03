@@ -22,6 +22,7 @@ export interface Game {
   amount: number;
 
   word: SearchResult;
+  nextWord?: SearchResult;
   wordState: WordState;
   wordStateChanged: Subject<{ previous: WordState, current: WordState }>;
 }

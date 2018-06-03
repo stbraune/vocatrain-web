@@ -14,4 +14,5 @@ export interface SearchOptions {
   searchLevelMaximum?: number;
   mod?: number;
   limit?: number;
+  skip?: number;
 }

@@ -122,7 +122,7 @@ export class AppComponent implements OnInit {
           this.loadingIndicatorVisible = true;
         }
         loadingIndicatorStartTimeout = null;
-      }, 750);
+      }, 1250);
     });
 
     this.loadingIndicatorService.finishedLoading.subscribe((loadingStack) => {
@@ -139,7 +139,7 @@ export class AppComponent implements OnInit {
           this.loadingIndicatorVisible = false;
         }
         loadingIndicatorStopTimeout = null;
-      }, 750);
+      }, 1250);
     });
   }
 

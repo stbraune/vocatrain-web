@@ -270,18 +270,22 @@ export class TypeComponent implements OnInit {
     const leftHalf = $event.offsetX < targetElement.clientWidth / 2;
 
     if (wordUncovered) {
-      if (leftHalf) {
-        if (this.lefthandMode) {
-          this.solveCorrect();
+      if (this.answerState === 'partially-correct') {
+        if (leftHalf) {
+          if (this.lefthandMode) {
+            this.solveCorrect();
+          } else {
+            this.solveWrong();
+          }
         } else {
-          this.solveWrong();
+          if (this.lefthandMode) {
+            this.solveWrong();
+          } else {
+            this.solveCorrect();
+          }
         }
-      } else {
-        if (this.lefthandMode) {
-          this.solveWrong();
-        } else {
-          this.solveCorrect();
-        }
+      } else if (this.answerState === 'totally-wrong') {
+        this.solveWrong();
       }
     }
   }

@@ -5,6 +5,7 @@ export interface DatabaseFetchOptions<TKey> {
   key?: TKey;
   keys?: TKey[];
   limit?: number;
+  skip?: number;
   descending?: boolean;
   reduce?: boolean;
   group?: boolean;

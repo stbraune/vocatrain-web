@@ -54,7 +54,7 @@
           {{game.word.key.question}}
         </mat-card-title>
         <mat-card-content *ngIf="game.word">
-          <p>
+          <p class="sm-hide">
             <strong>{{'type.language' | translate}}:</strong>
             {{game.word.key.questionLanguage}}
           </p>
@@ -81,7 +81,7 @@
           {{game.word.key.answer}}
         </mat-card-title>
         <mat-card-content *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
-          <p>
+          <p class="sm-hide">
             <strong>{{'type.language' | translate}}:</strong>
             {{game.word.key.answerLanguage}}
           </p>

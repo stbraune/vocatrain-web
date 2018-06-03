@@ -67,10 +67,10 @@ h3 {
 
 .margin {
   &--0 { margin: 0; }
-  &--top { margin-top: 1.5rem; }
-  &--right { margin-right: 1rem; }
-  &--left { margin-left: 1rem; }
-  &--bottom  { margin-bottom: 1.5rem; }
+  &--top { margin-top: 16px; }
+  &--right { margin-right: 12px; }
+  &--left { margin-left: 12px; }
+  &--bottom  { margin-bottom: 16px; }
   &--top-0 { margin-top: 0; }
   &--right-0 { margin-right: 0; }
   &--left-0 { margin-left: 0; }
@@ -79,14 +79,14 @@ h3 {
 
 .padding {
   &--0 { padding: 0; }
-  &--top { padding-top: 1rem; }
-  &--right { padding-right: 1rem; }
-  &--left { padding-left: 1rem; }
-  &--bottom  { padding-bottom: 1rem; }
-  &--top-05 { padding-top: 0.5rem; }
-  &--right-05 { padding-right: 0.5rem; }
-  &--left-05 { padding-left: 0.5rem; }
-  &--bottom-05 { padding-bottom: 0.5rem; }
+  &--top { padding-top: 12px; }
+  &--right { padding-right: 12px; }
+  &--left { padding-left: 12px; }
+  &--bottom  { padding-bottom: 12px; }
+  &--top-05 { padding-top: 6px; }
+  &--right-05 { padding-right: 6px; }
+  &--left-05 { padding-left: 6px; }
+  &--bottom-05 { padding-bottom: 6px; }
 }
 
 .cursor {
@@ -151,8 +151,8 @@ h3 {
 }
 
 .flex, .inline-flex {
-  margin-left: -0.5rem;
-  margin-right: -0.5rem;
+  margin-left: -6px;
+  margin-right: -6px;
 
   &--wrap {
     flex-wrap: wrap;
@@ -189,8 +189,8 @@ h3 {
   }
 
   .flex-col {
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
+    margin-left: 6px;
+    margin-right: 6px;
 
     &--1 {
       flex: 1;
@@ -235,8 +235,13 @@ h3 {
 
 @media(max-width: 599px) {
   h3 {
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
+    margin-left: 6px;
+    margin-right: 6px;
+  }
+  
+  .margin {
+    &--top { margin-top: 12px; }
+    &--bottom  { margin-bottom: 12px; }
   }
 
   .mat-card-actions {
@@ -255,7 +260,8 @@ h3 {
   }
 
   .word-card {
-    min-height: 100px !important;
+    min-height: 80px !important;
+    margin-bottom: 0 !important;
   }
 
   key.key-button {
@@ -310,22 +316,3 @@ h3 {
     }
   }
 }
-
-// @media(min-width: 600px) {
-//   .flex {
-//     display: flex;
-//     margin: 0 -0.5rem;
-
-//     .flex-col {
-//       margin: 0 0.5rem;
-//     }
-
-//     .flex-col--grow {
-//       flex-grow: 1;
-//     }
-
-//     .flex-col--50 {
-//       flex-basis: 50%;
-//     }
-//   }
-// }

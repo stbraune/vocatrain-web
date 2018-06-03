@@ -75,7 +75,7 @@ export class GameService {
 
       return this.pauseGame(game).pipe(
         switchMap(() => this.reachedGoal(game)),
-        switchMap((reachedGoal) => reachedGoal ? of([]) : this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 1 }))),
+        switchMap((reachedGoal) => reachedGoal ? of([]) : this.nextWordInternal(game)),
         switchMap((searchResults) => {
           if (searchResults.length === 0) {
             return ['started', 'paused'].indexOf(game.gameState.state) === -1 ? of(null) : this.stopGame(game, 'no-more-words').pipe(
@@ -92,6 +92,28 @@ export class GameService {
     }
 
     return throwError(`Cannot get next word in a not started game`);
+  }
+
+  private nextWordInternal(game: Game) {
+    const preloadWord = () => {
+      if (!game.nextWord && !game.searchOptions.searchLevelEnabled) {
+        this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 1, skip: 1 })).subscribe((nextSearchResults) => {
+          if (!game.nextWord) {
+            game.nextWord = nextSearchResults[0];
+          }
+        });
+      }
+    };
+
+    if (game.nextWord) {
+      const nextWord = game.nextWord;
+      game.nextWord = undefined;
+      return of([nextWord]).pipe(tap(() => preloadWord()));
+    }
+
+    return this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 1 })).pipe(
+      tap((searchResult) => preloadWord())
+    );
   }
 
   public coverWord(game: Game): Observable<Game> {
@@ -131,11 +153,21 @@ export class GameService {
       translatedWord.games[game.mode].level++;
       translatedWord.games[game.mode].date = new Date();
 
+      const saveWord = () => {
+        const observable = this.db.putEntity(game.word.doc).pipe(
+          tap(() => this.gameLogEntityService.incrementCorrect(game.gameLogEntity, game.durationReferenceDate))
+        );
+        if (game.nextWord) {
+          return of(game.gameLogEntity);
+        }
+
+        return observable;
+      };
+
       return this.pauseGame(game).pipe(
-        switchMap(() => this.db.putEntity(game.word.doc)),
-        switchMap((wordEntity) => this.gameLogEntityService.incrementCorrect(game.gameLogEntity, game.durationReferenceDate)),
+        switchMap(() => saveWord()),
         tap((gameLogEntity) => game.gameLogEntity = gameLogEntity),
-        tap((gameLogEntity) => game.wordStateChanged.next({
+        tap(() => game.wordStateChanged.next({
           previous: game.wordState,
           current: game.wordState = { state: 'solved', reason: 'correct' }
         })),
@@ -159,9 +191,19 @@ export class GameService {
       translatedWord.games[game.mode].level = 0;
       translatedWord.games[game.mode].date = new Date();
 
+      const saveWord = () => {
+        const observable = this.db.putEntity(game.word.doc).pipe(
+          tap(() => this.gameLogEntityService.incrementWrong(game.gameLogEntity, game.durationReferenceDate))
+        );
+        if (game.nextWord) {
+          return of(game.gameLogEntity);
+        }
+
+        return observable;
+      };
+
       return this.pauseGame(game).pipe(
-        switchMap(() => this.db.putEntity(game.word.doc)),
-        switchMap((wordEntity) => this.gameLogEntityService.incrementWrong(game.gameLogEntity, game.durationReferenceDate)),
+        switchMap(() => saveWord()),
         tap((gameLogEntity) => game.gameLogEntity = gameLogEntity),
         tap((gameLogEntity) => game.wordStateChanged.next({
           previous: game.wordState,
@@ -254,7 +296,8 @@ export class GameService {
 
   public findWords(mode: string, options: SearchOptions): Observable<SearchResult[]> {
     return this.findWordsInternal(mode, Object.assign({}, options, {
-      limit: options.searchLevelEnabled ? 100 : 1
+      limit: options.searchLevelEnabled ? 100 : 1,
+      skip: options.searchLevelEnabled ? 0 : options.skip
     })).pipe(
       switchMap((words) => {
         if (words.length === 0) {
@@ -444,7 +487,8 @@ export class GameService {
           : typeof options.reoccurBefore === 'string' ? options.reoccurBefore : undefined,
         answerHash: Number.MAX_VALUE
       },
-      limit: options.limit
+      limit: options.limit,
+      skip: options.skip
     }).pipe(
       map((result) => result.rows)
     );
