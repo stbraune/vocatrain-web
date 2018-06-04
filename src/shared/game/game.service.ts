@@ -159,6 +159,7 @@ export class GameService {
           tap((gameLogEntity) => game.gameLogEntity = gameLogEntity)
         );
         if (game.nextWord) {
+          observable.subscribe();
           return of(game.gameLogEntity);
         }
 
@@ -197,6 +198,7 @@ export class GameService {
           tap((gameLogEntity) => game.gameLogEntity = gameLogEntity)
         );
         if (game.nextWord) {
+          observable.subscribe();
           return of(game.gameLogEntity);
         }
 
@@ -430,7 +432,7 @@ export class GameService {
                   const answerHash = calculateHash(answerWord.value);
                   const answerLevel = (answerWord.games && answerWord.games[mode] && answerWord.games[mode].level) || 0;
                   const answerThen = new Date((answerWord.games && answerWord.games[mode] && answerWord.games[mode].date)
-                    || (doc.createdAt.getTime() + (answerHash / 1000000)));
+                    || (new Date(doc.createdAt).getTime() + Math.abs(answerHash)));
 
                   const requiredLanguage = getRequiredLanguage(answerLevel, mod, sourceLanguage, targetLanguage);
                   const requiredDistance = getRequiredDistance(answerLevel, mod);
