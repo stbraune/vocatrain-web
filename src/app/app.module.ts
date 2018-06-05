@@ -43,7 +43,6 @@ import { AppComponent } from './app.component';
 import {
   WordsComponent,
   WordTypeEditComponent,
-  WordEditComponent,
   WordTypesComponent
 } from './components';
 
@@ -55,6 +54,7 @@ import { StatisticsModule } from '../statistics';
 import { GuessModule } from '../guess';
 import { TypeModule } from '../type';
 import { WatchModule } from '../watch/watch.module';
+import { DupesModule } from '../dupes';
 
 @NgModule({
   declarations: [
@@ -62,8 +62,7 @@ import { WatchModule } from '../watch/watch.module';
     WordsComponent,
     WordTypesComponent,
     WordAddDialogComponent,
-    WordTypeEditComponent,
-    WordEditComponent
+    WordTypeEditComponent
   ],
   imports: [
     RouterModule.forRoot(AppRoutes, {
@@ -101,6 +100,7 @@ import { WatchModule } from '../watch/watch.module';
     GuessModule.forRoot(),
     TypeModule.forRoot(),
     WatchModule.forRoot(),
+    DupesModule.forRoot(),
     StatisticsModule.forRoot(),
     SettingsModule.forRoot()
   ],

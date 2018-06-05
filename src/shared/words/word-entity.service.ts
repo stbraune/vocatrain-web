@@ -205,7 +205,7 @@ export class WordEntityService {
     );
   }
 
-  private searchWordEntities(options?: Partial<DatabaseRunFulltextQueryOptions>) {
+  public searchWordEntities(options?: Partial<DatabaseRunFulltextQueryOptions>) {
     const supportedLanguages = this.settingsService.getAppSettings().userLanguages.map((userLanguage) => userLanguage.iso);
     return this.db.executeFulltextQuery(Object.assign({
       designDocument: 'words-index',

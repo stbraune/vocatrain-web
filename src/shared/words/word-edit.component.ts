@@ -13,10 +13,13 @@ import {
 } from '@angular/core';
 import { MatSnackBar, MatSelect } from '@angular/material';
 
-import { Observable ,  Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
-import { GoogleTranslateAlternative, ChipInputComponent } from '../../../shared';
-import { WordTypeEntity, WordEntity, Text } from '../../../shared';
+import { GoogleTranslateAlternative } from '../google-translate';
+import { ChipInputComponent } from '../chip-input';
+import { WordTypeEntity } from '../word-types';
+import { WordEntity } from './word-entity';
+import { Text } from './text';
 
 @Component({
   selector: 'word-edit',
@@ -34,6 +37,9 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
 
   @Input()
   public supportedLanguages: string[] = [];
+
+  @Input()
+  public supportMultipleTexts = true;
 
   @Output()
   public wordCancelled = new EventEmitter<void>();
@@ -100,6 +106,10 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   }
 
   public onDeleteText(text: Text) {
+    if (!this.supportMultipleTexts) {
+      return;
+    }
+
     const index = this.editedWordEntity.texts.indexOf(text);
     if (index !== -1) {
       this.editedWordEntity.texts.splice(index, 1);
@@ -107,6 +117,10 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   }
 
   public onAddText() {
+    if (!this.supportMultipleTexts) {
+      return;
+    }
+
     this.editedWordEntity.texts.push({
       meta: '',
       tags: [],
@@ -179,7 +193,7 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   public onBackspacePressed(source: HTMLElement, text: Text) {
     const row = parseInt(source.dataset.row, 10);
     const col = parseInt(source.dataset.col, 10);
-    if (this.isEmpty(text)) {
+    if (this.isEmpty(text) && this.supportMultipleTexts) {
       const index = this.editedWordEntity.texts.indexOf(text);
       if (index !== -1) {
         this.deferredNavigate = { row: row, col: 0, dir: 'left' };
@@ -189,6 +203,12 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   }
 
   public onEnterPressed(source: HTMLElement, text: Text) {
+    if (!this.supportMultipleTexts) {
+      // no multiple texts supported, just save the word
+      this.onSave();
+      return;
+    }
+
     const row = parseInt(source.dataset.row, 10);
     const col = parseInt(source.dataset.col, 10);
 

@@ -34,6 +34,15 @@
         </button>
       </span>
     </span>
+    <span routerLink="/dupes" routerLinkActive="sm-show" class="margin--left sm-hide">
+      <span class="inline-flex inline-flex--row inline-flex--align-center inline-flex--no-margin">
+        {{'nav.dupes.title' | translate}}
+        <button mat-icon-button (click)="toggleLefthandMode()">
+          <mat-icon *ngIf="lefthandMode">subdirectory_arrow_left</mat-icon>
+          <mat-icon *ngIf="!lefthandMode">subdirectory_arrow_right</mat-icon>
+        </button>
+      </span>
+    </span>
     <span routerLink="/words" routerLinkActive="sm-show" class="margin--left sm-hide">
       {{'nav.words.title' | translate}}
     </span>
@@ -56,6 +65,9 @@
   </button>
   <button mat-button routerLink="/watch" class="sm-hide">
     {{'nav.watch.title' | translate}}
+  </button>
+  <button mat-button routerLink="/dupes" class="sm-hide">
+    {{'nav.dupes.title' | translate}}
   </button>
   <button mat-button routerLink="/words" class="sm-hide">
     {{'nav.words.title' | translate}}
@@ -93,6 +105,9 @@
       </button>
       <button mat-button routerLink="/watch" (click)="sidenav.toggle()">
         {{'nav.watch.title' | translate}}
+      </button>
+      <button mat-button routerLink="/dupes" (click)="sidenav.toggle()">
+        {{'nav.dupes.title' | translate}}
       </button>
       <button mat-button routerLink="/words" (click)="sidenav.toggle()">
         {{'nav.words.title' | translate}}

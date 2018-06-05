@@ -1,0 +1,54 @@
+<li *ngFor="let wordEntity of wordEntities">
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <div class="flex flex--no-margin flex--align-center stretch">
+        <ng-container *ngFor="let text of wordEntity.texts">
+          <ng-container *ngFor="let lang of supportedLanguages; let i=index">
+            <div *ngIf="showLanguages === undefined || showLanguages.indexOf(lang) !== -1" class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal word" [class.sm-hide]="i > 0">
+              {{text.words[lang] && text.words[lang].value}}
+              <chips *ngIf="i === 0 || showTagsAtLanguage === lang" [chips]="text.tags" mode="read" class="lg-hide" [class.lg-hide]="showTagsAtLanguage === undefined"></chips>
+              <span class="buttons sm-hide">
+                <google-translate-button [from]="lang" [to]="supportedLanguages" [text]="text.words[lang].value">
+                </google-translate-button>
+                <button mat-icon-button (click)="openWordEntityDetails($event, wordEntity)" [matTooltip]="'words.show-details' | translate" class="open-details-button">
+                  <mat-icon [inline]="true">code</mat-icon>
+                </button>
+              </span>
+            </div>
+          </ng-container>
+          <div *ngIf="showTags" class="flex-col flex-col--17 align--center overflow--hidden word-wrap--break-word white-space--normal sm-hide">
+            <chips [chips]="text.tags" mode="read"></chips>
+          </div>
+        </ng-container>
+      </div>
+    </mat-expansion-panel-header>
+
+    <ng-template matExpansionPanelContent>
+      <word-edit #wordEdit
+        [wordTypeEntities]="wordTypeEntities"
+        [supportedLanguages]="supportedLanguages"
+        [wordEntity]="wordEntity"
+        (wordSaved)="saveWordEntity($event)">
+      </word-edit>
+      
+      <div class="flex flex--row">
+        <div class="flex-col flex-col--grow">
+          <button mat-button (click)="deleteWordEntity(wordEntity)">
+            <mat-icon>delete</mat-icon>
+            {{'actions.delete' | translate}}
+          </button>
+        </div>
+        <div class="flex-col">
+          <button mat-button (click)="saveWordEntity(wordEdit.editedWordEntity)">
+            <mat-icon>done</mat-icon>
+            {{'actions.save' | translate}}
+          </button>
+        </div>
+      </div>
+    </ng-template>
+  </mat-expansion-panel>
+</li>
+
+<ng-template #wordDetailsDialogContentTemplate>
+  <pre>{{wordEntityDetails | json}}</pre>
+</ng-template>

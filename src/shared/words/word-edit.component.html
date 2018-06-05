@@ -19,7 +19,7 @@
     </div>
     <div class="max-height-scroll--40">
       <div *ngFor="let text of editedWordEntity.texts; let w=index" class="flex flex--wrap flex--no-margin flex--align-center">
-        <div class="flex-col sm-hide">
+        <div *ngIf="supportMultipleTexts" class="flex-col sm-hide">
           <button mat-icon-button (click)="onDeleteText(text)">
             <mat-icon>delete</mat-icon>
           </button>
@@ -66,7 +66,7 @@
       </div>
     </div>
 
-    <button mat-button (click)="onAddText()" class="sm-hide">
+    <button *ngIf="supportMultipleTexts" mat-button (click)="onAddText()" class="sm-hide">
       <mat-icon>add</mat-icon>
       {{'actions.add' | translate}}
     </button>

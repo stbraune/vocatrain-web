@@ -4,7 +4,7 @@ import { MatDialogRef } from '@angular/material';
 import { SettingsService } from '../../../shared';
 import { WordTypeEntityService, WordTypeEntity, WordEntity } from '../../../shared';
 
-import { WordEditComponent } from './word-edit.component';
+import { WordEditComponent } from '../../../shared';
 
 @Component({
   selector: 'word-add-dialog',

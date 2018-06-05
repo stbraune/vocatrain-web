@@ -1,0 +1,199 @@
+<h3 class="sm-hide">
+  {{'dupes.title' | translate}}
+</h3>
+
+<mat-card *ngIf="!game || (game.gameState.state !== 'started' && game.gameState.state !== 'paused')" class="margin--bottom">
+  <mat-card-content>
+    <search-options [supportedLanguages]="supportedLanguages" [(searchOptions)]="searchOptions">
+    </search-options>
+  </mat-card-content>
+  <mat-card-actions>
+    <button class="stretch" mat-button (click)="startGame()">
+      {{'dupes.start' | translate}}
+    </button>
+  </mat-card-actions>
+</mat-card>
+
+<mat-card *ngIf="game && (game.gameState.state === 'started' || game.gameState.state === 'paused')" class="margin--bottom">
+  <mat-card-content>
+    <div class="margin--bottom">
+      <strong>{{'dupes.duration' | translate}}:</strong>
+      <span>
+        {{formatMillis(game.duration)}}
+      </span>
+      <span *ngIf="searchOptions.mode === 'by-time'"> / {{formatMinutes(searchOptions.minutes)}}</span>
+      -
+      <strong>{{'dupes.words' | translate}}:</strong>
+      <span>
+        {{game.amount}}
+      </span>
+      <span *ngIf="searchOptions.mode === 'by-amount'"> / {{searchOptions.amount}}</span>
+    </div>
+    <div class="margin--bottom">
+      <strong>{{'dupes.last-repeat' | translate}}:</strong>
+      <span *ngIf="!game.word || game.word.key.answerAt.getTime() === 0; else answerAtOk">
+        {{'dupes.never' | translate}}
+      </span>
+      <ng-template #answerAtOk>
+        <span>
+          {{game.word.key.answerAt | date:'dd.MM.yy H:mm'}}
+        </span>
+      </ng-template>
+      -
+      <strong>{{'dupes.current-level' | translate}}:</strong>
+      <span *ngIf="game.word; else answerLevelUnknown">
+        {{game.word.key.answerLevel}}
+      </span>
+      <ng-template #answerLevelUnknown>
+        ?
+      </ng-template>
+    </div>
+  </mat-card-content>
+  <mat-card-actions>
+    <div class="flex flex--align-center flex--justify-space-between" [class.flex--row]="!lefthandMode" [class.flex--row-reverse]="lefthandMode">
+      <key *ngIf="game.gameState.state === 'started'" [label]="'dupes.pause' | translate" class="key-button flex-col flex-col--1" (click)="pauseGame()">
+        <mat-icon>pause</mat-icon>
+      </key>
+      <key *ngIf="game.gameState.state === 'paused'" [label]="'dupes.resume' | translate" class="key-button flex-col flex-col--1" (click)="resumeGame()">
+        <mat-icon>play_arrow</mat-icon>
+      </key>
+      <key *ngIf="game.gameState.state === 'paused'" [label]="'dupes.stop' | translate" class="key-button flex-col flex-col--1" (click)="stopGame()">
+        <mat-icon>stop</mat-icon>
+      </key>
+      <key *ngIf="game.gameState.state === 'started' && game.word && game.wordState.state === 'uncovered'" [label]="'dupes.next' | translate" class="key-button flex-col flex-col--1 margin--left" (click)="solveCorrect()">
+        <mat-icon class="sm-hide">keyboard_arrow_right</mat-icon>
+        <mat-icon class="lg-hide">check</mat-icon>
+      </key>
+    </div>
+  </mat-card-actions>
+</mat-card>
+
+<div *ngIf="game && (game.gameState.state === 'started' || game.gameState.state === 'paused')" class="flex">
+  <div class="flex-col flex-col--50">
+    <mat-card class="margin--bottom">
+      <mat-card-title *ngIf="game.word" class="align--center">
+        {{game.word.key.question}}
+      </mat-card-title>
+      <mat-card-content *ngIf="game.word">
+        <div *ngIf="game.word" class="flex flex--column margin--bottom">
+          <mat-form-field>
+            <input matInput
+              placeholder="{{'dupes.similarity' | translate}}"
+              [(ngModel)]="questionQuerySimilarity"
+              (ngModelChange)="onQuestionSimilarityChanged()"
+            >
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput
+              placeholder="{{'dupes.search' | translate}}"
+              [(ngModel)]="questionQuery"
+              (ngModelChange)="onQuestionQueryChanged()">
+            <span matSuffix>
+              <button mat-icon-button (click)="onHelpQuery()" matTooltip="{{'dupes.search-help' | translate}} {{queryHelpFields.join(', ')}}">
+                <mat-icon>help</mat-icon>
+              </button>
+              <button mat-icon-button (click)="onClearQuestionQuery()">
+                <mat-icon>clear</mat-icon>
+              </button>
+            </span>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+      <mat-card-content *ngIf="!game.word" class="align--center">
+        <div class="display--inline-block">
+          <mat-spinner diameter="50">
+          </mat-spinner>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    
+    <div class="margin--bottom">
+      <ul class="ul--nostyle">
+        <words-editor
+          [showTags]="false"
+          [showLanguages]="[game.word.key.questionLanguage]"
+          [showTagsAtLanguage]="game.word.key.questionLanguage"
+          [wordEntities]="questionSearchResults"
+          [wordTypeEntities]="wordTypeEntities"
+          [supportedLanguages]="supportedLanguages">
+        </words-editor>
+      </ul>
+    </div>
+  </div>
+  <div class="flex-col flex-col--50">
+    <mat-card class="margin--bottom">
+      <mat-card-title *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')" class="align--center">
+        {{game.word.key.answer}}
+      </mat-card-title>
+      <mat-card-content *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
+        <div *ngIf="game.word" class="flex flex--column margin--bottom">
+          <mat-form-field>
+            <input matInput
+              placeholder="{{'dupes.similarity' | translate}}"
+              [(ngModel)]="answerQuerySimilarity"
+              (ngModelChange)="onAnswerSimilarityChanged()"
+            >
+          </mat-form-field>
+          <mat-form-field>
+            <input matInput
+              placeholder="{{'dupes.search' | translate}}"
+              [(ngModel)]="answerQuery"
+              (ngModelChange)="onAnswerQueryChanged()">
+            <span matSuffix>
+              <button mat-icon-button (click)="onHelpQuery()" matTooltip="{{'dupes.search-help' | translate}} {{queryHelpFields.join(', ')}}">
+                <mat-icon>help</mat-icon>
+              </button>
+              <button mat-icon-button (click)="onClearAnswerQuery()">
+                <mat-icon>clear</mat-icon>
+              </button>
+            </span>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+      <mat-card-content *ngIf="!game.word || game.wordState.state === 'undefined' || game.wordState.state === 'covered'" class="align--center">
+        <div class="display--inline-block">
+          <mat-spinner diameter="50">
+          </mat-spinner>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    
+    <div class="margin--bottom">
+      <ul class="ul--nostyle">
+        <words-editor
+          [showTags]="false"
+          [showLanguages]="[game.word.key.answerLanguage]"
+          [showTagsAtLanguage]="game.word.key.answerLanguage"
+          [wordEntities]="answerSearchResults"
+          [wordTypeEntities]="wordTypeEntities"
+          [supportedLanguages]="supportedLanguages">
+        </words-editor>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<mat-card *ngIf="game && game.gameState.state === 'stopped'">
+  <mat-card-title>
+    {{'dupes.finished' | translate}}
+  </mat-card-title>
+  <mat-card-content>
+    <p *ngIf="game.gameState.reason === 'no-more-words'">
+      {{'dupes.no-more-words' | translate}}
+    </p>
+    <p *ngIf="game.gameState.reason === 'reached-amount'">
+      {{'dupes.reached-amount' | translate}}
+    </p>
+    <p *ngIf="game.gameState.reason === 'reached-minutes'">
+      {{'dupes.reached-minutes' | translate}}
+    </p>
+    <p>
+      <strong>{{'dupes.required-duration' | translate}}:</strong>
+      {{formatMillis(game.duration)}}
+    </p>
+    <p>
+      <strong>{{'dupes.total-words' | translate}}:</strong>
+      {{game.amount}}
+    </p>
+  </mat-card-content>
+</mat-card>

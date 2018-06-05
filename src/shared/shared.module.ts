@@ -14,7 +14,8 @@ import {
   MatTooltipModule,
   MatRadioModule,
   MatSelectModule,
-  MatCheckboxModule
+  MatCheckboxModule,
+  MatExpansionModule
 } from '@angular/material';
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -28,7 +29,7 @@ import { ChipInputComponent } from './chip-input';
 import { ChipsComponent, ChipComponent } from './chips';
 import { KeyComponent } from './key';
 
-import { WordEntityService } from './words';
+import { WordEntityService, WordEditComponent, WordsEditorComponent } from './words';
 import { WordTypeEntityService } from './word-types';
 
 import { SearchOptionsComponent } from './search-options';
@@ -52,6 +53,7 @@ import { SettingsService } from './settings';
     MatButtonModule,
     MatCheckboxModule,
     MatChipsModule,
+    MatExpansionModule,
     MatRadioModule,
     MatFormFieldModule,
     MatIconModule,
@@ -66,7 +68,9 @@ import { SettingsService } from './settings';
     ChipComponent,
     ChipsComponent,
     KeyComponent,
-    SearchOptionsComponent
+    SearchOptionsComponent,
+    WordEditComponent,
+    WordsEditorComponent
   ],
   exports: [
     GoogleTranslateButtonComponent,
@@ -74,7 +78,9 @@ import { SettingsService } from './settings';
     ChipComponent,
     ChipsComponent,
     KeyComponent,
-    SearchOptionsComponent
+    SearchOptionsComponent,
+    WordEditComponent,
+    WordsEditorComponent
   ]
 })
 export class SharedModule {

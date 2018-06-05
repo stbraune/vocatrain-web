@@ -15,6 +15,9 @@
     "watch": {
       "title": "Schauen"
     },
+    "dupes": {
+      "title": "Duplikate"
+    },
     "words": {
       "title": "Vokabeln"
     },
@@ -143,6 +146,31 @@
     "tags": "Tags",
     "meta": "Hilfe",
     "stop": "Aufhören"
+  },
+  "dupes": {
+    "title": "Duplikate",
+    "start": "Starten!",
+    "finished": "Fertig!",
+    "no-more-words": "Keine weiteren Vokabeln vorhanden!",
+    "reached-amount": "Die Anzahl erforderlicher Vokabeln wurde erreicht.",
+    "reached-minutes": "Die Zeit ist abgelaufen.",
+    "required-duration": "Benötigte Dauer",
+    "total-words": "Geschaffte Vokabeln",
+    "duration": "Dauer",
+    "words": "Vokabeln",
+    "next": "Weiter",
+    "pause": "Pause",
+    "resume": "Fortsetzen",
+    "last-repeat": "Letzte Wiederholung",
+    "never": "Nie",
+    "current-level": "Aktuelle Stufe",
+    "language": "Sprache",
+    "tags": "Tags",
+    "meta": "Hilfe",
+    "stop": "Aufhören",
+    "similarity": "Ähnlichkeit",
+    "search": "Suche...",
+    "search-help": "Verfügbare Felder:"
   },
   "search-options": {
     "mode": {

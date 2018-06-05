@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { throwError, Observable, of, Subject, pipe } from 'rxjs';
+import { throwError, Observable, of, Subject, pipe, BehaviorSubject } from 'rxjs';
 import { map, switchMap, catchError, tap, filter } from 'rxjs/operators';
 
 import { Database } from '../database';
@@ -29,10 +29,16 @@ export class GameService {
       searchOptions: searchOptions,
       gameLogEntity: undefined,
       gameState: { state: 'undefined', reason: 'undefined' },
-      gameStateChanged: new Subject<{ previous: GameState, current: GameState }>(),
+      gameStateChanged: new BehaviorSubject<{ previous: GameState, current: GameState }>({
+        previous: { state: 'undefined', reason: 'undefined' },
+        current: { state: 'undefined', reason: 'undefined' }
+      }),
       word: undefined,
       wordState: { state: 'undefined', reason: 'undefined' },
-      wordStateChanged: new Subject<{ previous: WordState, current: WordState }>(),
+      wordStateChanged: new BehaviorSubject<{ previous: WordState, current: WordState }>({
+        previous: { state: 'undefined', reason: 'undefined' },
+        current: { state: 'undefined', reason: 'undefined' }
+      }),
       durationReferenceDate: new Date(),
       duration: 0,
       durationInterval: undefined,
@@ -71,11 +77,15 @@ export class GameService {
   public nextWord(game: Game): Observable<SearchResult> {
     if (game.gameState.state === 'started') {
       game.word = undefined;
-      game.wordState = { state: 'undefined', reason: 'next-word' };
+      game.wordStateChanged.next({
+        previous: game.wordState,
+        current: game.wordState = { state: 'undefined', reason: 'next-word' }
+      });
 
       return this.pauseGame(game).pipe(
         switchMap(() => this.reachedGoal(game)),
         switchMap((reachedGoal) => reachedGoal ? of([]) : this.nextWordInternal(game)),
+        tap(() => this.resumeGame(game)),
         switchMap((searchResults) => {
           if (searchResults.length === 0) {
             return ['started', 'paused'].indexOf(game.gameState.state) === -1 ? of(null) : this.stopGame(game, 'no-more-words').pipe(
@@ -84,10 +94,12 @@ export class GameService {
           }
 
           game.word = searchResults[0];
-          game.wordState = { state: 'covered', reason: 'covered' };
+          game.wordStateChanged.next({
+            previous: game.wordState,
+            current: game.wordState = { state: 'covered', reason: 'covered' }
+          });
           return of(game.word);
-        }),
-        tap(() => this.resumeGame(game))
+        })
       );
     }
 
@@ -168,11 +180,11 @@ export class GameService {
 
       return this.pauseGame(game).pipe(
         switchMap(() => saveWord()),
+        switchMap(() => this.resumeGame(game)),
         tap(() => game.wordStateChanged.next({
           previous: game.wordState,
           current: game.wordState = { state: 'solved', reason: 'correct' }
-        })),
-        switchMap(() => this.resumeGame(game))
+        }))
       );
     }
 
@@ -207,11 +219,11 @@ export class GameService {
 
       return this.pauseGame(game).pipe(
         switchMap(() => saveWord()),
+        switchMap(() => this.resumeGame(game)),
         tap((gameLogEntity) => game.wordStateChanged.next({
           previous: game.wordState,
           current: game.wordState = { state: 'solved', reason: 'wrong' }
         })),
-        switchMap(() => this.resumeGame(game))
       );
     }
 

@@ -16,7 +16,7 @@ import {
 import { SettingsService } from '../../../shared';
 
 import { WordAddDialogComponent } from './word-add-dialog.component';
-import { WordEditComponent } from './word-edit.component';
+import { WordEditComponent } from '../../../shared';
 
 @Component({
   selector: 'words',

@@ -1,0 +1,111 @@
+@media(max-width: 599px) {
+  .header {
+    padding-top: 12px;
+  }
+}
+
+.word-button {
+  line-height: 24px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.header-row {
+  padding: 0 24px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.7);
+
+  .header-wrapper {
+    display: flex;
+    flex: 1;
+
+    .mat-expansion-indicator {
+      visibility: hidden;
+    }
+  }
+}
+
+.flex-cell-15 {
+  flex: initial;
+  flex-basis: 15%;
+}
+
+.flex-cell-5 {
+  flex: initial;
+  flex-basis: 5%;
+}
+
+::ng-deep .mat-expansion-panel-header .mat-content {
+  overflow: visible;
+}
+
+.word {
+  position: relative;
+  overflow: visible;
+
+  .buttons {
+    position: relative;
+    white-space: nowrap;
+  }
+
+  .open-details-button, google-translate-button {
+    opacity: 0;
+    transition: opacity 0.4s;
+    position: absolute;
+    bottom: -11px;
+
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 20px;
+  }
+
+  google-translate-button {
+    right: -11px;
+    height: 22px;
+    ::ng-deep .mat-icon-button {
+      font-size: 14px;
+      width: 22px;  
+      height: 22px;
+      line-height: 14px;
+    }
+  }
+
+  .open-details-button {
+    right: -35px;
+    font-size: 14px;
+    width: 22px;
+    height: 22px;
+    line-height: 14px;
+  }
+
+  &:hover {
+    .open-details-button, google-translate-button {
+      opacity: 1;
+    }
+  }
+}
+
+.mat-input {
+  &--no-margin {
+    ::ng-deep .mat-form-field-wrapper {
+      padding-bottom: 0;
+    }
+  
+    ::ng-deep .mat-form-field-infix {
+      width: initial;
+      border-top: 0;
+    }
+  
+    ::ng-deep .mat-form-field-underline {
+      bottom: 0;
+    }
+  }
+}
+
+@media(max-width: 599px) {
+  .search-container {
+    display: flex;
+    flex-direction: column;
+  }
+}
