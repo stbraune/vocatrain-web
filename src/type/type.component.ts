@@ -59,9 +59,9 @@ export class TypeComponent implements OnInit {
   public lefthandMode = false;
 
   public searchOptions: SearchOptions = {
-    mode: 'by-time',
+    mode: 'by-amount',
     minutes: 15,
-    amount: 75,
+    amount: 150,
     searchLanguagesDirection: 'both',
     searchLevelEnabled: false,
     searchLevelMinimum: 0,

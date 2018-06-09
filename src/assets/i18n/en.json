@@ -1,16 +1,31 @@
 {
   "app": {
-    "title": "VocaTrain"
+    "title": "VocaTrain",
+    "sync-failed": "Lost connection.",
+    "sync-broken": "Synchronization failed. Going offline...",
+    "sync-broken-ok": "Ok"
   },
   "nav": {
     "guess": {
       "title": "Guess"
+    },
+    "type": {
+      "title": "Type"
+    },
+    "watch": {
+      "title": "Watch"
+    },
+    "dupes": {
+      "title": "Duplicates"
     },
     "words": {
       "title": "Words"
     },
     "word-types": {
       "title": "Word Types"
+    },
+    "statistics": {
+      "title": "Statistics"
     },
     "settings": {
       "title": "Settings"
@@ -20,6 +35,9 @@
     "title": "Words",
     "search": "Search...",
     "search-help": "Available fields:",
+    "sort-by": "Sort by {{col}}",
+    "filter-duplicates": "Filter by duplicates in {{lang}}",
+    "show-details": "Show details",
     "tags": "Tags",
     "edit-word": {
       "title": "Edit word",
@@ -29,6 +47,30 @@
   },
   "word-types": {
     "title": "Word Types"
+  },
+  "statistics": {
+    "title": "Statistics",
+    "totals": "Total",
+    "last30": "Last 30 days",
+    "mode": {
+      "guess": "Guess",
+      "type": "Type",
+      "watch": "Watch",
+      "dupes": "Duplicates"
+    },
+    "total-duration": "Total duration",
+    "correct-words": "Correct words",
+    "wrong-words": "Wrong words",
+    "total-words": "Total amount of words",
+    "average-per-word": "Average duration per word",
+    "words-per-level": "Words per level",
+    "to": "to",
+    "level": "Level ",
+    "words-per-day": "Words per day",
+    "date-format": "d.M.",
+    "correct": "Correct",
+    "wrong": "Wrong",
+    "total": "Total"
   },
   "guess": {
     "title": "Gues",
@@ -45,6 +87,8 @@
     "cover": "Cover",
     "right": "Correct",
     "wrong": "Wrong",
+    "pause": "Pause",
+    "resume": "Continue",
     "last-repeat": "Last Repeat",
     "never": "Never",
     "current-level": "Current Level",
@@ -53,6 +97,82 @@
     "meta": "Help",
     "stop": "Stop"
   },
+  "type": {
+    "title": "Type",
+    "start": "Start!",
+    "finished": "Finished!",
+    "no-more-words": "No more words available!",
+    "reached-amount": "Reached the amount of required words.",
+    "reached-minutes": "Time is over.",
+    "required-duration": "Duration",
+    "total-words": "Total words",
+    "duration": "Duration",
+    "words": "Words",
+    "uncover": "Uncover",
+    "cover": "Cover",
+    "right": "Correct",
+    "wrong": "Wrong",
+    "pause": "Pause",
+    "resume": "Continue",
+    "last-repeat": "Last Repeat",
+    "never": "Never",
+    "current-level": "Current Level",
+    "language": "Language",
+    "tags": "Tags",
+    "meta": "Help",
+    "stop": "Stop",
+    "answer": "Answer"
+  },
+  "watch": {
+    "title": "Watch",
+    "start": "Start!",
+    "finished": "Finished!",
+    "no-more-words": "No more words available!",
+    "reached-amount": "Reached the amount of required words.",
+    "reached-minutes": "Time is over.",
+    "required-duration": "Duration",
+    "total-words": "Total words",
+    "duration": "Duration",
+    "words": "Words",
+    "uncover": "Uncover",
+    "cover": "Cover",
+    "right": "Next",
+    "wrong": "Wrong",
+    "pause": "Pause",
+    "resume": "Continue",
+    "last-repeat": "Last Repeat",
+    "never": "Never",
+    "current-level": "Current Level",
+    "language": "Language",
+    "tags": "Tags",
+    "meta": "Help",
+    "stop": "Stop"
+  },
+  "dupes": {
+    "title": "Duplicates",
+    "start": "Start!",
+    "finished": "Finished!",
+    "no-more-words": "No more words available!",
+    "reached-amount": "Reached the amount of required words.",
+    "reached-minutes": "Time is over.",
+    "required-duration": "Duration",
+    "total-words": "Total words",
+    "duration": "Duration",
+    "words": "Words",
+    "next": "Next",
+    "pause": "Pause",
+    "resume": "Continue",
+    "last-repeat": "Last Repeat",
+    "never": "Never",
+    "current-level": "Current Level",
+    "language": "Language",
+    "tags": "Tags",
+    "meta": "Help",
+    "stop": "Stop",
+    "similarity": "Similarity",
+    "search": "Search...",
+    "search-help": "Available fields:"
+  },
   "search-options": {
     "mode": {
       "time": "Time",
@@ -60,6 +180,8 @@
       "words": "Words",
       "amount": "Amount"
     },
+    "mod": "Module",
+    "max-distance-in-days": "Max distance in days of repetitions",
     "source-language": "Source language",
     "target-language": "Target language",
     "min-level": "Lowest level",
@@ -69,12 +191,21 @@
     "title": "Settings",
     "app": "VocaTrain",
     "app-language": "Application Language",
+    "lefthand-mode": "Left hand mode",
     "languages": "Used Languages",
     "language-placeholder": "Add Language",
     "database": "CouchDB",
+    "database-local": "Local Database",
     "database-name": "Database Name",
+    "database-remote": "Remote Database",
+    "database-remote-invalid-url": "Invalid URL",
+    "database-remote-unsupported-version": "No CouchDB or unsupported version",
+    "database-remote-unknown-database": "Unknown database",
+    "database-fti-invalid-url": "Invalid URL",
+    "database-fti-unsupported-version": "No CouchDB Lucene or unsupported version",
     "database-couchdb-url": "CouchDB URL",
-    "database-couchdb-lucene-url": "CouchDB-Lucene URL (Full text search)",
+    "database-fulltext-search": "Fulltext search",
+    "database-couchdb-lucene-url": "CouchDB-Lucene URL (Fulltext search)",
     "database-synchronization": "Synchronize the local IndexedDB and remote CouchDB",
     "backend": "VocaTrain Backend",
     "backend-base-url": "Backend URL",

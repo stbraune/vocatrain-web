@@ -59,7 +59,7 @@ export class WatchComponent implements OnInit {
 
   public searchOptions: SearchOptions = {
     mode: 'by-time',
-    minutes: 15,
+    minutes: 5,
     amount: 75,
     searchLanguagesDirection: 'both',
     searchLevelEnabled: false,

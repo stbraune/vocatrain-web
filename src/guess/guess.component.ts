@@ -47,8 +47,8 @@ export class GuessComponent implements OnInit {
   public lefthandMode = false;
 
   public searchOptions: SearchOptions = {
-    mode: 'by-time',
-    minutes: 15,
+    mode: 'by-amount',
+    minutes: 10,
     amount: 75,
     searchLanguagesDirection: 'both',
     searchLevelEnabled: false,

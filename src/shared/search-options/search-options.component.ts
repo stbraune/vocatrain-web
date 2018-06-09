@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, EventEmitter, Output, Input } from '@angular/core';
 
 import { SearchOptions } from './search-options';
 
@@ -7,7 +7,7 @@ import { SearchOptions } from './search-options';
   templateUrl: './search-options.component.html',
   styleUrls: ['./search-options.component.scss']
 })
-export class SearchOptionsComponent implements OnInit {
+export class SearchOptionsComponent implements OnInit, OnChanges {
   @Input()
   public supportedLanguages: string[] = [];
 
@@ -25,8 +25,11 @@ export class SearchOptionsComponent implements OnInit {
     ],
     searchLevelEnabled: false,
     searchLevelMinimum: 0,
-    searchLevelMaximum: 100
+    searchLevelMaximum: 100,
+    mod: 6
   };
+
+  public maxDistanceInDays;
 
   @Output()
   public searchOptionsChange = new EventEmitter<SearchOptions>();
@@ -35,6 +38,13 @@ export class SearchOptionsComponent implements OnInit {
   }
 
   public ngOnInit(): void {
+  }
+
+  public ngOnChanges(changes: SimpleChanges) {
+    if (changes.searchOptions && this.searchOptions) {
+      this.searchOptions.mod = this.searchOptions.mod || 6;
+      this.onModChanged();
+    }
   }
 
   public toggleLanguageDirection() {
@@ -62,6 +72,23 @@ export class SearchOptionsComponent implements OnInit {
   public setMode(mode: 'by-time' | 'by-amount') {
     this.searchOptions.mode = mode;
     this.onPropertyChanged();
+  }
+
+  public onModChanged() {
+    const maxDistanceInDays = Math.pow(2, this.searchOptions.mod - 2);
+    if (maxDistanceInDays !== this.maxDistanceInDays) {
+      this.maxDistanceInDays = maxDistanceInDays;
+      this.onMaxDistanceInDaysChanged();
+    }
+  }
+
+  public onMaxDistanceInDaysChanged() {
+    const mod = Math.ceil(Math.log2(this.maxDistanceInDays)) + 2;
+    if (mod !== this.searchOptions.mod) {
+      this.searchOptions.mod = mod;
+      console.log('opts', this.searchOptions);
+      this.onPropertyChanged();
+    }
   }
 
   public onPropertyChanged() {

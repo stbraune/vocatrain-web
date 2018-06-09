@@ -24,6 +24,21 @@
         </mat-form-field>
       </div>
     </mat-radio-group>
+
+    <div class="flex">
+      <mat-form-field class="flex-col flex-col--1">
+        <input matInput type="number"
+          placeholder="{{'search-options.max-distance-in-days' | translate}}"
+          [(ngModel)]="maxDistanceInDays"
+          (ngModelChange)="onMaxDistanceInDaysChanged()">
+      </mat-form-field>
+      <mat-form-field class="flex-col flex-col--1">
+        <input matInput type="number"
+          placeholder="{{'search-options.mod' | translate}}"
+          [(ngModel)]="searchOptions.mod"
+          (ngModelChange)="onModChanged()">
+      </mat-form-field>
+    </div>
     
     <div class="flex flex--row">
       <mat-form-field class="flex-col flex-col--1 language-select">

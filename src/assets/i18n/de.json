@@ -55,7 +55,8 @@
     "mode": {
       "guess": "Raten",
       "type": "Tippen",
-      "watch": "Schauen"
+      "watch": "Schauen",
+      "dupes": "Duplikate"
     },
     "total-duration": "Gesamtdauer",
     "correct-words": "Richtige Wörter",
@@ -179,6 +180,8 @@
       "words": "Wörter",
       "amount": "Anzahl"
     },
+    "mod": "Modul",
+    "max-distance-in-days": "Maximaler Abstand von Wiederholungen",
     "source-language": "Ausgangssprache",
     "target-language": "Zielsprache",
     "min-level": "Mindeststufe",

@@ -449,15 +449,8 @@ export class GameService {
                   const requiredLanguage = getRequiredLanguage(answerLevel, mod, sourceLanguage, targetLanguage);
                   const requiredDistance = getRequiredDistance(answerLevel, mod);
 ;
-                  const reoccurAt = new Date(normalizeDate(answerThen).getTime() + convertMillis(requiredDistance));
-                  if (reoccurAt.getTime() === createdAt.getTime()) {
-                    reoccurAt.setDate(reoccurAt.getDate() + 1);
-                  }
-
-                  const reoccurAtSame = reoccurAt.getTime() === normalizeDate(answerThen).getTime();
-                  if (reoccurAtSame) {
-                    reoccurAt.setSeconds(reoccurAt.getSeconds() + (300 + Math.floor(Math.random() * 900)));
-                  }
+                  const reoccurAt = new Date(normalizeDate(answerThen).getTime() + convertMillis(requiredDistance)
+                    + Math.round(Math.random() * 2 * 86400000));
 
                   const indexKey = {
                     reoccurAt: reoccurAt,
