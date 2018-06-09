@@ -1,6 +1,7 @@
 {
   "app": {
     "title": "VocaTrain",
+    "toggle-lefthand-mode": "Toggle lefthand mode",
     "sync-failed": "Lost connection.",
     "sync-broken": "Synchronization failed. Going offline...",
     "sync-broken-ok": "Ok"
@@ -73,7 +74,7 @@
     "total": "Total"
   },
   "guess": {
-    "title": "Gues",
+    "title": "Guess",
     "start": "Start!",
     "finished": "Finished!",
     "no-more-words": "No more words available!",

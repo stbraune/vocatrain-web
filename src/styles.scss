@@ -227,7 +227,19 @@ h3 {
   .stretch {
     width: 100%;
   }
+}
 
+@media(max-width: 1049px) {
+  .md-hide {
+    display: none !important;
+  }
+
+  .md-show {
+    display: initial !important;
+  }
+}
+
+@media(min-width: 1050px) {
   .lg-hide {
     display: none !important;
   }

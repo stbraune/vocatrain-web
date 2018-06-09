@@ -1,13 +1,19 @@
 <mat-toolbar class="app-navbar mat-elevation-z8 flex flex--row flex--no-margin">
-  <a mat-button routerLink="/" class="sm-hide">
+  <a mat-button routerLink="/" class="sm-hide md-hide">
     <mat-icon>filter_9_plus</mat-icon>
     {{'app.title' | translate}}
   </a>
+  
+  <button mat-icon-button (click)="toggleLefthandMode()" class="sm-hide md-hide" matTooltip="{{'app.toggle-lefthand-mode' | translate}}">
+    <mat-icon *ngIf="lefthandMode">subdirectory_arrow_left</mat-icon>
+    <mat-icon *ngIf="!lefthandMode">subdirectory_arrow_right</mat-icon>
+  </button>
+
   <span class="lg-hide app-navbar-mobile">
     <button mat-icon-button (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
-    <span routerLink="/guess" routerLinkActive="sm-show" class="margin--left sm-hide">
+    <span routerLink="/guess" routerLinkActive="sm-show md-show" class="margin--left sm-hide md-hide">
       <span class="inline-flex inline-flex--row inline-flex--align-center inline-flex--no-margin">
         {{'nav.guess.title' | translate}}
         <button mat-icon-button (click)="toggleLefthandMode()">
@@ -16,7 +22,7 @@
         </button>
       </span>
     </span>
-    <span routerLink="/type" routerLinkActive="sm-show" class="margin--left sm-hide">
+    <span routerLink="/type" routerLinkActive="sm-show md-show" class="margin--left sm-hide md-hide">
       <span class="inline-flex inline-flex--row inline-flex--align-center inline-flex--no-margin">
         {{'nav.type.title' | translate}}
         <button mat-icon-button (click)="toggleLefthandMode()">
@@ -25,7 +31,7 @@
         </button>
       </span>
     </span>
-    <span routerLink="/watch" routerLinkActive="sm-show" class="margin--left sm-hide">
+    <span routerLink="/watch" routerLinkActive="sm-show md-show" class="margin--left sm-hide md-hide">
       <span class="inline-flex inline-flex--row inline-flex--align-center inline-flex--no-margin">
         {{'nav.watch.title' | translate}}
         <button mat-icon-button (click)="toggleLefthandMode()">
@@ -34,7 +40,7 @@
         </button>
       </span>
     </span>
-    <span routerLink="/dupes" routerLinkActive="sm-show" class="margin--left sm-hide">
+    <span routerLink="/dupes" routerLinkActive="sm-show md-show" class="margin--left sm-hide md-hide">
       <span class="inline-flex inline-flex--row inline-flex--align-center inline-flex--no-margin">
         {{'nav.dupes.title' | translate}}
         <button mat-icon-button (click)="toggleLefthandMode()">
@@ -43,39 +49,39 @@
         </button>
       </span>
     </span>
-    <span routerLink="/words" routerLinkActive="sm-show" class="margin--left sm-hide">
+    <span routerLink="/words" routerLinkActive="sm-show md-show" class="margin--left sm-hide md-hide">
       {{'nav.words.title' | translate}}
     </span>
-    <span routerLink="/word-types" routerLinkActive="sm-show" class="margin--left sm-hide">
+    <span routerLink="/word-types" routerLinkActive="sm-show md-show" class="margin--left sm-hide md-hide">
       {{'nav.word-types.title' | translate}}
     </span>
-    <span routerLink="/statistics" routerLinkActive="sm-show" class="margin--left sm-hide">
+    <span routerLink="/statistics" routerLinkActive="sm-show md-show" class="margin--left sm-hide md-hide">
       {{'nav.statistics.title' | translate}}
     </span>
-    <span routerLink="/settings" routerLinkActive="sm-show" class="margin--left sm-hide">
+    <span routerLink="/settings" routerLinkActive="sm-show md-show" class="margin--left sm-hide md-hide">
       {{'nav.settings.title' | translate}}
     </span>
   </span>
   
-  <button mat-button routerLink="/guess" class="sm-hide">
+  <button mat-button routerLink="/guess" class="sm-hide md-hide">
     {{'nav.guess.title' | translate}}
   </button>
-  <button mat-button routerLink="/type" class="sm-hide">
+  <button mat-button routerLink="/type" class="sm-hide md-hide">
     {{'nav.type.title' | translate}}
   </button>
-  <button mat-button routerLink="/watch" class="sm-hide">
+  <button mat-button routerLink="/watch" class="sm-hide md-hide">
     {{'nav.watch.title' | translate}}
   </button>
-  <button mat-button routerLink="/dupes" class="sm-hide">
+  <button mat-button routerLink="/dupes" class="sm-hide md-hide">
     {{'nav.dupes.title' | translate}}
   </button>
-  <button mat-button routerLink="/words" class="sm-hide">
+  <button mat-button routerLink="/words" class="sm-hide md-hide">
     {{'nav.words.title' | translate}}
   </button>
-  <button mat-button routerLink="/word-types" class="sm-hide">
+  <button mat-button routerLink="/word-types" class="sm-hide md-hide">
     {{'nav.word-types.title' | translate}}
   </button>
-  <button mat-button routerLink="/statistics" class="sm-hide">
+  <button mat-button routerLink="/statistics" class="sm-hide md-hide">
     {{'nav.statistics.title' | translate}}
   </button>
 
@@ -84,7 +90,7 @@
       <mat-icon *ngIf="!synchronizationEnabled">cloud_off</mat-icon>
       <mat-icon *ngIf="synchronizationEnabled" class="synchronization-enabled" [class.synchronization-running]="synchronizationRunning">cloud</mat-icon>
     </button>
-    <button mat-button routerLink="/settings" class="sm-hide">
+    <button mat-button routerLink="/settings" class="sm-hide md-hide">
       <mat-icon>settings</mat-icon>
       {{'nav.settings.title' | translate}}
     </button>

@@ -139,7 +139,15 @@ export class GuessComponent implements OnInit {
     }
   }
 
-  public tapWord($event: MouseEvent) {
+  public onQuestionCardTapped($event: MouseEvent) {
+    const gameStarted = this.game.gameState.state === 'started';
+    const wordUncovered = this.game.wordState.state === 'uncovered';
+    if (gameStarted && wordUncovered) {
+      this.coverWord();
+    }
+  }
+
+  public onAnswerCardTapped($event: MouseEvent) {
     const gameStarted = this.game.gameState.state === 'started';
     const wordCovered = this.game.wordState.state === 'covered';
     const wordUncovered = this.game.wordState.state === 'uncovered';
@@ -153,21 +161,17 @@ export class GuessComponent implements OnInit {
     const leftHalf = $event.offsetX < targetElement.clientWidth / 2;
 
     if (wordUncovered) {
-      if (upperHalf) {
-        this.coverWord();
-      } else {
-        if (leftHalf) {
-          if (this.lefthandMode) {
-            this.solveCorrect();
-          } else {
-            this.solveWrong();
-          }
+      if (leftHalf) {
+        if (this.lefthandMode) {
+          this.solveCorrect();
         } else {
-          if (this.lefthandMode) {
-            this.solveWrong();
-          } else {
-            this.solveCorrect();
-          }
+          this.solveWrong();
+        }
+      } else {
+        if (this.lefthandMode) {
+          this.solveWrong();
+        } else {
+          this.solveCorrect();
         }
       }
     } else {

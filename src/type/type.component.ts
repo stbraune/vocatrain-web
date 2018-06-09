@@ -261,7 +261,7 @@ export class TypeComponent implements OnInit {
     const wordCovered = this.game.wordState.state === 'covered';
     const wordUncovered = this.game.wordState.state === 'uncovered';
 
-    if (!gameStarted) {
+    if (!gameStarted || !wordUncovered) {
       return;
     }
 
@@ -269,24 +269,22 @@ export class TypeComponent implements OnInit {
     const upperHalf = $event.offsetY < targetElement.clientHeight / 2;
     const leftHalf = $event.offsetX < targetElement.clientWidth / 2;
 
-    if (wordUncovered) {
-      if (this.answerState === 'partially-correct') {
-        if (leftHalf) {
-          if (this.lefthandMode) {
-            this.solveCorrect();
-          } else {
-            this.solveWrong();
-          }
+    if (this.answerState === 'partially-correct') {
+      if (leftHalf) {
+        if (this.lefthandMode) {
+          this.solveCorrect();
         } else {
-          if (this.lefthandMode) {
-            this.solveWrong();
-          } else {
-            this.solveCorrect();
-          }
+          this.solveWrong();
         }
-      } else if (this.answerState === 'totally-wrong') {
-        this.solveWrong();
+      } else {
+        if (this.lefthandMode) {
+          this.solveWrong();
+        } else {
+          this.solveCorrect();
+        }
       }
+    } else if (this.answerState === 'totally-wrong') {
+      this.solveWrong();
     }
   }
 

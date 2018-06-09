@@ -1,6 +1,7 @@
 {
   "app": {
     "title": "VocaTrain",
+    "toggle-lefthand-mode": "Linkshändermodus wechseln",
     "sync-failed": "Verbindung verloren.",
     "sync-broken": "Synchronisation fehlgeschlagen. Gehe offline...",
     "sync-broken-ok": "Ok"
