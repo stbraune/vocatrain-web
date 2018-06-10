@@ -96,7 +96,8 @@
     "language": "Sprache",
     "tags": "Tags",
     "meta": "Hilfe",
-    "stop": "Aufhören"
+    "stop": "Aufhören",
+    "last-50-wrong-words": "Letzte 50 falsche Vokabeln"
   },
   "type": {
     "title": "Tippen",
@@ -122,7 +123,8 @@
     "tags": "Tags",
     "meta": "Hilfe",
     "stop": "Aufhören",
-    "answer": "Antwort"
+    "answer": "Antwort",
+    "last-50-wrong-words": "Letzte 50 falsche Vokabeln"
   },
   "watch": {
     "title": "Schauen",

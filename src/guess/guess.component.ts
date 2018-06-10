@@ -17,7 +17,10 @@ import {
   LoadingIndicatorService,
   observeLoading,
   startLoading,
-  finishLoading
+  finishLoading,
+  WordEntity,
+  WordTypeEntityService,
+  WordTypeEntity
 } from '../shared';
 
 @Component({
@@ -58,10 +61,14 @@ export class GuessComponent implements OnInit {
 
   public game: Game;
 
+  public wrongWords: WordEntity[] = [];
+  public wordTypeEntities: WordTypeEntity[] = [];
+
   public constructor(
     private loadingIndicatorService: LoadingIndicatorService,
     private settingsService: SettingsService,
     private gameService: GameService,
+    private wordTypeEntityService: WordTypeEntityService,
     private dateFormatService: DateFormatService,
     private snackBar: MatSnackBar
   ) {
@@ -88,9 +95,22 @@ export class GuessComponent implements OnInit {
       this.searchOptions.searchLevelMaximum = maxLevel;
     });
 
+    this.loadWordTypeEntities();
+    this.gameService.getWrongWords('guess', { limit: 50 }).subscribe((wrongWords) => {
+      this.wrongWords = wrongWords;
+    });
+
     window.addEventListener('keydown', (event: KeyboardEvent) => {
       this.onKeyDown(event);
     }, false);
+  }
+
+  private loadWordTypeEntities() {
+    this.wordTypeEntityService.getWordTypeEntities().pipe(observeLoading()).subscribe((wordTypeEntities) => {
+      this.wordTypeEntities = wordTypeEntities;
+    }, (error) => {
+      console.error(error);
+    });
   }
 
   public startGame() {

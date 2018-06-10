@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { throwError, Observable, of, Subject, pipe, BehaviorSubject } from 'rxjs';
 import { map, switchMap, catchError, tap, filter } from 'rxjs/operators';
 
-import { Database } from '../database';
+import { Database, DatabaseRunQueryOptions } from '../database';
 import { SearchOptions } from '../search-options';
 import { SearchResult, SearchResultKey } from '../search-result';
 import { WordEntityService, WordEntity } from '../words';
@@ -559,6 +559,31 @@ export class GameService {
       }
     }).pipe(
       map((result) => result.rows.length > 0 ? result.rows[0].value : 0)
+    );
+  }
+
+  public getWrongWords(mode: string, options?: Partial<DatabaseRunQueryOptions<Date>>): Observable<WordEntity[]> {
+    return this.db.executeQuery<Date>(Object.assign({
+      designDocument: 'words',
+      viewName: `wrong-words-${mode}`,
+      mapFunction(emit) {
+        return `function (doc) {
+          if (doc._id.substring(0, 'word_'.length) === 'word_') {
+            const mode = '${mode}';
+            doc.texts.forEach(function (text) {
+              Object.keys(text.words).forEach(function (lang) {
+                if (text.words[lang].games && text.words[lang].games[mode] && text.words[lang].games[mode].level === 0) {
+                  emit(text.words[lang].games[mode].date);
+                }
+              });
+            });
+          }
+        }`;
+      },
+      include_docs: true,
+      descending: true
+    }, options)).pipe(
+      map((result) => result.rows.map((row) => row.doc))
     );
   }
 }

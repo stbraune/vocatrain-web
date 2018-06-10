@@ -96,7 +96,8 @@
     "language": "Language",
     "tags": "Tags",
     "meta": "Help",
-    "stop": "Stop"
+    "stop": "Stop",
+    "last-50-wrong-words": "Last 50 wrong words"
   },
   "type": {
     "title": "Type",
@@ -122,7 +123,8 @@
     "tags": "Tags",
     "meta": "Help",
     "stop": "Stop",
-    "answer": "Answer"
+    "answer": "Answer",
+    "last-50-wrong-words": "Last 50 wrong words"
   },
   "watch": {
     "title": "Watch",

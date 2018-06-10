@@ -131,7 +131,7 @@
   </mat-card-actions>
 </mat-card>
 
-<mat-card *ngIf="game && game.gameState.state === 'stopped'">
+<mat-card *ngIf="game && game.gameState.state === 'stopped'" class="margin--bottom">
   <mat-card-title>
     {{'guess.finished' | translate}}
   </mat-card-title>
@@ -155,3 +155,12 @@
     </p>
   </mat-card-content>
 </mat-card>
+
+<h3>{{'guess.last-50-wrong-words' | translate}}</h3>
+<ul class="ul--nostyle">
+  <words-editor
+    [wordEntities]="wrongWords"
+    [wordTypeEntities]="wordTypeEntities"
+    [supportedLanguages]="supportedLanguages">
+  </words-editor>
+</ul>
