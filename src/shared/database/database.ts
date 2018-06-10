@@ -24,6 +24,7 @@ import { DatabaseExecuteFulltextQueryOptions } from './database-execute-fulltext
 import { DatabaseFulltextQueryResult } from './database-fulltext-query-result';
 
 import { any, sanitize, clone } from './utils';
+import { DatabaseRunQuickSearchQueryOptions, DatabaseQuickSearchQueryResult } from '.';
 
 export class Database<TEntity extends DatabaseEntity> {
   public entitySaved = new EventEmitter<TEntity>();
@@ -249,6 +250,12 @@ export class Database<TEntity extends DatabaseEntity> {
           })
           : result)
       );
+  }
+
+  public executeQuickSearch(
+    options: DatabaseRunQuickSearchQueryOptions<TEntity>
+  ): Observable<DatabaseQuickSearchQueryResult<TEntity>> {
+    return from(this._database.search(options));
   }
 
   public executeFulltextQuery(

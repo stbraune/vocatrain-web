@@ -9,13 +9,15 @@ import PouchDBAdapterHttp from 'pouchdb-adapter-http';
 import PouchDBMapReduce from 'pouchdb-mapreduce';
 import PouchDBReplication from 'pouchdb-replication';
 import PouchDBFind from 'pouchdb-find';
+import PouchDBQuickSearch from 'pouchdb-quick-search';
 
 PouchDB
   .plugin(PouchDBAdapterIdb)
   .plugin(PouchDBAdapterHttp)
   .plugin(PouchDBMapReduce)
   .plugin(PouchDBReplication)
-  .plugin(PouchDBFind);
+  .plugin(PouchDBFind)
+  .plugin(PouchDBQuickSearch);
 
 import { DatabaseEntity } from './database-entity';
 import { Database } from './database';

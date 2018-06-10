@@ -13,6 +13,9 @@ export * from './database-run-fulltext-query-options';
 export * from './database-execute-fulltext-query-options';
 export * from './database-fulltext-query-result';
 
+export * from './database-run-quick-search-query-options';
+export * from './database-quick-search-query-result';
+
 export * from './database-options';
 export * from './database';
 export * from './database.service';

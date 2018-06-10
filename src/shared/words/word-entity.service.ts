@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Observable, pipe, forkJoin } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, tap, catchError } from 'rxjs/operators';
 
 import * as uuidv4 from 'uuid/v4';
 
@@ -201,7 +201,10 @@ export class WordEntityService {
 
   public getWordEntitiesFields(): Observable<string[]> {
     return this.searchWordEntities().pipe(
-      map((result) => result.fields.reduce((prev, cur) => prev.indexOf(cur) === -1 ? [...prev, cur] : prev, []))
+      map((result) => (<DatabaseFulltextQueryResult<WordEntity>>result).fields
+        ? (<DatabaseFulltextQueryResult<WordEntity>>result).fields
+          .reduce((prev, cur) => prev.indexOf(cur) === -1 ? [...prev, cur] : prev, [])
+        : [])
     );
   }
 
@@ -236,7 +239,14 @@ export class WordEntityService {
           }
         }`;
       }
-    }, options));
+    }, options)).pipe(
+      catchError((error) => this.db.executeQuickSearch({
+        query: options.q,
+        skip: options.skip,
+        limit: options.limit,
+        fields: ['type.title', 'texts[].meta', 'texts[].tags', 'texts[].words[].value']
+      }))
+    );
   }
 
   public putWordEntity(wordEntity: WordEntity): Observable<WordEntity> {
