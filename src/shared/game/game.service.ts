@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { throwError, Observable, of, Subject, pipe, BehaviorSubject } from 'rxjs';
+import { throwError, Observable, of, Subject, pipe, BehaviorSubject, Subscription } from 'rxjs';
 import { map, switchMap, catchError, tap, filter } from 'rxjs/operators';
 
 import { Database, DatabaseRunQueryOptions } from '../database';
@@ -15,6 +15,8 @@ import { WordState } from './word-state';
 @Injectable()
 export class GameService {
   private db: Database<WordEntity>;
+
+  private nextWordSubscription: Subscription;
 
   public constructor(
     private wordEntityService: WordEntityService,
@@ -108,23 +110,33 @@ export class GameService {
 
   private nextWordInternal(game: Game) {
     const preloadWord = () => {
-      if (!game.nextWord && !game.searchOptions.searchLevelEnabled) {
-        this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 1, skip: 1 })).subscribe((nextSearchResults) => {
-          if (!game.nextWord) {
+      if (!game.searchOptions.searchLevelEnabled) {
+        console.log('preloading next word, current is', game.word, game.nextWord);
+        if (this.nextWordSubscription) {
+          this.nextWordSubscription.unsubscribe();
+          this.nextWordSubscription = undefined;
+        }
+
+        this.nextWordSubscription = this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 1, skip: 1 }))
+          .subscribe((nextSearchResults) => {
             game.nextWord = nextSearchResults[0];
-          }
-        });
+            console.log('preloaded next word, current is', game.word, game.nextWord);
+          });
       }
     };
 
     if (game.nextWord) {
       const nextWord = game.nextWord;
       game.nextWord = undefined;
-      return of([nextWord]).pipe(tap(() => preloadWord()));
+      console.log('returning next word');
+      return of([nextWord]).pipe(
+        tap(() => preloadWord())
+      );
     }
 
+    console.log('loading new word');
     return this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 1 })).pipe(
-      tap((searchResult) => preloadWord())
+      tap(() => preloadWord())
     );
   }
 

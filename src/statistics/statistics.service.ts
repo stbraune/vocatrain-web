@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Database, GameLogEntity, GameLogEntityService } from '../shared';
 import { WordEntityService, WordEntity } from '../shared';
 
-import { Observable, pipe, zip } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable, pipe, zip, of, ReplaySubject, forkJoin } from 'rxjs';
+import { map, switchMap, tap } from 'rxjs/operators';
 
 declare const sum: any;
 
@@ -11,6 +11,9 @@ declare const sum: any;
 export class StatisticsService {
   private wordEntityDatabase: Database<WordEntity>;
   private gameLogDatabase: Database<GameLogEntity>;
+
+  private _languages: ReplaySubject<string[]>;
+  private _modes: ReplaySubject<string[]>;
 
   public constructor(
     private wordEntityService: WordEntityService,
@@ -39,22 +42,25 @@ export class StatisticsService {
       group_level: 2
     })).pipe(
       map((result) => {
-        const minDate = result.map((r) => new Date(<string>r.key[1]))
-          .reduce((prev, cur) => prev.getTime() === 0 || prev.getTime() > cur.getTime() ? cur : prev, new Date(0));
-        const maxDate = result.map((r) => new Date(<string>r.key[1]))
-          .reduce((prev, cur) => prev.getTime() === 0 || prev.getTime() < cur.getTime() ? cur : prev, new Date(0));
+        // const minDate = result.map((r) => new Date(<string>r.key[1]))
+        //   .reduce((prev, cur) => prev.getTime() === 0 || prev.getTime() > cur.getTime() ? cur : prev, new Date(0));
+        // const maxDate = result.map((r) => new Date(<string>r.key[1]))
+        //   .reduce((prev, cur) => prev.getTime() === 0 || prev.getTime() < cur.getTime() ? cur : prev, new Date(0));
+        const minDate = options.startDate;
+        const maxDate = options.endDate;
         const anyKey = result[0];
         if (!anyKey) {
           return result;
         }
 
+        const filledResult = [];
         while (minDate.getTime() < maxDate.getTime()) {
-          if (!result.find((r) => r.key[1] === minDate.toISOString())) {
-            const oneDayLess = new Date(minDate.getTime());
-            oneDayLess.setDate(oneDayLess.getDate() - 1);
-            const index = result.findIndex((r) => r.key[1] === oneDayLess.toISOString());
+          // if (!result.find((r) => r.key[1] === minDate.toISOString())) {
+            // const oneDayLess = new Date(minDate.getTime());
+            // oneDayLess.setDate(oneDayLess.getDate() - 1);
+            const index = result.findIndex((r) => r.key[1] === minDate.toISOString());
             if (index === -1) {
-              result.push({
+              filledResult.push({
                 key: [options.mode, minDate.toISOString()],
                 value: {
                   durationInMillis: 0,
@@ -64,21 +70,22 @@ export class StatisticsService {
                 }
               });
             } else {
-              result.splice(index + 1, 0, {
-                key: [options.mode, minDate.toISOString()],
-                value: {
-                  durationInMillis: 0,
-                  countCorrect: 0,
-                  countWrong: 0,
-                  countTotal: 0
-                }
-              });
+              filledResult.push(result[index]);
+              // result.splice(index + 1, 0, {
+              //   key: [options.mode, minDate.toISOString()],
+              //   value: {
+              //     durationInMillis: 0,
+              //     countCorrect: 0,
+              //     countWrong: 0,
+              //     countTotal: 0
+              //   }
+              // });
             }
-          }
+          // }
 
           minDate.setDate(minDate.getDate() + 1);
         }
-        return result;
+        return filledResult;
       })
     );
   }
@@ -183,58 +190,61 @@ export class StatisticsService {
   public queryWordsPerLevel(options: {
     mode: string
   }) {
-    return zip(this.queryAllGameModes(), this.queryAllLanguages()).pipe(
+    return forkJoin(this.queryAllGameModes(), this.queryAllLanguages()).pipe(
       switchMap(([modes, langs]) => this.wordEntityDatabase.executeQuery<
-        [string, string, number],
+        [string, number],
         number,
         number
         >({
           designDocument: 'word-stats',
-          viewName: 'words-per-level',
+          viewName: `words-per-level-${options.mode}`,
           mapFunction(emit) {
             return `function (doc) {
               if (doc._id.substr(0, 'word_'.length) === 'word_') {
-                const modes = ${JSON.stringify(modes)};
-                const langs = ${JSON.stringify(langs)};
+                const mode = '${options.mode}';
+                const langs = ${JSON.stringify(langs.sort())};
                 doc.texts.forEach(function (text) {
                   langs.forEach(function (lang) {
-                    modes.forEach(function (mode) {
-                      emit([mode, lang, (text && text.words && text.words[lang] && text.words[lang].games
-                        && text.words[lang].games[mode] && text.words[lang].games[mode].level) || 0]);
-                    });
+                    emit([
+                      lang,
+                      (
+                        text &&
+                        text.words &&
+                        text.words[lang] &&
+                        text.words[lang].games &&
+                        text.words[lang].games[mode] &&
+                        text.words[lang].games[mode].level
+                      ) || 0]);
                   });
                 });
               }
             }`;
           },
           reduceFunction: () => '_count',
-          group: true,
-          startkey: [options.mode, undefined, undefined],
-          endkey: [options.mode, `\uffff`, Number.MAX_VALUE]
+          group: true
         })),
       map((result) => {
-        const keysWithoutLevel = result.rows.map((row) => <[string, string]>[row.key[0], row.key[1]])
-          .reduce((prev, cur) => prev.findIndex((x) => x[0] === cur[0] && x[1] === cur[1]) === -1 ? [...prev, cur] : prev,
-            <[string, string][]>[]);
-        const groups = keysWithoutLevel.map((keyWithoutLevel) => ({
-          key: keyWithoutLevel,
-          rows: result.rows.filter((row) => row.key[0] === keyWithoutLevel[0] && row.key[1] === keyWithoutLevel[1])
+        const langs = result.rows.map((row) => row.key[0])
+          .reduce((prev, cur) => prev.findIndex((x) => x === cur) === -1 ? [...prev, cur] : prev, <string[]>[]);
+        const groups = langs.map((lang) => ({
+          key: lang,
+          rows: result.rows.filter((row) => row.key[0] === lang)
         }));
         groups.forEach((group) => {
-          const minLevel = group.rows.map((row) => row.key[2]).reduce((prev, cur) => prev === -1 || prev > cur ? cur : prev, -1);
-          const maxLevel = group.rows.map((row) => row.key[2]).reduce((prev, cur) => prev === -1 || prev < cur ? cur : prev, -1);
+          const minLevel = group.rows.map((row) => row.key[1]).reduce((prev, cur) => prev === -1 || prev > cur ? cur : prev, -1);
+          const maxLevel = group.rows.map((row) => row.key[1]).reduce((prev, cur) => prev === -1 || prev < cur ? cur : prev, -1);
           for (let level = minLevel; level <= maxLevel; level++) {
-            const row = group.rows.find((r) => r.key[0] === group.key[0] && r.key[1] === group.key[1] && r.key[2] === level);
+            const row = group.rows.find((r) => r.key[0] === group.key && r.key[1] === level);
             if (!row) {
-              const index = result.rows.findIndex((r) => r.key[0] === group.key[0] && r.key[1] === group.key[1] && r.key[2] === level - 1);
+              const index = result.rows.findIndex((r) => r.key[0] === group.key && r.key[1] === level - 1);
               if (index === -1) {
                 result.rows.push({
-                  key: [group.key[0], group.key[1], level],
+                  key: [group.key[0], level],
                   value: 0
                 });
               } else {
                 result.rows.splice(index + 1, 0, {
-                  key: [group.key[0], group.key[1], level],
+                  key: [group.key[0], level],
                   value: 0
                 });
               }
@@ -247,6 +257,11 @@ export class StatisticsService {
   }
 
   public queryAllGameModes(): Observable<string[]> {
+    if (this._modes) {
+      return this._modes;
+    }
+
+    this._modes = new ReplaySubject<string[]>(1);
     return this.wordEntityDatabase.executeQuery<string, undefined, number>({
       designDocument: 'game-modes',
       viewName: 'all',
@@ -270,11 +285,21 @@ export class StatisticsService {
       reduceFunction: () => '_count',
       group: true
     }).pipe(
-      map((result) => result.rows.map((row) => row.key))
+      map((result) => result.rows.map((row) => row.key)),
+      tap((result) => {
+        this._modes.next(result);
+        this._modes.complete();
+      }),
+      switchMap(() => this._modes)
     );
   }
 
   public queryAllLanguages(): Observable<string[]> {
+    if (this._languages) {
+      return this._languages;
+    }
+
+    this._languages = new ReplaySubject<string[]>(1);
     return this.wordEntityDatabase.executeQuery<string, undefined, number>({
       designDocument: 'languages',
       viewName: 'all',
@@ -294,7 +319,12 @@ export class StatisticsService {
       reduceFunction: () => '_count',
       group: true
     }).pipe(
-      map((result) => result.rows.map((row) => row.key))
+      map((result) => result.rows.map((row) => row.key)),
+      tap((result) => {
+        this._languages.next(result);
+        this._languages.complete();
+      }),
+      switchMap(() => this._languages)
     );
   }
 }

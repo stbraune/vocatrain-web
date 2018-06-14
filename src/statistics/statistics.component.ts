@@ -4,12 +4,15 @@ import { DatePipe } from '@angular/common';
 import { TranslateService } from '@ngx-translate/core';
 import { ColorHelper } from '@swimlane/ngx-charts';
 
-import { GameLogEntity, LoadingIndicatorService } from '../shared';
+import { concat, forkJoin, throwError, from } from 'rxjs';
+import { tap, switchMap, catchError, map } from 'rxjs/operators';
+
+import { GameLogEntity, LoadingIndicatorService, startLoading, finishLoading, observeLoading } from '../shared';
 import { StatisticsService } from './statistics.service';
 
 declare interface WordsPerLevel {
-  // [mode, lang]
-  key: [string, string];
+  // lang
+  key: string;
   value: {
     // level
     name: string,
@@ -33,35 +36,31 @@ declare interface WordsPerDay {
   }[];
 }
 
+declare interface Totals {
+  key: [string, Date | string];
+  value: {
+    durationInMillis: number,
+    countCorrect: number
+    countWrong: number
+    countTotal: number
+  };
+}
+
 @Component({
   selector: 'statistics',
   templateUrl: './statistics.component.html',
   styleUrls: ['./statistics.component.scss']
 })
 export class StatisticsComponent implements OnInit {
-  public totalsOverall: {
-    key: [string, Date | string],
-    value: {
-      durationInMillis: number,
-      countCorrect: number
-      countWrong: number
-      countTotal: number
+  public modes: string[] = [];
+  public stats: {
+    [mode: string]: {
+      overall?: Totals[],
+      last30?: Totals[],
+      wordsPerLevels?: WordsPerLevel[],
+      wordsPerDays?: WordsPerDay[]
     }
-  }[] = [];
-
-  public totalsLast30: {
-    key: [string, Date | string],
-    value: {
-      durationInMillis: number,
-      countCorrect: number
-      countWrong: number
-      countTotal: number
-    }
-  }[] = [];
-
-  public wordsPerLevels: WordsPerLevel[] = [];
-
-  public wordsPerDays: WordsPerDay[] = [];
+  } = {};
 
   public constructor(
     private loadingIndicatorService: LoadingIndicatorService,
@@ -71,129 +70,120 @@ export class StatisticsComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.loadingIndicatorService.notifyLoading();
-    this.statisticsService.queryAllGameModes().subscribe((gameModes) => {
-      this.loadingIndicatorService.notifyFinished();
-      gameModes.forEach((mode) => {
-        this.loadStatistics(mode);
-      });
-    }, (error) => {
-      this.loadingIndicatorService.notifyFinished();
-      console.error(error);
+    this.statisticsService.queryAllGameModes().pipe(
+      startLoading(),
+      tap((modes) => this.modes = modes),
+      tap((modes) => modes.forEach((mode) => this.stats[mode] = {
+        overall: [],
+        last30: [],
+        wordsPerDays: [],
+        wordsPerLevels: []
+      })),
+      finishLoading()
+    ).subscribe((modes) => {
+      concat(...modes.map((mode) => this.loadStatistics(mode).pipe(observeLoading()))).subscribe();
     });
   }
 
   private loadStatistics(mode: string) {
-    this.loadTotals(mode);
-    this.loadLast30DaysTotals(mode);
-    this.loadWordsPerLevel(mode);
-    this.loadTotalsPerDay(mode);
+    return forkJoin(
+      this.loadTotals(mode),
+      this.loadLast30DaysTotals(mode),
+      this.loadTotalsPerDay(mode),
+      this.loadWordsPerLevel(mode),
+    );
   }
 
   private loadTotals(mode: string) {
-    this.loadingIndicatorService.notifyLoading();
-    this.statisticsService.getTotals({ mode: mode }).subscribe((result) => {
-      this.loadingIndicatorService.notifyFinished();
-      this.totalsOverall.push(...result);
-    }, (error) => {
-      this.loadingIndicatorService.notifyFinished();
-      console.error(error);
-    });
+    return this.statisticsService.getTotals({ mode: mode }).pipe(
+      tap((result) => this.stats[mode].overall.push(...result))
+    );
   }
 
   private loadLast30DaysTotals(mode: string) {
     const now = new Date();
     const then = new Date(now);
     then.setDate(then.getDate() - 30);
-    this.loadingIndicatorService.notifyLoading();
-    this.statisticsService.getTotals({ mode: mode, startDate: then, endDate: now }).subscribe((result) => {
-      this.loadingIndicatorService.notifyFinished();
-      this.totalsLast30.push(...result);
-    }, (error) => {
-      this.loadingIndicatorService.notifyFinished();
-      console.error(error);
-    });
+    return this.statisticsService.getTotals({ mode: mode, startDate: then, endDate: now }).pipe(
+      tap((result) => this.stats[mode].last30.push(...result))
+    );
   }
 
   private loadWordsPerLevel(mode: string) {
-    this.translateService.get('statistics.level').subscribe((level) => {
-      this.loadingIndicatorService.notifyLoading();
-      this.statisticsService.queryWordsPerLevel({ mode: mode }).subscribe((result) => {
-        this.wordsPerLevels.push(...result.rows
-          .map((row) => ({
-            key: <[string, string]>[row.key[0], row.key[1]],
+    return this.statisticsService.queryWordsPerLevel({ mode: mode }).pipe(
+      switchMap((result) => this.translateService.get('statistics.level').pipe(map((level) => ([level, result])))),
+      tap(([level, result]) => this.stats[mode].wordsPerLevels.push(...result.rows
+        .map((row) => ({
+          key: row.key[0],
+          value: [
+            {
+              name: level + row.key[1],
+              value: row.value
+            }
+          ]
+        }))
+        .reduce((prev, cur) => {
+          const index = prev.findIndex((x) => x.key === cur.key);
+          if (index !== -1) {
+            prev[index].value.push(...cur.value);
+          } else {
+            prev.push(cur);
+          }
+          return prev;
+        }, <WordsPerLevel[]>[])))
+    );
+  }
+
+  private loadTotalsPerDay(mode: string) {
+    const now = new Date();
+    now.setUTCMilliseconds(0);
+    now.setUTCSeconds(0);
+    now.setUTCMinutes(0);
+    now.setUTCHours(0);
+    const then = new Date(now);
+    then.setDate(then.getDate() - 7);
+
+    return forkJoin(
+      this.translateService.get(['statistics.date-format', 'statistics.correct', 'statistics.wrong', 'statistics.total']),
+      this.statisticsService.getTotalsPerDay({ mode: mode, startDate: then, endDate: now })
+    ).pipe(
+      tap(([texts, result]) => {
+        const dateFormatString = texts['statistics.date-format'];
+        const correct = texts['statistics.correct'];
+        const wrong = texts['statistics.wrong'];
+        const total = texts['statistics.total'];
+        this.stats[mode].wordsPerDays.push(...result
+          .map((r) => ({
+            key: r.key[0],
             value: [
               {
-                name: level + row.key[2],
-                value: row.value
+                name: this.formatDateShort(new Date(<string>r.key[1]), dateFormatString)
+                  + ` (${Math.round(r.value.durationInMillis / 60000)}m)`,
+                series: [
+                  {
+                    name: correct,
+                    value: r.value.countCorrect
+                  },
+                  {
+                    name: wrong,
+                    value: r.value.countWrong
+                  }
+                ]
               }
             ]
           }))
           .reduce((prev, cur) => {
-            const index = prev.findIndex((x) => x.key[0] === cur.key[0] && x.key[1] === cur.key[1]);
+            const index = prev.findIndex((x) => x.key === cur.key);
             if (index !== -1) {
               prev[index].value.push(...cur.value);
             } else {
               prev.push(cur);
             }
             return prev;
-          }, <WordsPerLevel[]>[]));
-        this.loadingIndicatorService.notifyFinished();
-      }, (error) => {
-        this.loadingIndicatorService.notifyFinished();
-        console.error(error);
-      });
-    });
-  }
-
-  private loadTotalsPerDay(mode: string) {
-    const now = new Date();
-    const then = new Date(now);
-    then.setDate(then.getDate() - 7);
-    this.translateService.get(['statistics.date-format', 'statistics.correct', 'statistics.wrong', 'statistics.total'])
-      .subscribe((texts) => {
-        this.loadingIndicatorService.notifyLoading();
-        const dateFormatString = texts['statistics.date-format'];
-        const correct = texts['statistics.correct'];
-        const wrong = texts['statistics.wrong'];
-        const total = texts['statistics.total'];
-        this.statisticsService.getTotalsPerDay({ mode: mode, startDate: then, endDate: now }).subscribe((result) => {
-          this.wordsPerDays.push(...result
-            .map((r) => ({
-              key: r.key[0],
-              value: [
-                {
-                  name: this.formatDateShort(new Date(<string>r.key[1]), dateFormatString)
-                    + ` (${Math.round(r.value.durationInMillis / 60000)}m)`,
-                  series: [
-                    {
-                      name: correct,
-                      value: r.value.countCorrect
-                    },
-                    {
-                      name: wrong,
-                      value: r.value.countWrong
-                    }
-                  ]
-                }
-              ]
-            }))
-            .reduce((prev, cur) => {
-              const index = prev.findIndex((x) => x.key === cur.key);
-              if (index !== -1) {
-                prev[index].value.push(...cur.value);
-              } else {
-                prev.push(cur);
-              }
-              return prev;
-            }, <WordsPerDay[]>[])
-          );
-          this.loadingIndicatorService.notifyFinished();
-        }, (error) => {
-          this.loadingIndicatorService.notifyFinished();
-          console.error(error);
-        });
-      });
+          }, <WordsPerDay[]>[])
+        );
+      })
+    );
   }
 
   public percent(a, b) {
