@@ -135,6 +135,7 @@ export class DatabaseService {
 
   public disableSyncing(): Observable<any> {
     if (this._sync) {
+      this.databaseSubject.next(this.getLocalDatabase());
       this._sync.cancel();
       this._sync = undefined;
     }
