@@ -1,17 +1,14 @@
-<h3 class="sm-hide">
-  {{'statistics.title' | translate}}
-</h3>
-
 <ng-container *ngFor="let mode of modes">
+  <h3>{{('statistics.mode.' + mode) | translate}}</h3>
   <div class="flex">
     <mat-card class="flex-col flex-col--1 margin--bottom">
       <mat-card-title>
         {{'statistics.totals' | translate}}
       </mat-card-title>
       <ng-container *ngFor="let total of stats[mode].overall">
-        <mat-card-subtitle>
+        <!-- <mat-card-subtitle>
           {{('statistics.mode.' + total.key[0]) | translate}}
-        </mat-card-subtitle>
+        </mat-card-subtitle> -->
         <mat-card-content>
           <p class="flex flex--row">
             <em class="flex-col flex-col--1">{{'statistics.total-duration' | translate}}</em>
@@ -42,9 +39,9 @@
         {{'statistics.last30' | translate}}
       </mat-card-title>
       <ng-container *ngFor="let total of stats[mode].last30">
-        <mat-card-subtitle>
+        <!-- <mat-card-subtitle>
           {{('statistics.mode.' + total.key[0]) | translate}}
-        </mat-card-subtitle>
+        </mat-card-subtitle> -->
         <mat-card-content>
           <p class="flex flex--row">
             <em class="flex-col flex-col--1">{{'statistics.total-duration' | translate}}</em>
@@ -76,8 +73,11 @@
       <mat-card-title>
         {{'statistics.words-per-level' | translate}}
       </mat-card-title>
-      <mat-card-subtitle>
+      <!-- <mat-card-subtitle>
         {{('statistics.mode.' + mode) | translate}}, {{'statistics.to' | translate}} {{wordsPerLevel.key | translate}}
+      </mat-card-subtitle> -->
+      <mat-card-subtitle>
+        {{'statistics.to' | translate}} {{wordsPerLevel.key | translate}}
       </mat-card-subtitle>
       <mat-card-content>
         <div style="display: block; overflow: auto;">
@@ -96,9 +96,9 @@
     <mat-card-title>
       {{'statistics.words-per-day' | translate}}
     </mat-card-title>
-    <mat-card-subtitle>
+    <!-- <mat-card-subtitle>
       {{('statistics.mode.' + wordsPerDay.key) | translate}}
-    </mat-card-subtitle>
+    </mat-card-subtitle> -->
     <mat-card-content>
       <div style="display: block; overflow: auto;">
         <ngx-charts-bar-vertical-stacked #wordsPerDayChart

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
 import PouchDB from 'pouchdb-core';
 import PouchDBAdapterIdb from 'pouchdb-adapter-idb';
@@ -39,6 +39,8 @@ export class DatabaseService {
 
   public databaseOpened = new Subject<Database<DatabaseEntity>>();
 
+  private databaseSubject = new BehaviorSubject<any>(undefined);
+
   public constructor(
     private httpClient: HttpClient,
     private settingsService: SettingsService
@@ -52,9 +54,13 @@ export class DatabaseService {
     // for going directly onto couchdb-lucene instance
     // options.couchLuceneUrl = options.couchLuceneUrl || 'http://localhost:5985/local';
     // for using the couchdb proxy handler
+    if (this.databaseSubject.getValue() === undefined) {
+      this.databaseSubject.next(this.getLocalDatabase());
+    }
+
     options.couchLuceneUrl = options.couchLuceneUrl || `${this._settings.fti.couchDbLuceneUrl}/${this._settings.fti.databaseName}`;
     options.debugging = true;
-    const database = new Database<T>(this.getLocalDatabase(), options, this.httpClient);
+    const database = new Database<T>(this.databaseSubject, options, this.httpClient);
     this.databaseOpened.next(database);
     return database;
   }
@@ -93,26 +99,31 @@ export class DatabaseService {
       live: true
     });
     this._sync.on('change', (change) => {
+      this.databaseSubject.next(this.getRemoteDatabase());
       this.synchronizationSubject.next({
         type: 'change',
         change: change
       });
     }).on('paused', (info) => {
+      this.databaseSubject.next(this.getRemoteDatabase());
       this.synchronizationSubject.next({
         type: 'paused',
         info: info
       });
     }).on('active', (info) => {
+      this.databaseSubject.next(this.getRemoteDatabase());
       this.synchronizationSubject.next({
         type: 'active',
         info: info
       });
     }).on('complete', (info) => {
+      this.databaseSubject.next(this.getRemoteDatabase());
       this.synchronizationSubject.next({
         type: 'complete',
         info: info
       });
     }).on('error', (error) => {
+      this.databaseSubject.next(this.getLocalDatabase());
       this.synchronizationSubject.next({
         type: 'error',
         error: error

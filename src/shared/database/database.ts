@@ -2,7 +2,7 @@
 import { EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable, from, of, throwError, forkJoin } from 'rxjs';
+import { Observable, from, of, throwError, forkJoin, BehaviorSubject } from 'rxjs';
 import { tap, map, switchMap, catchError } from 'rxjs/operators';
 
 import * as uuidv4 from 'uuid/v4';
@@ -29,8 +29,12 @@ export class Database<TEntity extends DatabaseEntity> {
   public entitySaved = new EventEmitter<TEntity>();
   public entityRemoved = new EventEmitter<TEntity>();
 
+  private get _database() {
+    return this._databaseSubject.getValue();
+  }
+
   public constructor(
-    private _database: any,
+    private _databaseSubject: BehaviorSubject<any>,
     private _options: DatabaseOptions<TEntity>,
     private _httpClient: HttpClient
   ) {
