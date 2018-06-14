@@ -54,7 +54,7 @@ export class StatisticsService {
         }
 
         const filledResult = [];
-        while (minDate.getTime() < maxDate.getTime()) {
+        while (minDate.getTime() <= maxDate.getTime()) {
           // if (!result.find((r) => r.key[1] === minDate.toISOString())) {
             // const oneDayLess = new Date(minDate.getTime());
             // oneDayLess.setDate(oneDayLess.getDate() - 1);
