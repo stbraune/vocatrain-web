@@ -117,9 +117,9 @@ export class GameService {
           this.nextWordSubscription = undefined;
         }
 
-        this.nextWordSubscription = this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 1, skip: 1 }))
+        this.nextWordSubscription = this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 2, skip: 1 }))
           .subscribe((nextSearchResults) => {
-            game.nextWord = nextSearchResults[0];
+            game.nextWord = nextSearchResults.find((nextSearchResult) => (game.word && game.word.id) !== nextSearchResult.id);
             console.log('preloaded next word, current is', game.word, game.nextWord);
           });
       }
