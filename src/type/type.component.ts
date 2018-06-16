@@ -336,6 +336,7 @@ export class TypeComponent implements OnInit {
   }
 
   public solveWrong() {
+    this.wrongWords.unshift(this.game.word.doc);
     this.gameService.solveWordWrong(this.game).pipe(
       observeLoading(),
       tap((game) => this.answerState = 'wrong')
