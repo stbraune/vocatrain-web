@@ -81,7 +81,22 @@ export class StatisticsComponent implements OnInit {
       })),
       finishLoading()
     ).subscribe((modes) => {
-      concat(...modes.map((mode) => this.loadStatistics(mode).pipe(observeLoading()))).subscribe();
+      concat(...modes.map((mode) => this.loadStatistics(mode).pipe(observeLoading())))
+        .subscribe(() => {
+          this.modes.sort((a, b) => {
+            const aDuration = this.stats[a].last30.reduce((prev, cur) => prev + cur.value.durationInMillis, 0);
+            const bDuration = this.stats[b].last30.reduce((prev, cur) => prev + cur.value.durationInMillis, 0);
+            if (aDuration > bDuration) {
+              return -1;
+            }
+
+            if (aDuration < bDuration) {
+              return 1;
+            }
+
+            return 0;
+          });
+        });
     });
   }
 
