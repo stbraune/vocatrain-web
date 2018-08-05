@@ -11,6 +11,7 @@ import { GameLogEntityService, GameLogEntity } from '../game-log';
 import { Game } from './game';
 import { GameState } from './game-state';
 import { WordState } from './word-state';
+import { preserveWhitespacesDefault } from '@angular/compiler';
 
 @Injectable()
 export class GameService {
@@ -108,35 +109,33 @@ export class GameService {
     return throwError(`Cannot get next word in a not started game`);
   }
 
-  private nextWordInternal(game: Game) {
-    const preloadWord = () => {
-      if (!game.searchOptions.searchLevelEnabled) {
-        console.log('preloading next word, current is', game.word, game.nextWord);
-        if (this.nextWordSubscription) {
-          this.nextWordSubscription.unsubscribe();
-          this.nextWordSubscription = undefined;
-        }
-
-        this.nextWordSubscription = this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 2, skip: 1 }))
-          .subscribe((nextSearchResults) => {
-            game.nextWord = nextSearchResults.find((nextSearchResult) => (game.word && game.word.id) !== nextSearchResult.id);
-            console.log('preloaded next word, current is', game.word, game.nextWord);
-          });
+  private nextWordInternal(game: Game): Observable<SearchResult[]> {
+    console.log('loading new word');
+    if (game.nextWords) {
+      const levels = game.nextWords.map((searchResult) => searchResult.key.answerLevel)
+        .reduce((prev, cur) => prev.indexOf(cur) === -1 ? prev.concat([cur]) : prev, [])
+        .sort()
+        .reverse();
+      if (levels.length === 0) {
+        return of([]);
       }
-    };
 
-    if (game.nextWord) {
-      const nextWord = game.nextWord;
-      game.nextWord = undefined;
-      console.log('returning next word');
-      return of([nextWord]).pipe(
-        tap(() => preloadWord())
-      );
+      const wordsByLevel = levels.map((level) => game.nextWords.filter((searchResult) => searchResult.key.answerLevel === level));
+      const nextWord = game.nextWords.find((searchResult) => searchResult.key.answerLevel === levels[0]);
+      if (!nextWord) {
+        return of([]);
+      }
+
+      const nextWordIndex = game.nextWords.indexOf(nextWord);
+      if (nextWordIndex !== -1) {
+        game.nextWords.splice(nextWordIndex, 1);
+      }
+      return of([nextWord]);
     }
 
-    console.log('loading new word');
-    return this.findWords(game.mode, Object.assign({}, game.searchOptions, { limit: 1 })).pipe(
-      tap(() => preloadWord())
+    return this.findWords(game.mode, game.searchOptions).pipe(
+      tap((searchResults) => game.nextWords = searchResults),
+      switchMap((searchResults) => this.nextWordInternal(game))
     );
   }
 
@@ -325,22 +324,10 @@ export class GameService {
   }
 
   public findWords(mode: string, options: SearchOptions): Observable<SearchResult[]> {
-    return this.findWordsInternal(mode, Object.assign({}, options, {
-      limit: options.searchLevelEnabled ? 100 : 1,
-      skip: options.searchLevelEnabled ? 0 : options.skip
-    })).pipe(
-      switchMap((words) => {
-        if (words.length === 0) {
-          return of(words);
-        }
-
-        const word = options.searchLevelEnabled
-          ? words.find((w) => options.searchLevelMinimum <= w.key.answerLevel && w.key.answerLevel <= options.searchLevelMaximum)
-          : words[0];
-        return word ? of([word]) : this.findWords(mode, Object.assign({}, options, {
-          reoccurAfter: words[words.length - 1].key.reoccurAt + '1'
-        }));
-      }),
+    return this.findWordsInternal(mode, options).pipe(
+      map((searchResults) => options.searchLevelEnabled
+        ? searchResults.filter((w) => options.searchLevelMinimum <= w.key.answerLevel && w.key.answerLevel <= options.searchLevelMaximum)
+        : searchResults),
       map((searchResults) => searchResults.map((searchResult) => Object.assign(searchResult, {
         key: Object.assign(searchResult.key, { answerAt: new Date(searchResult.key.answerAt) })
       })))
