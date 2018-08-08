@@ -112,7 +112,10 @@ export class GameService {
   private nextWordInternal(game: Game): Observable<SearchResult[]> {
     console.log('loading new word');
     if (game.nextWords) {
-      const levels = game.nextWords.map((searchResult) => searchResult.key.answerLevel)
+      const possibleWords = game.nextWords
+        .filter((searchResult) => new Date().getTime() - new Date(searchResult.key.reoccurAt as string).getTime() >= 0);
+      const levels = possibleWords
+        .map((searchResult) => searchResult.key.answerLevel)
         .reduce((prev, cur) => prev.indexOf(cur) === -1 ? prev.concat([cur]) : prev, [])
         .sort()
         .reverse();
@@ -120,8 +123,17 @@ export class GameService {
         return of([]);
       }
 
-      const wordsByLevel = levels.map((level) => game.nextWords.filter((searchResult) => searchResult.key.answerLevel === level));
-      const nextWord = game.nextWords.find((searchResult) => searchResult.key.answerLevel === levels[0]);
+      const levelsHigherThanNothing = possibleWords
+        .filter((searchResult) => searchResult.key.answerLevel >= 0)
+        .map((searchResult) => searchResult.key.answerLevel);
+      let nextWordLevel = levels[0];
+      if (levelsHigherThanNothing.length > 0) {
+        nextWordLevel = levelsHigherThanNothing[Math.max(Math.min(Math.round(Math.random() * (levelsHigherThanNothing.length - 1)),
+          levelsHigherThanNothing.length - 1), 0)];
+      }
+
+      const wordsByLevel = levels.map((level) => possibleWords.filter((searchResult) => searchResult.key.answerLevel === level));
+      const nextWord = possibleWords.find((searchResult) => searchResult.key.answerLevel === nextWordLevel);
       if (!nextWord) {
         return of([]);
       }
@@ -173,7 +185,12 @@ export class GameService {
         level: 0
       };
 
-      translatedWord.games[game.mode].level++;
+      if (game.word.key.answerLevel === -1) {
+        translatedWord.games[game.mode].level = 0;
+      } else {
+        translatedWord.games[game.mode].level++;
+      }
+
       translatedWord.games[game.mode].date = new Date();
 
       const saveWord = () => {
@@ -212,8 +229,15 @@ export class GameService {
         level: 0
       };
 
+      game.word.key.answerLevel = 0;
       translatedWord.games[game.mode].level = 0;
       translatedWord.games[game.mode].date = new Date();
+
+      if (game.nextWords && game.nextWords.indexOf(game.word) === -1) {
+        game.word.key.reoccurAt = new Date(game.word.key.reoccurAt as string);
+        game.word.key.reoccurAt.setSeconds(game.word.key.reoccurAt.getSeconds() + 30 + Math.random() * 90);
+        game.nextWords.push(game.word);
+      }
 
       const saveWord = () => {
         const observable = this.db.putEntity(game.word.doc).pipe(
@@ -390,11 +414,11 @@ export class GameService {
           }
 
           function getRequiredDistance(level, mod) {
-            return level % mod === 0 ? 0 : Math.pow(2, (level % mod) - 1);
+            return level === -1 || level % mod === 0 ? 0 : Math.pow(2, (level % mod) - 1);
           }
 
           function getRequiredLanguage(level, mod, sourceLanguage, targetLanguage) {
-            return level % (mod * 2) < mod ? sourceLanguage : targetLanguage;
+            return level === -1 || level % (mod * 2) < mod ? sourceLanguage : targetLanguage;
           }
 
           function assign(target, varArgs) { // .length of function is 2
@@ -441,7 +465,7 @@ export class GameService {
                   const createdAt = normalizeDate(new Date(doc.createdAt));
 
                   const answerHash = calculateHash(answerWord.value);
-                  const answerLevel = (answerWord.games && answerWord.games[mode] && answerWord.games[mode].level) || 0;
+                  const answerLevel = (answerWord.games && answerWord.games[mode] && answerWord.games[mode].level) || -1;
                   const answerThen = new Date((answerWord.games && answerWord.games[mode] && answerWord.games[mode].date)
                     || (new Date(doc.createdAt).getTime() + Math.abs(answerHash)));
 

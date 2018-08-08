@@ -42,7 +42,7 @@
       -
       <strong>{{'guess.current-level' | translate}}:</strong>
       <span *ngIf="game.word; else answerLevelUnknown">
-        {{game.word.key.answerLevel}}
+        {{(game.word.key.answerLevel === -1 ? '?' : game.word.key.answerLevel)}}
       </span>
       <ng-template #answerLevelUnknown>
         ?

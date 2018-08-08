@@ -205,16 +205,13 @@ export class StatisticsService {
                 const langs = ${JSON.stringify(langs.sort())};
                 doc.texts.forEach(function (text) {
                   langs.forEach(function (lang) {
-                    emit([
-                      lang,
-                      (
-                        text &&
-                        text.words &&
-                        text.words[lang] &&
-                        text.words[lang].games &&
-                        text.words[lang].games[mode] &&
-                        text.words[lang].games[mode].level
-                      ) || 0]);
+                    const level = text
+                      && text.words
+                      && text.words[lang]
+                      && text.words[lang].games
+                      && text.words[lang].games[mode]
+                      && text.words[lang].games[mode].level;
+                    emit([lang, level === undefined ? -1 : level]);
                   });
                 });
               }
