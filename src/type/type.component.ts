@@ -46,14 +46,14 @@ import * as XRegExp from 'xregexp/xregexp-all';
       state('totally-wrong', style({
         backgroundColor: '#D84315'
       })),
-      transition('* => correct', animate('1.5s ease-out')),
-      transition('* => partially-correct', animate('1.5s ease-out')),
-      transition('* => wrong', animate('1.5s ease-out')),
-      transition('* => totally-wrong', animate('1.5s ease-out')),
-      transition('correct => *', animate('0.5s 0.2s ease-out')),
-      transition('partially-correct => *', animate('0.5s 0.2s ease-out')),
-      transition('wrong => *', animate('0.5s 0.2s ease-out')),
-      transition('totally-wrong => *', animate('0.5s 0.2s ease-out'))
+      transition('* => correct', animate('0.6s ease-out')),
+      transition('* => partially-correct', animate('0.6s ease-out')),
+      transition('* => wrong', animate('0.6s ease-out')),
+      transition('* => totally-wrong', animate('0.6s ease-out')),
+      transition('correct => *', animate('0.3s 0.2s ease-out')),
+      transition('partially-correct => *', animate('0.3s 0.2s ease-out')),
+      transition('wrong => *', animate('0.3s 0.2s ease-out')),
+      transition('totally-wrong => *', animate('0.3s 0.2s ease-out'))
     ])
   ]
 })
@@ -65,7 +65,7 @@ export class TypeComponent implements OnInit {
     mode: 'by-amount',
     minutes: 15,
     amount: 150,
-    searchLanguagesDirection: 'both',
+    searchLanguagesDirection: 'tts',
     searchLevelEnabled: false,
     searchLevelMinimum: 0,
     searchLevelMaximum: 100

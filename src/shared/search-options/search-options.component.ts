@@ -34,6 +34,9 @@ export class SearchOptionsComponent implements OnInit, OnChanges {
   @Output()
   public searchOptionsChange = new EventEmitter<SearchOptions>();
 
+  @Output()
+  public enterPressed = new EventEmitter<void>();
+
   public constructor() {
   }
 
@@ -93,5 +96,11 @@ export class SearchOptionsComponent implements OnInit, OnChanges {
 
   public onPropertyChanged() {
     this.searchOptionsChange.emit(this.searchOptions);
+  }
+
+  public onKeyDown($event: KeyboardEvent) {
+    if ($event.which === 13) {
+      this.enterPressed.emit();
+    }
   }
 }

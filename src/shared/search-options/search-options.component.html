@@ -9,6 +9,7 @@
             placeholder="{{'search-options.mode.time' | translate}}"
             [(ngModel)]="searchOptions.minutes"
             (ngModelChange)="onPropertyChanged()"
+            (keydown)="onKeyDown($event)"
             (focus)="setMode('by-time')">
         </mat-form-field>
       </div>
@@ -20,6 +21,7 @@
             placeholder="{{'search-options.mode.words' | translate}}"
             [(ngModel)]="searchOptions.amount"
             (ngModelChange)="onPropertyChanged()"
+            (keydown)="onKeyDown($event)"
             (focus)="setMode('by-amount')">
         </mat-form-field>
       </div>
@@ -30,19 +32,25 @@
         <input matInput type="number"
           placeholder="{{'search-options.max-distance-in-days' | translate}}"
           [(ngModel)]="maxDistanceInDays"
-          (ngModelChange)="onMaxDistanceInDaysChanged()">
+          (ngModelChange)="onMaxDistanceInDaysChanged()"
+          (keydown)="onKeyDown($event)">
       </mat-form-field>
       <mat-form-field class="flex-col flex-col--1">
         <input matInput type="number"
           placeholder="{{'search-options.mod' | translate}}"
           [(ngModel)]="searchOptions.mod"
-          (ngModelChange)="onModChanged()">
+          (ngModelChange)="onModChanged()"
+          (keydown)="onKeyDown($event)">
       </mat-form-field>
     </div>
     
     <div class="flex flex--row">
       <mat-form-field class="flex-col flex-col--1 language-select">
-        <mat-select #typeSelect placeholder="{{'search-options.source-language' | translate}}" [(ngModel)]="searchOptions.sourceLanguage" (ngModelChange)="onPropertyChanged()">
+        <mat-select #typeSelect
+          placeholder="{{'search-options.source-language' | translate}}"
+          [(ngModel)]="searchOptions.sourceLanguage"
+          (ngModelChange)="onPropertyChanged()"
+          (keydown)="onKeyDown($event)">
           <mat-option
             *ngFor="let supportedLanguage of supportedLanguages"
             [value]="supportedLanguage">
@@ -57,7 +65,11 @@
       </button>
         
       <mat-form-field class="flex-col flex-col--1 language-select">
-        <mat-select #typeSelect placeholder="{{'search-options.target-language' | translate}}" [(ngModel)]="searchOptions.targetLanguage" (ngModelChange)="onPropertyChanged()">
+        <mat-select #typeSelect
+          placeholder="{{'search-options.target-language' | translate}}"
+          [(ngModel)]="searchOptions.targetLanguage"
+          (ngModelChange)="onPropertyChanged()"
+          (keydown)="onKeyDown($event)">
           <mat-option
             *ngFor="let supportedLanguage of supportedLanguages"
             [value]="supportedLanguage">
@@ -73,14 +85,16 @@
         <input matInput type="number"
           [placeholder]="'search-options.min-level' | translate"
           [(ngModel)]="searchOptions.searchLevelMinimum"
-          (ngModelChange)="onPropertyChanged()">
+          (ngModelChange)="onPropertyChanged()"
+          (keydown)="onKeyDown($event)">
       </mat-form-field>
   
       <mat-form-field class="flex-col flex-col--1 level-select">
         <input matInput type="number"
           [placeholder]="'search-options.max-level' | translate"
           [(ngModel)]="searchOptions.searchLevelMaximum"
-          (ngModelChange)="onPropertyChanged()">
+          (ngModelChange)="onPropertyChanged()"
+          (keydown)="onKeyDown($event)">
       </mat-form-field>
     </div>
   </div>

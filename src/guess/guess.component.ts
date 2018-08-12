@@ -38,10 +38,10 @@ import {
       state('wrong', style({
         backgroundColor: '#D84315'
       })),
-      transition('* => correct', animate('1.5s ease-out')),
-      transition('* => wrong', animate('1.5s ease-out')),
-      transition('correct => *', animate('0.5s 0.2s ease-out')),
-      transition('wrong => *', animate('0.5s 0.2s ease-out'))
+      transition('* => correct', animate('0.6s ease-out')),
+      transition('* => wrong', animate('0.6s ease-out')),
+      transition('correct => *', animate('0.3s 0.2s ease-out')),
+      transition('wrong => *', animate('0.3s 0.2s ease-out'))
     ])
   ]
 })
@@ -52,7 +52,7 @@ export class GuessComponent implements OnInit {
   public searchOptions: SearchOptions = {
     mode: 'by-amount',
     minutes: 10,
-    amount: 75,
+    amount: 150,
     searchLanguagesDirection: 'both',
     searchLevelEnabled: false,
     searchLevelMinimum: 0,

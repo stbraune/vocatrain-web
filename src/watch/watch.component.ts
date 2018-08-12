@@ -35,8 +35,8 @@ import {
       state('solved', style({
         backgroundColor: '#9E9E9E'
       })),
-      transition('* => solved', animate('1.5s ease-out')),
-      transition('solved => *', animate('0.5s 0.2s ease-out'))
+      transition('* => solved', animate('0.6s ease-out')),
+      transition('solved => *', animate('0.3s 0.2s ease-out'))
     ]),
     trigger('watched-right', [
       state('covered', style({
@@ -48,19 +48,20 @@ import {
       state('solved', style({
         backgroundColor: '#9E9E9E'
       })),
-      transition('* => solved', animate('1.5s ease-out')),
-      transition('solved => *', animate('0.5s 0.2s ease-out'))
+      transition('* => solved', animate('0.6s ease-out')),
+      transition('solved => *', animate('0.3s 0.2s ease-out'))
     ])
   ]
 })
 export class WatchComponent implements OnInit {
+  public timeout = 2500;
   public supportedLanguages: string[] = [];
   public lefthandMode = false;
 
   public searchOptions: SearchOptions = {
-    mode: 'by-time',
+    mode: 'by-amount',
     minutes: 5,
-    amount: 75,
+    amount: 150,
     searchLanguagesDirection: 'both',
     searchLevelEnabled: false,
     searchLevelMinimum: 0,
@@ -118,7 +119,7 @@ export class WatchComponent implements OnInit {
 
   private startInterval() {
     if (!this.interval) {
-      this.interval = setInterval(this.intervalFunction(), 5000);
+      this.interval = setInterval(this.intervalFunction(), this.timeout);
     }
   }
 
@@ -154,6 +155,8 @@ export class WatchComponent implements OnInit {
       this.stopGame();
       return;
     }
+
+    this.solveCorrect();
   }
 
   public coverWord() {

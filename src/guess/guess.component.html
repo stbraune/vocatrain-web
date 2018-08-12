@@ -4,7 +4,7 @@
 
 <mat-card *ngIf="!game || (game.gameState.state !== 'started' && game.gameState.state !== 'paused')" class="margin--bottom">
   <mat-card-content>
-    <search-options [supportedLanguages]="supportedLanguages" [(searchOptions)]="searchOptions">
+    <search-options [supportedLanguages]="supportedLanguages" [(searchOptions)]="searchOptions" (enterPressed)="startGame()">
     </search-options>
   </mat-card-content>
   <mat-card-actions>
