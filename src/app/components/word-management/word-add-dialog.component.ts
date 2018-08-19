@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { MatDialogRef } from '@angular/material';
 
 import { SettingsService } from '../../../shared';
-import { WordTypeEntityService, WordTypeEntity, WordEntity } from '../../../shared';
+import { WordEntity } from '../../../shared';
 
 import { WordEditComponent } from '../../../shared';
 
@@ -12,11 +12,13 @@ import { WordEditComponent } from '../../../shared';
   styleUrls: ['./word-add-dialog.component.scss']
 })
 export class WordAddDialogComponent implements OnInit {
-  public wordTypeEntities: WordTypeEntity[] = [];
   public supportedLanguages: string[] = [];
   public newWordEntity: WordEntity;
 
   private _wordEditComponent: WordEditComponent;
+
+  @Input()
+  public availableTags: string[] = [];
 
   @ViewChild('wordEdit')
   public set wordEditComponent(value: WordEditComponent) {
@@ -29,8 +31,7 @@ export class WordAddDialogComponent implements OnInit {
 
   public constructor(
     private dialogRef: MatDialogRef<WordAddDialogComponent>,
-    private settingsService: SettingsService,
-    private wordTypeEntityService: WordTypeEntityService
+    private settingsService: SettingsService
   ) {
   }
 
@@ -39,23 +40,15 @@ export class WordAddDialogComponent implements OnInit {
       this.supportedLanguages = appSettings.userLanguages.filter((userLanguage) => userLanguage.enabled)
         .map((userLanguage) => userLanguage.iso);
     });
-    this.loadWordTypeEntities();
-  }
-
-  private loadWordTypeEntities() {
-    this.wordTypeEntityService.getWordTypeEntities().subscribe((wordTypeEntities) => {
-      this.wordTypeEntities = wordTypeEntities;
-      this.newWordEntity = {
-        type: this.wordTypeEntities.length > 0 && this.wordTypeEntities[0],
-        texts: [
-          {
-            meta: '',
-            tags: [],
-            words: {}
-          }
-        ]
-      };
-    });
+    this.newWordEntity = {
+      texts: [
+        {
+          meta: '',
+          tags: [],
+          words: {}
+        }
+      ]
+    };
   }
 
   public onCancel() {

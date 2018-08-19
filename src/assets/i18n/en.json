@@ -22,9 +22,6 @@
     "words": {
       "title": "Words"
     },
-    "word-types": {
-      "title": "Word Types"
-    },
     "statistics": {
       "title": "Statistics"
     },
@@ -45,9 +42,6 @@
       "available-tags": "Available tags",
       "meta": "Help"
     }
-  },
-  "word-types": {
-    "title": "Word Types"
   },
   "statistics": {
     "title": "Statistics",

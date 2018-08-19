@@ -19,8 +19,7 @@ import {
   startLoading,
   finishLoading,
   WordEntity,
-  WordTypeEntity,
-  WordTypeEntityService
+  WordEntityService
 } from '../shared';
 
 import * as XRegExp from 'xregexp/xregexp-all';
@@ -59,6 +58,7 @@ import * as XRegExp from 'xregexp/xregexp-all';
 })
 export class TypeComponent implements OnInit {
   public supportedLanguages: string[] = [];
+  public availableTags: string[] = [];
   public lefthandMode = false;
 
   public searchOptions: SearchOptions = {
@@ -80,7 +80,6 @@ export class TypeComponent implements OnInit {
   public _answerInputElement: ElementRef;
 
   public wrongWords: WordEntity[] = [];
-  public wordTypeEntities: WordTypeEntity[] = [];
 
   @ViewChild('answerInput')
   public set answerInputElement(value: ElementRef) {
@@ -98,8 +97,8 @@ export class TypeComponent implements OnInit {
     private loadingIndicatorService: LoadingIndicatorService,
     private settingsService: SettingsService,
     private gameService: GameService,
-    private wordTypeEntityService: WordTypeEntityService,
     private dateFormatService: DateFormatService,
+    private wordEntityService: WordEntityService,
     private snackBar: MatSnackBar
   ) {
   }
@@ -125,22 +124,17 @@ export class TypeComponent implements OnInit {
       this.searchOptions.searchLevelMaximum = maxLevel;
     });
 
-    this.loadWordTypeEntities();
     this.gameService.getWrongWords('type', { limit: 50 }).subscribe((wrongWords) => {
       this.wrongWords = wrongWords;
+    });
+
+    this.wordEntityService.getTags().subscribe((tags) => {
+      this.availableTags = tags;
     });
 
     window.addEventListener('keydown', (event: KeyboardEvent) => {
       this.onKeyDown(event);
     }, false);
-  }
-
-  private loadWordTypeEntities() {
-    this.wordTypeEntityService.getWordTypeEntities().pipe(observeLoading()).subscribe((wordTypeEntities) => {
-      this.wordTypeEntities = wordTypeEntities;
-    }, (error) => {
-      console.error(error);
-    });
   }
 
   public startGame() {

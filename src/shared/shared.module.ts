@@ -30,7 +30,6 @@ import { ChipsComponent, ChipComponent } from './chips';
 import { KeyComponent } from './key';
 
 import { WordEntityService, WordEditComponent, WordsEditorComponent } from './words';
-import { WordTypeEntityService } from './word-types';
 
 import { SearchOptionsComponent } from './search-options';
 import { GameLogEntityService } from './game-log';
@@ -92,7 +91,6 @@ export class SharedModule {
         DateFormatService,
         GoogleTranslateService,
         WordEntityService,
-        WordTypeEntityService,
         GameService,
         GameLogEntityService,
         LoadingIndicatorService,

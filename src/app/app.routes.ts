@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { WordsComponent, WordTypesComponent } from './components';
+import { WordsComponent } from './components';
 
 export const AppRoutes: Routes = [
   {
@@ -10,9 +10,5 @@ export const AppRoutes: Routes = [
   {
     path: 'words',
     component: WordsComponent
-  },
-  {
-    path: 'word-types',
-    component: WordTypesComponent
   }
 ];

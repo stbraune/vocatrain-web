@@ -107,7 +107,6 @@ export class ChipInputComponent {
 
   public onKeyDown($event: KeyboardEvent) {
     this.chips = this.chips || [];
-
     const target = <HTMLInputElement>$event.target;
     if ($event.which === 37 || $event.which === 36) {
       // left, home

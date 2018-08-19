@@ -17,7 +17,6 @@ import { Observable, Subject } from 'rxjs';
 
 import { GoogleTranslateAlternative } from '../google-translate';
 import { ChipInputComponent } from '../chip-input';
-import { WordTypeEntity } from '../word-types';
 import { WordEntity } from './word-entity';
 import { Text } from './text';
 
@@ -28,10 +27,10 @@ import { Text } from './text';
 })
 export class WordEditComponent implements AfterViewInit, OnChanges {
   @Input()
-  public wordTypeEntities: WordTypeEntity[] = [];
+  public wordEntity: WordEntity;
 
   @Input()
-  public wordEntity: WordEntity;
+  public availableTags: string[] = [];
 
   public editedWordEntity: WordEntity;
 
@@ -64,10 +63,6 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   public ngOnChanges(changes: SimpleChanges) {
     if (changes.wordEntity) {
       this.editedWordEntity = JSON.parse(JSON.stringify(this.wordEntity));
-      if (this.editedWordEntity.type) {
-        this.editedWordEntity.type = this.wordTypeEntities.find((x) => x._id === this.editedWordEntity.type._id);
-      }
-
       this.editedWordEntity.texts = this.editedWordEntity.texts || [];
       this.editedWordEntity.texts.forEach((text) => {
         this.supportedLanguages.forEach((lang) => {

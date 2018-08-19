@@ -25,7 +25,7 @@
 
     <ng-template matExpansionPanelContent>
       <word-edit #wordEdit
-        [wordTypeEntities]="wordTypeEntities"
+        [availableTags]="availableTags"
         [supportedLanguages]="supportedLanguages"
         [wordEntity]="wordEntity"
         (wordSaved)="saveWordEntity($event)">

@@ -19,9 +19,7 @@ import {
   startLoading,
   finishLoading,
   WordEntityService,
-  WordEntity,
-  WordTypeEntityService,
-  WordTypeEntity
+  WordEntity
 } from '../shared';
 
 import * as XRegExp from 'xregexp/xregexp-all';
@@ -46,8 +44,7 @@ export class DupesComponent implements OnInit {
   };
 
   public queryHelpFields: string[] = [];
-
-  public wordTypeEntities: WordTypeEntity[] = [];
+  public availableTags: string[] = [];
 
   public game: Game;
   public wordStateSubscription: Subscription;
@@ -67,7 +64,6 @@ export class DupesComponent implements OnInit {
     private settingsService: SettingsService,
     private gameService: GameService,
     private wordEntityService: WordEntityService,
-    private wordTypeEntityService: WordTypeEntityService,
     private dateFormatService: DateFormatService,
     private snackBar: MatSnackBar
   ) {
@@ -86,8 +82,11 @@ export class DupesComponent implements OnInit {
       this.lefthandMode = appSettings.lefthandMode;
     });
 
-    this.loadWordTypeEntities();
     this.loadQueryHelpFields();
+
+    this.wordEntityService.getTags().subscribe((tags) => {
+      this.availableTags = tags;
+    });
 
     this.gameService.getMinimumLevel('dupes').subscribe((minLevel) => {
       this.searchOptions.searchLevelMinimum = minLevel;
@@ -121,17 +120,6 @@ export class DupesComponent implements OnInit {
     this.wordEntityService.getWordEntitiesFields().subscribe((queryFields) => {
       this.loadingIndicatorService.notifyFinished();
       this.queryHelpFields.push(...queryFields);
-    }, (error) => {
-      this.loadingIndicatorService.notifyFinished();
-      console.error(error);
-    });
-  }
-
-  private loadWordTypeEntities() {
-    this.loadingIndicatorService.notifyLoading();
-    this.wordTypeEntityService.getWordTypeEntities().subscribe((wordTypeEntities) => {
-      this.loadingIndicatorService.notifyFinished();
-      this.wordTypeEntities = wordTypeEntities;
     }, (error) => {
       this.loadingIndicatorService.notifyFinished();
       console.error(error);

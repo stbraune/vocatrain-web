@@ -26,10 +26,6 @@ export class WordEntityService {
     this.db = this.databaseService.openDatabase({
       name: 'word',
       deserializeItem(item) {
-        if (item.type) {
-          item.type.createdAt = item.type.createdAt && new Date(item.type.createdAt);
-          item.type.updatedAt = item.type.updatedAt && new Date(item.type.updatedAt);
-        }
         item.texts.forEach((text) => {
           Object.keys(text.words).forEach((lang) => {
             const word = text.words[lang];
@@ -47,7 +43,6 @@ export class WordEntityService {
       },
       reconcileItem(conflictingItem, winningItem) {
         const winningNewer = winningItem.updatedAt.getTime() > conflictingItem.updatedAt.getTime();
-        winningItem.type = winningNewer ? winningItem.type : conflictingItem.type;
         for (let textIndex = 0; textIndex < winningItem.texts.length; textIndex++) {
           const winningText = winningItem.texts[textIndex];
           const conflictingText = conflictingItem.texts[textIndex];
@@ -103,6 +98,43 @@ export class WordEntityService {
 
   public getPrefix(): string {
     return this.db.getPrefix();
+  }
+
+  public getTags() {
+    return this.db.executeQuery<{}, string, string[]>({
+      designDocument: 'tags',
+      viewName: 'by-name',
+      mapFunction(emit) {
+        return `function (doc) {
+          if (doc._id.substr(0, 'word_'.length) === 'word_') {
+            doc.texts.forEach(function (text) {
+              text.tags.forEach(function (tag) {
+                emit(undefined, tag);
+              });
+            });
+          }
+        }`;
+      },
+      reduceFunction() {
+        return `function (keys, values, rereduce) {
+          if (rereduce) {
+            values = values.reduce(function (prev, cur) {
+              return prev.concat(cur);
+            }, []);
+          }
+
+          return values.reduce(function (prev, cur) {
+            if (prev.indexOf(cur) === -1) {
+              prev.push(cur);
+            }
+            return prev;
+          }, []);
+        }`;
+      }
+    }).pipe(
+      map((result) => result.rows.map((row) => row.value as string[])),
+      map((result) => result[0] || [])
+    );
   }
 
   public getWordEntities(options: {

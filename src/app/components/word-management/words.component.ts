@@ -5,9 +5,7 @@ import { Observable, Subject, forkJoin } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 import {
-  WordTypeEntityService,
   WordEntityService,
-  WordTypeEntity,
   WordEntity,
   DatabaseFulltextQueryResult,
   DatabaseQueryResult,
@@ -32,10 +30,7 @@ export class WordsComponent implements OnInit {
   @ViewChild('wordDetailsDialogContentTemplate')
   public wordDetailsDialogContentTemplate: TemplateRef<void>;
 
-  public wordTypeEntities: WordTypeEntity[] = [];
-
   public emptyWordEntity: WordEntity = {
-    type: undefined,
     texts: [
       {
         meta: '',
@@ -54,6 +49,8 @@ export class WordsComponent implements OnInit {
   public queryChanged = new Subject<string>();
   public queryHelpFields: string[] = [];
 
+  public availableTags = [];
+
   public sorting: {
     property: string,
     descending: boolean
@@ -70,7 +67,6 @@ export class WordsComponent implements OnInit {
     private settingsService: SettingsService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private wordTypeEntityService: WordTypeEntityService,
     private wordEntityService: WordEntityService
   ) {
   }
@@ -81,7 +77,6 @@ export class WordsComponent implements OnInit {
         .map((userLanguage) => userLanguage.iso);
     });
     this.queryAvailable = !!this.settingsService.getDatabaseSettings().fti.couchDbLuceneUrl;
-    this.loadWordTypeEntities();
     this.loadWordEntities();
     this.loadQueryHelpFields();
 
@@ -90,6 +85,10 @@ export class WordsComponent implements OnInit {
       .subscribe((query) => {
         this.reloadWordEntities();
       });
+
+    this.wordEntityService.getTags().subscribe((tags) => {
+      this.availableTags = tags;
+    });
   }
 
   public onDuplicatesFilterChanged(lang) {
@@ -98,17 +97,6 @@ export class WordsComponent implements OnInit {
       .forEach((l) => this.duplicatesFilter[l] = false);
     this.duplicatesFiltered = Object.keys(this.duplicatesFilter).some((l) => this.duplicatesFilter[l]);
     this.reloadWordEntities();
-  }
-
-  private loadWordTypeEntities() {
-    this.loadingIndicatorService.notifyLoading();
-    this.wordTypeEntityService.getWordTypeEntities().subscribe((wordTypeEntities) => {
-      this.loadingIndicatorService.notifyFinished();
-      this.wordTypeEntities = wordTypeEntities;
-    }, (error) => {
-      this.loadingIndicatorService.notifyFinished();
-      console.error(error);
-    });
   }
 
   public reloadWordEntities() {
@@ -210,6 +198,7 @@ export class WordsComponent implements OnInit {
 
   public createWordEntity() {
     const dialogRef = this.dialog.open(WordAddDialogComponent);
+    dialogRef.componentInstance.availableTags = this.availableTags;
     dialogRef.afterClosed().subscribe((result) => {
       if (result && result.success) {
         this.saveWordEntity(result.wordEntity);

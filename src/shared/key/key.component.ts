@@ -10,12 +10,10 @@ export class KeyComponent {
   public label: string;
 
   @Output()
-  // public click = new EventEmitter<MouseEvent>();
   public click = new EventEmitter<any>();
 
   public onClick($event: MouseEvent) {
     $event.stopPropagation();
-    // this.click.emit($event);
     this.click.emit(this.label);
   }
 }

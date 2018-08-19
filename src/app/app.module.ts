@@ -41,9 +41,7 @@ import {
 
 import { AppComponent } from './app.component';
 import {
-  WordsComponent,
-  WordTypeEditComponent,
-  WordTypesComponent
+  WordsComponent
 } from './components';
 
 import { AppRoutes } from './app.routes';
@@ -60,9 +58,7 @@ import { DupesModule } from '../dupes';
   declarations: [
     AppComponent,
     WordsComponent,
-    WordTypesComponent,
-    WordAddDialogComponent,
-    WordTypeEditComponent
+    WordAddDialogComponent
   ],
   imports: [
     RouterModule.forRoot(AppRoutes, {

@@ -42,10 +42,6 @@ export class StatisticsService {
       group_level: 2
     })).pipe(
       map((result) => {
-        // const minDate = result.map((r) => new Date(<string>r.key[1]))
-        //   .reduce((prev, cur) => prev.getTime() === 0 || prev.getTime() > cur.getTime() ? cur : prev, new Date(0));
-        // const maxDate = result.map((r) => new Date(<string>r.key[1]))
-        //   .reduce((prev, cur) => prev.getTime() === 0 || prev.getTime() < cur.getTime() ? cur : prev, new Date(0));
         const minDate = options.startDate;
         const maxDate = options.endDate;
         const anyKey = result[0];
@@ -55,33 +51,20 @@ export class StatisticsService {
 
         const filledResult = [];
         while (minDate.getTime() <= maxDate.getTime()) {
-          // if (!result.find((r) => r.key[1] === minDate.toISOString())) {
-            // const oneDayLess = new Date(minDate.getTime());
-            // oneDayLess.setDate(oneDayLess.getDate() - 1);
-            const index = result.findIndex((r) => r.key[1] === minDate.toISOString());
-            if (index === -1) {
-              filledResult.push({
-                key: [options.mode, minDate.toISOString()],
-                value: {
-                  durationInMillis: 0,
-                  countCorrect: 0,
-                  countWrong: 0,
-                  countTotal: 0
-                }
-              });
-            } else {
-              filledResult.push(result[index]);
-              // result.splice(index + 1, 0, {
-              //   key: [options.mode, minDate.toISOString()],
-              //   value: {
-              //     durationInMillis: 0,
-              //     countCorrect: 0,
-              //     countWrong: 0,
-              //     countTotal: 0
-              //   }
-              // });
-            }
-          // }
+          const index = result.findIndex((r) => r.key[1] === minDate.toISOString());
+          if (index === -1) {
+            filledResult.push({
+              key: [options.mode, minDate.toISOString()],
+              value: {
+                durationInMillis: 0,
+                countCorrect: 0,
+                countWrong: 0,
+                countTotal: 0
+              }
+            });
+          } else {
+            filledResult.push(result[index]);
+          }
 
           minDate.setDate(minDate.getDate() + 1);
         }

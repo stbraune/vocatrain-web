@@ -7,7 +7,6 @@ import { debounceTime } from 'rxjs/operators';
 import { LoadingIndicatorService } from '../loading-indicator';
 import { SettingsService } from '../settings';
 
-import { WordTypeEntity } from '../word-types';
 import { WordEntity } from './word-entity';
 import { WordEntityService } from './word-entity.service';
 import { WordEditComponent } from './word-edit.component';
@@ -20,10 +19,11 @@ import { WordEditComponent } from './word-edit.component';
 export class WordsEditorComponent implements OnInit {
   @Input()
   public wordEntities: WordEntity[] = [];
-  public wordEntityDetails: WordEntity;
 
   @Input()
-  public wordTypeEntities: WordTypeEntity[] = [];
+  public availableTags: string[] = [];
+
+  public wordEntityDetails: WordEntity;
 
   @Input()
   public showTags = true;
@@ -35,7 +35,6 @@ export class WordsEditorComponent implements OnInit {
   public showTagsAtLanguage;
 
   public emptyWordEntity: WordEntity = {
-    type: undefined,
     texts: [
       {
         meta: '',

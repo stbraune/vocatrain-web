@@ -1,20 +1,10 @@
 <div class="flex flex--no-margin flex--column">
-  <mat-form-field>
-    <mat-select #typeSelect placeholder="Type" [(ngModel)]="editedWordEntity.type">
-      <mat-option
-        *ngFor="let wordTypeEntity of wordTypeEntities"
-        [value]="wordTypeEntity">
-        {{wordTypeEntity.title}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <ng-container *ngIf="editedWordEntity.type">
-    <div class="margin--bottom">
+  <ng-container>
+    <div *ngIf="availableTags && availableTags.length > 0" class="margin--bottom">
       <h4 class="margin--top-0 margin--bottom">
         {{'words.edit-word.available-tags' | translate}}
       </h4>
-      <chip *ngFor="let tag of editedWordEntity.type.tags" [chip]="tag" mode="read" (chipClicked)="onChipClicked($event)">
+      <chip *ngFor="let tag of availableTags" [chip]="tag" mode="read" (chipClicked)="onChipClicked($event)">
       </chip>
     </div>
     <div class="max-height-scroll--40">
@@ -33,7 +23,6 @@
             <chip-input
               [(value)]="text.words[lang].value"
               [(chips)]="text.tags"
-              [allowedChips]="editedWordEntity.type.tags"
               [hideChips]="true"
               [placeholder]="lang | translate"
               (cursorPressed)="navigate(chipInputWrapper, $event)"
@@ -52,7 +41,6 @@
           <chip-input
             [(value)]="text.meta"
             [(chips)]="text.tags"
-            [allowedChips]="editedWordEntity.type.tags"
             [hideChips]="true"
             [placeholder]="'words.edit-word.meta' | translate"
             (cursorPressed)="navigate(chipInputWrapper, $event)"

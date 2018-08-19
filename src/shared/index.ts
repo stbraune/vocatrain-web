@@ -9,7 +9,6 @@ export * from './chips';
 export * from './key';
 
 export * from './words';
-export * from './word-types';
 
 export * from './search-options';
 export * from './search-result';

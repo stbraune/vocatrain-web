@@ -22,9 +22,6 @@
     "words": {
       "title": "Vokabeln"
     },
-    "word-types": {
-      "title": "Vokabelarten"
-    },
     "statistics": {
       "title": "Statistiken"
     },
@@ -45,9 +42,6 @@
       "available-tags": "Verfügbare Tags",
       "meta": "Hilfe"
     }
-  },
-  "word-types": {
-    "title": "Vokabelarten"
   },
   "statistics": {
     "title": "Statistiken",

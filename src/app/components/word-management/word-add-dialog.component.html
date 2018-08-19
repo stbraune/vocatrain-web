@@ -1,6 +1,6 @@
 <word-edit #wordEdit
   *ngIf="newWordEntity"
-  [wordTypeEntities]="wordTypeEntities"
+  [availableTags]="availableTags"
   [supportedLanguages]="supportedLanguages"
   [wordEntity]="newWordEntity"
   (wordSaved)="onSave(wordEdit.editedWordEntity)">
