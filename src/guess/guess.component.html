@@ -113,19 +113,19 @@
       </key>
       <key *ngIf="game.gameState.state === 'started' && game.word && game.wordState.state === 'covered'" [label]="'guess.uncover' | translate" class="key-button flex-col flex-col--1 margin--left" (click)="uncoverWord()">
         <mat-icon class="sm-hide">keyboard_arrow_up</mat-icon>
-        <mat-icon class="lg-hide">pageview</mat-icon>
+        <mat-icon class="lg-hide md-hide">pageview</mat-icon>
       </key>
       <key *ngIf="game.gameState.state === 'started' && game.word && game.wordState.state === 'uncovered'" [label]="'guess.cover' | translate" class="key-button flex-col flex-col--1 margin--left" (click)="coverWord()">
         <mat-icon class="sm-hide">keyboard_arrow_down</mat-icon>
-        <mat-icon class="lg-hide">pageview</mat-icon>
+        <mat-icon class="lg-hide md-hide">pageview</mat-icon>
       </key>
       <key *ngIf="game.gameState.state === 'started' && game.word && game.wordState.state === 'uncovered'" [label]="'guess.wrong' | translate" class="key-button flex-col flex-col--1 margin--left" (click)="solveWrong()">
         <mat-icon class="sm-hide">keyboard_arrow_left</mat-icon>
-        <mat-icon class="lg-hide">block</mat-icon>
+        <mat-icon class="lg-hide md-hide">block</mat-icon>
       </key>
       <key *ngIf="game.gameState.state === 'started' && game.word && game.wordState.state === 'uncovered'" [label]="'guess.right' | translate" class="key-button flex-col flex-col--1 margin--left" (click)="solveCorrect()">
         <mat-icon class="sm-hide">keyboard_arrow_right</mat-icon>
-        <mat-icon class="lg-hide">check</mat-icon>
+        <mat-icon class="lg-hide md-hide">check</mat-icon>
       </key>
     </div>
   </mat-card-actions>

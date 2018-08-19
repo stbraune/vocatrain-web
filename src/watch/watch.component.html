@@ -114,7 +114,7 @@
       </key>
       <key *ngIf="game.gameState.state === 'started' && game.word && game.wordState.state === 'uncovered'" [label]="'watch.right' | translate" class="key-button flex-col flex-col--1 margin--left" (click)="solveCorrect()">
         <mat-icon class="sm-hide">keyboard_arrow_right</mat-icon>
-        <mat-icon class="lg-hide">check</mat-icon>
+        <mat-icon class="lg-hide md-hide">check</mat-icon>
       </key>
     </div>
   </mat-card-actions>

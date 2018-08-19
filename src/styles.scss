@@ -229,7 +229,7 @@ h3 {
   }
 }
 
-@media(max-width: 1049px) {
+@media(min-width: 600px) and (max-width: 1049px) {
   .md-hide {
     display: none !important;
   }
