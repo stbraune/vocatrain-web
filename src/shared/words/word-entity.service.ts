@@ -247,8 +247,6 @@ export class WordEntityService {
           if (doc._id.substr(0, 'word_'.length) === 'word_') {
             const supportedLanguages = ${JSON.stringify(supportedLanguages)};
             const indexDocument = new Document();
-            indexDocument.add(doc.type.title);
-            indexDocument.add(doc.type.title, { field: 'type' });
             doc.texts.forEach(function (text) {
               indexDocument.add(text.meta);
               indexDocument.add(text.meta, { field: 'meta' });
