@@ -1,5 +1,10 @@
 <div class="flex flex--no-margin flex--column">
   <ng-container>
+    <div class="margin--bottom">
+      <mat-checkbox class="flex-col" [(ngModel)]="dialogText" (ngModelChange)="dialogTextChanged()">
+        {{'words.edit-word.is-text' | translate}}
+      </mat-checkbox>
+    </div>
     <div *ngIf="availableTags && availableTags.length > 0" class="margin--bottom">
       <h4 class="margin--top-0 margin--bottom">
         {{'words.edit-word.available-tags' | translate}}
@@ -25,6 +30,7 @@
               [(chips)]="text.tags"
               [hideChips]="true"
               [placeholder]="lang | translate"
+              (chipsChange)="onChipsChange($event)"
               (cursorPressed)="navigate(chipInputWrapper, $event)"
               (backspacePressed)="onBackspacePressed(chipInputWrapper, text)"
               (enterPressed)="onEnterPressed(chipInputWrapper, text)">
@@ -43,13 +49,14 @@
             [(chips)]="text.tags"
             [hideChips]="true"
             [placeholder]="'words.edit-word.meta' | translate"
+            (chipsChange)="onChipsChange($event)"
             (cursorPressed)="navigate(chipInputWrapper, $event)"
             (enterPressed)="onEnterPressed(chipInputWrapper, text)">
           </chip-input>
         </div>
 
         <div class="flex-col flex-col--25 align--center margin--bottom">
-          <chips [(chips)]="text.tags"></chips>
+          <chips [(chips)]="text.tags" (chipsChange)="onChipsChange($event)"></chips>
         </div>
       </div>
     </div>

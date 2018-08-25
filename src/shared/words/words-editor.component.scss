@@ -39,6 +39,14 @@
 
 ::ng-deep .mat-expansion-panel-header .mat-content {
   overflow: visible;
+  flex-direction: column;
+}
+
+.more-words::after {
+  content: '...';
+  display: block;
+  font-size: 4pt;
+  letter-spacing: 3px;
 }
 
 .word {

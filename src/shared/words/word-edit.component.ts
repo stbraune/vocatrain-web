@@ -55,6 +55,8 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   @ViewChildren(ChipInputComponent)
   public chipInputComponents: QueryList<ChipInputComponent>;
 
+  public dialogText = false;
+
   private deferredNavigate: { row: number, col: number, dir: 'up' | 'right' | 'down' | 'left' };
 
   public constructor() {
@@ -79,6 +81,25 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
           };
         });
       });
+      this.dialogText = this.editedWordEntity.texts.some((text) => text.tags.indexOf('text') !== -1);
+    }
+  }
+
+  public dialogTextChanged() {
+    if (!this.editedWordEntity.texts[0]) {
+      return;
+    }
+
+    const tags = this.editedWordEntity.texts[0].tags;
+    const index = tags.indexOf('text');
+    if (this.dialogText) {
+      if (index === -1) {
+        tags.push('text');
+      }
+    } else {
+      if (index !== -1) {
+        tags.splice(index, 1);
+      }
     }
   }
 
@@ -98,6 +119,10 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
     if (chipInputComponents.length > 0) {
       chipInputComponents[0].toggleChip(chip);
     }
+  }
+
+  public onChipsChange($event: any) {
+    this.dialogText = this.editedWordEntity.texts.some((text) => text.tags.indexOf('text') !== -1);
   }
 
   public onDeleteText(text: Text) {

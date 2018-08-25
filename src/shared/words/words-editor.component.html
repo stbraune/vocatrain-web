@@ -2,13 +2,13 @@
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       <div class="flex flex--no-margin flex--align-center stretch">
-        <ng-container *ngFor="let text of wordEntity.texts">
+        <ng-container *ngIf="wordEntity.texts[0]">
           <ng-container *ngFor="let lang of supportedLanguages; let i=index">
             <div *ngIf="showLanguages === undefined || showLanguages.indexOf(lang) !== -1" class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal word" [class.sm-hide]="i > 0">
-              {{text.words[lang] && text.words[lang].value}}
-              <chips *ngIf="i === 0 || showTagsAtLanguage === lang" [chips]="text.tags" mode="read" class="lg-hide" [class.lg-hide]="showTagsAtLanguage === undefined"></chips>
+              {{wordEntity.texts[0].words[lang] && wordEntity.texts[0].words[lang].value}}
+              <chips *ngIf="i === 0 || showTagsAtLanguage === lang" [chips]="wordEntity.texts[0].tags" mode="read" class="lg-hide" [class.lg-hide]="showTagsAtLanguage === undefined"></chips>
               <span class="buttons sm-hide">
-                <google-translate-button [from]="lang" [to]="supportedLanguages" [text]="text.words[lang].value">
+                <google-translate-button [from]="lang" [to]="supportedLanguages" [text]="wordEntity.texts[0].words[lang].value">
                 </google-translate-button>
                 <button mat-icon-button (click)="openWordEntityDetails($event, wordEntity)" [matTooltip]="'words.show-details' | translate" class="open-details-button">
                   <mat-icon [inline]="true">code</mat-icon>
@@ -17,9 +17,11 @@
             </div>
           </ng-container>
           <div *ngIf="showTags" class="flex-col flex-col--17 align--center overflow--hidden word-wrap--break-word white-space--normal sm-hide">
-            <chips [chips]="text.tags" mode="read"></chips>
+            <chips [chips]="wordEntity.texts[0].tags" mode="read"></chips>
           </div>
         </ng-container>
+      </div>
+      <div *ngIf="wordEntity.texts[1]" class="more-words">
       </div>
     </mat-expansion-panel-header>
 

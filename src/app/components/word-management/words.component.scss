@@ -39,6 +39,7 @@
 
 ::ng-deep .mat-expansion-panel-header .mat-content {
   overflow: visible;
+  flex-direction: column;
 }
 
 .word {

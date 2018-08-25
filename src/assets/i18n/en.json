@@ -39,6 +39,7 @@
     "tags": "Tags",
     "edit-word": {
       "title": "Edit word",
+      "is-text": "Dialog text",
       "available-tags": "Available tags",
       "meta": "Help"
     }
