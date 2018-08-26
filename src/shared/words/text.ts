@@ -8,7 +8,7 @@ export interface Text {
         [mode: string]: {
           level: number,
           date: Date,
-          answer: string // used for dialog texts
+          answer?: string // used for dialog texts
         }
       }
     }
