@@ -68,9 +68,13 @@ export class WordsEditorComponent implements OnInit {
 
   public saveWordEntity(wordEntity: WordEntity) {
     function splitWords() {
-      const shouldSplit = wordEntity.texts.every((text) => text.tags.indexOf('text') === -1);
-      console.log(shouldSplit, wordEntity);
-      if (!shouldSplit) {
+      const isDialogText = wordEntity.texts.every((text) => text.tags.indexOf('text') === -1);
+      if (!isDialogText) {
+        wordEntity.texts.forEach((text) => {
+          if (text.tags.indexOf('text') === -1) {
+            text.tags.push('text');
+          }
+        });
         return [wordEntity];
       }
 

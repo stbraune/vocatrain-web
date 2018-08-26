@@ -7,7 +7,8 @@ export interface Text {
       games?: {
         [mode: string]: {
           level: number,
-          date: Date
+          date: Date,
+          answer: string // used for dialog texts
         }
       }
     }

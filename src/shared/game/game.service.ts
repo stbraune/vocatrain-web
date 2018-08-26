@@ -445,6 +445,10 @@ export class GameService {
 
           if (doc._id.substr(0, 'word_'.length) === 'word_') {
             doc.texts.forEach(function (text, textIndex) {
+              if (text.tags && text.tags.indexOf('ignore') !== -1) {
+                return;
+              }
+
               [sourceLanguage, targetLanguage]
                 .map(function (language) {
                   return { language: language, word: text.words[language] };
