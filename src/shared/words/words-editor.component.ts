@@ -67,19 +67,29 @@ export class WordsEditorComponent implements OnInit {
   }
 
   public saveWordEntity(wordEntity: WordEntity) {
-    const splittedWordEntities = wordEntity.texts.map((text) => Object.assign({}, wordEntity, {
-      _id: undefined,
-      _rev: undefined,
-      texts: [text]
-    }));
+    function splitWords() {
+      const shouldSplit = wordEntity.texts.every((text) => text.tags.indexOf('text') === -1);
+      console.log(shouldSplit, wordEntity);
+      if (!shouldSplit) {
+        return [wordEntity];
+      }
 
-    if (wordEntity._id && splittedWordEntities.length > 0) {
-      splittedWordEntities[0]._id = wordEntity._id;
-      splittedWordEntities[0]._rev = wordEntity._rev;
+      const splittedWordEntities = wordEntity.texts.map((text) => Object.assign({}, wordEntity, {
+        _id: undefined,
+        _rev: undefined,
+        texts: [text]
+      }));
+
+      if (wordEntity._id && splittedWordEntities.length > 0) {
+        splittedWordEntities[0]._id = wordEntity._id;
+        splittedWordEntities[0]._rev = wordEntity._rev;
+      }
+
+      return splittedWordEntities;
     }
 
     this.loadingIndicatorService.notifyLoading();
-    forkJoin(splittedWordEntities.map((w) => this.wordEntityService.putWordEntity(w)))
+    forkJoin(splitWords().map((w) => this.wordEntityService.putWordEntity(w)))
       .subscribe((wordEntities) => {
         this.loadingIndicatorService.notifyFinished();
         this.snackBar.open('Saved!', null, {

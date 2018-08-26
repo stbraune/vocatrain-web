@@ -9,7 +9,8 @@ import {
   WordEntity,
   DatabaseFulltextQueryResult,
   DatabaseQueryResult,
-  LoadingIndicatorService
+  LoadingIndicatorService,
+  WordsEditorComponent
 } from '../../../shared';
 import { SettingsService } from '../../../shared';
 
@@ -29,6 +30,9 @@ export class WordsComponent implements OnInit {
 
   @ViewChild('wordDetailsDialogContentTemplate')
   public wordDetailsDialogContentTemplate: TemplateRef<void>;
+
+  @ViewChild(WordsEditorComponent)
+  public wordsEditor: WordsEditorComponent;
 
   public emptyWordEntity: WordEntity = {
     texts: [
@@ -208,71 +212,11 @@ export class WordsComponent implements OnInit {
     });
   }
 
-  public openWordEntityDetails($event: MouseEvent, wordEntity: WordEntity) {
-    $event.stopPropagation();
-    this.wordEntityDetails = wordEntity;
-    this.dialog.open(this.wordDetailsDialogContentTemplate);
-  }
-
   public saveWordEntity(wordEntity: WordEntity) {
-    function splitWords() {
-      const shouldSplit = wordEntity.texts.every((text) => text.tags.indexOf('text') === -1);
-      if (!shouldSplit) {
-        return [wordEntity];
-      }
-
-      const splittedWordEntities = wordEntity.texts.map((text) => Object.assign({}, wordEntity, {
-        _id: undefined,
-        _rev: undefined,
-        texts: [text]
-      }));
-
-      if (wordEntity._id && splittedWordEntities.length > 0) {
-        splittedWordEntities[0]._id = wordEntity._id;
-        splittedWordEntities[0]._rev = wordEntity._rev;
-      }
-
-      return splittedWordEntities;
-    }
-
-    this.loadingIndicatorService.notifyLoading();
-    forkJoin(splitWords().map((w) => this.wordEntityService.putWordEntity(w)))
-      .subscribe((wordEntities) => {
-        this.loadingIndicatorService.notifyFinished();
-        this.snackBar.open('Saved!', null, {
-          duration: 3000
-        });
-
-        wordEntities.reverse().forEach((persistedWordEntity) => {
-          const indexOf = this.wordEntities.findIndex((w) => w._id === persistedWordEntity._id);
-          if (indexOf === -1) {
-            this.wordEntities.unshift(persistedWordEntity);
-          } else {
-            this.wordEntities.splice(indexOf, 1, persistedWordEntity);
-          }
-        });
-      }, (error) => {
-        this.loadingIndicatorService.notifyFinished();
-        console.error(error);
-        this.snackBar.open('Error!', 'Ok', {
-          panelClass: 'error'
-        });
-      });
+    this.wordsEditor.saveWordEntity(wordEntity);
   }
 
   public deleteWordEntity(wordEntity: WordEntity) {
-    this.loadingIndicatorService.notifyLoading();
-    this.wordEntityService.deleteWordEntity(wordEntity).subscribe((result) => {
-      this.loadingIndicatorService.notifyFinished();
-      this.snackBar.open('Entry deleted', null, { duration: 3000 });
-      const indexOf = this.wordEntities.findIndex((w) => w._id === wordEntity._id);
-      if (indexOf !== -1) {
-        this.wordEntities.splice(indexOf, 1);
-      }
-    }, (error) => {
-      this.loadingIndicatorService.notifyFinished();
-      console.error(error);
-      this.snackBar.open('Error!', 'Ok', { panelClass: 'error' });
-    });
+    this.wordsEditor.deleteWordEntity(wordEntity);
   }
 }
