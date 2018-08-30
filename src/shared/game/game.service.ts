@@ -469,7 +469,9 @@ export class GameService {
                   const createdAt = normalizeDate(new Date(doc.createdAt));
 
                   const answerHash = calculateHash(answerWord.value);
-                  const answerLevel = (answerWord.games && answerWord.games[mode] && answerWord.games[mode].level) || -1;
+                  const answerLevel = (answerWord.games && answerWord.games[mode] && answerWord.games[mode].level !== undefined)
+                    ? answerWord.games[mode].level
+                    : -1;
                   const answerThen = new Date((answerWord.games && answerWord.games[mode] && answerWord.games[mode].date)
                     || (new Date(doc.createdAt).getTime() + Math.abs(answerHash)));
 

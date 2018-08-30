@@ -1,0 +1,48 @@
+.word-card {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.heading-row {
+  .col-question,
+  .col-answer {
+    font-weight: bold;
+  }
+}
+
+.heading-row,
+.ignore-row {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.ignore-row {
+  .col-question,
+  .col-answer {
+    font-style: italic;
+  }
+}
+
+.row-word:nth-child(even) {
+  background-color: #454545;
+}
+
+.NOmat-input {
+  &--no-margin {
+    ::ng-deep .mat-form-field-wrapper {
+      padding-bottom: 0;
+    }
+  
+    ::ng-deep .mat-form-field-infix {
+      // width: initial;
+      border-top: 0;
+    }
+  
+    ::ng-deep .mat-form-field-underline {
+      bottom: 0;
+    }
+  }
+}

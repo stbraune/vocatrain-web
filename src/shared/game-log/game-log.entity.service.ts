@@ -22,22 +22,22 @@ export class GameLogEntityService {
       }
     });
 
-    this.db.executeQuery<number>({
-      designDocument: 'game-logs',
-      viewName: 'with-nothing',
-      mapFunction(emit) {
-        return `function(doc) {
-          if (doc._id.substr(0, 'game-log_'.length) === 'game-log_') {
-            if (doc.countTotal < 5) {
-              emit(doc.countTotal);
-            }
-          }
-        }`;
-      },
-      include_docs: true
-    }).pipe(
-      switchMap((result) => forkJoin(result.rows.map((row) => this.db.removeEntity(row.doc))))
-    ).subscribe();
+    // this.db.executeQuery<number>({
+    //   designDocument: 'game-logs',
+    //   viewName: 'with-nothing',
+    //   mapFunction(emit) {
+    //     return `function(doc) {
+    //       if (doc._id.substr(0, 'game-log_'.length) === 'game-log_') {
+    //         if (doc.countTotal < 5) {
+    //           emit(doc.countTotal);
+    //         }
+    //       }
+    //     }`;
+    //   },
+    //   include_docs: true
+    // }).pipe(
+    //   switchMap((result) => forkJoin(result.rows.map((row) => this.db.removeEntity(row.doc))))
+    // ).subscribe();
   }
 
   public getDatabase(): Database<GameLogEntity> {

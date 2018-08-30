@@ -1,7 +1,9 @@
-<chip *ngFor="let chip of chips"
-  [chip]="chip"
-  [chipClickable]="chipClicked.observers.length > 0"
-  [mode]="mode"
-  (chipClicked)="onChipClicked($event)"
-  (chipDeleteClicked)="deleteChip($event)">
-</chip>
+<ng-container *ngFor="let chip of chips">
+  <chip *ngIf="chip !== 'text'"
+    [chip]="chip"
+    [chipClickable]="chipClicked.observers.length > 0"
+    [mode]="mode"
+    (chipClicked)="onChipClicked($event)"
+    (chipDeleteClicked)="deleteChip($event)">
+  </chip>
+</ng-container>

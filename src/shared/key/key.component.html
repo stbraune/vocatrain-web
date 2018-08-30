@@ -1,9 +1,9 @@
 <span class="inline-flex inline-flex--no-margin inline-flex--align-center stretch">
-  <button mat-button (click)="onClick($event)" class="stretch">
+  <button mat-button (click)="onClick($event)" class="stretch" [title]="label || ''" [class.tiny-button]="noLabel">
     <span class="key">
       <ng-container *ngTemplateOutlet="iconContent"></ng-container>
     </span>
-    <span class="margin--left sm-hide">
+    <span *ngIf="!noLabel" class="margin--left sm-hide">
       {{label}}
     </span>
   </button>

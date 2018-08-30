@@ -1,0 +1,241 @@
+<h3 class="sm-hide">
+  {{'dialog-texts.title' | translate}}
+</h3>
+
+<mat-card *ngIf="!game || (game.gameState.state !== 'started' && game.gameState.state !== 'paused')" class="margin--bottom">
+  <mat-card-content>
+    <div class="flex flex--row">
+      <mat-form-field class="flex-col flex-col--1">
+        <mat-select [(ngModel)]="mode" (ngModelChange)="modeChanged()">
+          <mat-option [value]="'dialog-text-type-free'">{{'dialog-text-search-options.dialog-text-type-free' | translate}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <dialog-text-search-options [supportedLanguages]="supportedLanguages" [(searchOptions)]="searchOptions" (enterPressed)="startGame()">
+    </dialog-text-search-options>
+  </mat-card-content>
+  <mat-card-actions>
+    <button class="stretch" mat-button (click)="startGame()">
+      {{'dialog-texts.start' | translate}}
+    </button>
+  </mat-card-actions>
+</mat-card>
+
+<mat-card *ngIf="game && (game.gameState.state === 'started' || game.gameState.state === 'paused')">
+  <mat-card-content>
+    <div class="margin--bottom">
+      <strong>{{'dialog-texts.duration' | translate}}:</strong>
+      <span>
+        {{formatMillis(game.duration)}}
+      </span>
+    </div>
+    <div class="margin--bottom">
+      <strong>{{'dialog-texts.last-repeat' | translate}}:</strong>
+      <span *ngIf="!game.word || game.word.key.answerAt.getTime() === 0; else answerAtOk">
+        {{'dialog-texts.never' | translate}}
+      </span>
+      <ng-template #answerAtOk>
+        <span>
+          {{game.word.key.answerAt | date:'dd.MM.yy H:mm'}}
+        </span>
+      </ng-template>
+      -
+      <strong>{{'dialog-texts.current-level' | translate}}:</strong>
+      <span *ngIf="game.word; else answerLevelUnknown">
+        {{(game.word.key.answerLevel === -1 ? '?' : game.word.key.answerLevel)}}
+      </span>
+      <ng-template #answerLevelUnknown>
+        ?
+      </ng-template>
+    </div>
+    <div class="flex margin--bottom">
+      <div *ngIf="game.word" class="flex-col flex-col--1">
+        <div *ngFor="let question of game.word.key.questions; let i=index" class="flex padding--top-05 padding--bottom-05 padding--left-05 padding--right-05 flex--align-center row-word"
+          [class.heading-row]="containsTag(game.word.key.tags[i], 'heading')"
+          [class.ignore-row]="containsTag(game.word.key.tags[i], 'ignore')">
+          <div class="flex-col flex-col--1 col-question">
+            {{game.word.key.questions[i]}}
+          </div>
+          <div class="flex-col flex-col--1 col-answer">
+            <div class="flex">
+              <div class="flex-col flex-col--1">
+                <mat-form-field *ngIf="game.gameState.state === 'started' && !containsTag(game.word.key.tags[i], 'ignore')"
+                  floatLabel="always"
+                  class="stretch mat-input--no-margin">
+                  <input matInput
+                    placeholder="{{'dialog-texts.answer' | translate}}"
+                    [(ngModel)]="answers[i]"
+                    (keypress)="onKeyPress($event, i)"
+                    (keydown)="onKeyDown($event, i)"
+                    [disabled]="game.gameState.state !== 'started' || answerStates[i] === 'correct' || answerStates[i] === 'wrong'">
+                  <mat-hint *ngIf="game.word.key.meta[i]">{{game.word.key.meta[i]}}</mat-hint>
+                </mat-form-field>
+                <ng-container *ngIf="(game.wordState[i].state === 'uncovered' || containsTag(game.word.key.tags[i], 'ignore')) || answerStates[i] !== 'undefined'">
+                  <p>
+                    {{game.word.key.answers[i]}}
+                  </p>
+                  <p *ngIf="game.word.key.history[i] && !containsTag(game.word.key.tags[i], 'ignore')">
+                    <em>{{'dialog-texts.old-answer' | translate}}:</em>
+                    {{game.word.key.history[i].answer}}
+                    ({{(game.word.key.history[i].correct ? 'dialog-texts.right' : 'dialog-texts.wrong') | translate}})
+                  </p>
+                </ng-container>
+              </div>
+              <ng-container *ngIf="!containsTag(game.word.key.tags[i], 'ignore')">
+                <key *ngIf="answerStates[i] === 'correct'" class="key-button flex-col flex-col--5 margin--left" [noLabel]="true">
+                  <mat-icon color="primary">check_circle</mat-icon>
+                </key>
+                <key *ngIf="answerStates[i] === 'wrong'" class="key-button flex-col flex-col--5 margin--left" [noLabel]="true">
+                  <mat-icon color="warn">cancel</mat-icon>
+                </key>
+                <key *ngIf="game.gameState.state === 'started' && answerStates[i] !== 'correct' && answerStates[i] !== 'wrong'"
+                  [label]="'dialog-texts.test' | translate"
+                  [noLabel]="true"
+                  class="key-button flex-col flex-col--5 margin--left"
+                  (click)="testAnswer(i)">
+                  <mat-icon>help</mat-icon>
+                </key>
+                <key *ngIf="game.gameState.state === 'started' && game.wordState[i].state === 'covered' && answerStates[i] === 'undefined'"
+                  [label]="'dialog-texts.uncover' | translate"
+                  [noLabel]="true"
+                  class="key-button flex-col flex-col--5 margin--left"
+                  (click)="uncoverWord(i)">
+                  <mat-icon class="sm-hide">keyboard_arrow_up</mat-icon>
+                  <mat-icon class="lg-hide md-hide">pageview</mat-icon>
+                </key>
+                <key *ngIf="game.gameState.state === 'started' && game.wordState[i].state === 'uncovered' && answerStates[i] === 'undefined'"
+                  [label]="'dialog-texts.cover' | translate"
+                  [noLabel]="true"
+                  class="key-button flex-col flex-col--5 margin--left"
+                  (click)="coverWord(i)">
+                  <mat-icon class="sm-hide">keyboard_arrow_down</mat-icon>
+                  <mat-icon class="lg-hide md-hide">pageview</mat-icon>
+                </key>
+                <key *ngIf="game.gameState.state === 'started' && game.wordState[i].state === 'uncovered' && answerStates[i] === 'partially-correct'"
+                  [label]="'dialog-texts.wrong' | translate"
+                  [noLabel]="true"
+                  class="key-button flex-col flex-col--5 margin--left"
+                  (click)="solveWrong(i)">
+                  <mat-icon class="sm-hide">keyboard_arrow_left</mat-icon>
+                  <mat-icon class="lg-hide md-hide">block</mat-icon>
+                </key>
+                <key *ngIf="game.gameState.state === 'started' && game.wordState[i].state === 'uncovered' && answerStates[i] === 'partially-correct'"
+                  [label]="'dialog-texts.right' | translate"
+                  [noLabel]="true"
+                  class="key-button flex-col flex-col--5 margin--left"
+                  (click)="solveCorrect(i)">
+                  <mat-icon class="sm-hide">keyboard_arrow_right</mat-icon>
+                  <mat-icon class="lg-hide md-hide">check</mat-icon>
+                </key>
+              </ng-container>
+            </div>
+          </div>
+          <!-- <div class="flex-col flex-col--20 col-meta">
+            <ng-container *ngIf="game.word.key.meta[i]">
+              <strong>{{'dialog-texts.meta' | translate}}:</strong>
+              {{game.word.key.meta[i]}}
+            </ng-container>
+          </div> -->
+          <div class="flex-col flex-col--17 col-tags">
+            <chips [chips]="game.word.key.tags[i]" mode="read"></chips>
+          </div>
+        </div>
+        
+        <mat-card *ngIf="!game.word" class="align--center flex-col word-card">
+          <mat-card-content class="align--center">
+            <div class="display--inline-block">
+              <mat-spinner diameter="50">
+              </mat-spinner>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- <mat-card class="align--center flex-col flex-col--50 word-card">
+        <mat-card-title *ngIf="game.word">
+          {{game.word.key.question}}
+        </mat-card-title>
+        <mat-card-content *ngIf="game.word">
+          <p class="sm-hide">
+            <strong>{{'dialog-texts.language' | translate}}:</strong>
+            {{game.word.key.questionLanguage}}
+          </p>
+          <p *ngIf="game.word.key.tags.length > 0">
+            <strong>{{'dialog-texts.tags' | translate}}:</strong>
+            <chips [chips]="game.word.key.tags" mode="read"></chips>
+          </p>
+          <p *ngIf="game.word.key.meta">
+            <strong>{{'dialog-texts.meta' | translate}}:</strong>
+            {{game.word.key.meta}}
+          </p>
+        </mat-card-content>
+        <mat-card-content *ngIf="!game.word" class="align--center">
+          <div class="display--inline-block">
+            <mat-spinner diameter="50">
+            </mat-spinner>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="align--center flex-col flex-col--50 word-card">
+        <mat-card-title *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
+          {{game.word.key.answer}}
+        </mat-card-title>
+        <mat-card-content *ngIf="game.word && (game.wordState.state === 'uncovered' || game.wordState.state === 'solved')">
+          <p class="sm-hide">
+            <strong>{{'dialog-texts.language' | translate}}:</strong>
+            {{game.word.key.answerLanguage}}
+          </p>
+          <p *ngIf="game.word.key.tags.length > 0">
+            <strong>{{'dialog-texts.tags' | translate}}:</strong>
+            <chips [chips]="game.word.key.tags" mode="read"></chips>
+          </p>
+        </mat-card-content>
+        <mat-card-content *ngIf="game.word && game.wordState.state === 'covered'" class="align--center">
+          <div class="flex flex--no-margin flex--column">
+            <mat-form-field>
+              <input matInput #answerInput
+                placeholder="{{'dialog-texts.answer' | translate}}"
+                [(ngModel)]="answer"
+                (keypress)="onKeyPress($event)"
+                [disabled]="game.gameState.state !== 'started'">
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+        <mat-card-content *ngIf="!game.word || game.wordState.state === 'undefined'" class="align--center">
+          <div class="display--inline-block">
+            <mat-spinner diameter="50">
+            </mat-spinner>
+          </div>
+        </mat-card-content>
+      </mat-card> -->
+    </div>
+  </mat-card-content>
+  <mat-card-actions>
+    <div class="flex flex--align-center flex--justify-space-between" [class.flex--row]="!lefthandMode">
+      <key *ngIf="game.gameState.state === 'started'" [label]="'dialog-texts.pause' | translate" class="key-button flex-col flex-col--1" (click)="pauseGame()">
+        <mat-icon>pause</mat-icon>
+      </key>
+      <key *ngIf="game.gameState.state === 'paused'" [label]="'dialog-texts.resume' | translate" class="key-button flex-col flex-col--1" (click)="resumeGame()">
+        <mat-icon>play_arrow</mat-icon>
+      </key>
+      <key *ngIf="game.gameState.state === 'paused'" [label]="'dialog-texts.stop' | translate" class="key-button flex-col flex-col--1" (click)="stopGame()">
+        <mat-icon>stop</mat-icon>
+      </key>
+    </div>
+  </mat-card-actions>
+</mat-card>
+
+<mat-card *ngIf="game && game.gameState.state === 'stopped'" class="margin--bottom">
+  <mat-card-title>
+    {{'dialog-texts.finished' | translate}}
+  </mat-card-title>
+  <mat-card-content>
+    <p *ngIf="game.gameState.reason === 'no-more-words'">
+      {{'dialog-texts.no-more-words' | translate}}
+    </p>
+    <p>
+      <strong>{{'dialog-texts.required-duration' | translate}}:</strong>
+      {{formatMillis(game.duration)}}
+    </p>
+  </mat-card-content>
+</mat-card>

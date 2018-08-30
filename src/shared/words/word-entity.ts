@@ -6,9 +6,11 @@ export interface WordEntity extends DatabaseEntity {
 
   // used for dialog texts
   games?: {
-    [mode: string]: {
-      level: number,
-      date: Date
+    [lang: string]: {
+      [mode: string]: {
+        level: number,
+        date: Date
+      }
     }
   };
 }

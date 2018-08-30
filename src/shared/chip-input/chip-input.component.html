@@ -1,11 +1,13 @@
 <div class="chip-input">
   <ng-container *ngIf="!hideChips">
-    <mat-chip *ngFor="let chip of chips" class="chip-input__chip mat-basic-chip">
-      {{chip}}
-      <button mat-icon-button (click)="deleteChip(chip)" tabindex="-1">
-        <mat-icon>delete</mat-icon>
-      </button>
-    </mat-chip>
+    <ng-container *ngFor="let chip of chips">
+      <mat-chip *ngIf="chip !== 'text'" class="chip-input__chip mat-basic-chip">
+        {{chip}}
+        <button mat-icon-button (click)="deleteChip(chip)" tabindex="-1">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-chip>
+    </ng-container>
   </ng-container>
   <mat-form-field class="chip-input__input">
     <input #input matInput [placeholder]="placeholder" (keydown)="onKeyDown($event)" (keyup)="onKeyUp($event)" [(ngModel)]="value" (ngModelChange)="emitValueChange()">

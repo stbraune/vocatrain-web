@@ -9,6 +9,9 @@ export class KeyComponent {
   @Input()
   public label: string;
 
+  @Input()
+  public noLabel = false;
+
   @Output()
   public click = new EventEmitter<any>();
 

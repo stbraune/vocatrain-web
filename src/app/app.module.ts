@@ -53,6 +53,7 @@ import { GuessModule } from '../guess';
 import { TypeModule } from '../type';
 import { WatchModule } from '../watch/watch.module';
 import { DupesModule } from '../dupes';
+import { DialogTextsModule } from '../dialog-texts';
 
 @NgModule({
   declarations: [
@@ -97,6 +98,7 @@ import { DupesModule } from '../dupes';
     TypeModule.forRoot(),
     WatchModule.forRoot(),
     DupesModule.forRoot(),
+    DialogTextsModule.forRoot(),
     StatisticsModule.forRoot(),
     SettingsModule.forRoot()
   ],

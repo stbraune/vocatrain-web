@@ -49,6 +49,9 @@
         </button>
       </span>
     </span>
+    <span routerLink="/dialog-texts" routerLinkActive="sm-show md-show" class="margin--left sm-hide md-hide">
+      {{'nav.dialog-texts.title' | translate}}
+    </span>
     <span routerLink="/words" routerLinkActive="sm-show md-show" class="margin--left sm-hide md-hide">
       {{'nav.words.title' | translate}}
     </span>
@@ -71,6 +74,9 @@
   </button>
   <button mat-button routerLink="/dupes" class="sm-hide md-hide">
     {{'nav.dupes.title' | translate}}
+  </button>
+  <button mat-button routerLink="/dialog-texts" class="sm-hide md-hide">
+    {{'nav.dialog-texts.title' | translate}}
   </button>
   <button mat-button routerLink="/words" class="sm-hide md-hide">
     {{'nav.words.title' | translate}}
@@ -108,6 +114,9 @@
       </button>
       <button mat-button routerLink="/dupes" (click)="sidenav.toggle()">
         {{'nav.dupes.title' | translate}}
+      </button>
+      <button mat-button routerLink="/dialog-texts" (click)="sidenav.toggle()">
+        {{'nav.dialog-texts.title' | translate}}
       </button>
       <button mat-button routerLink="/words" (click)="sidenav.toggle()">
         {{'nav.words.title' | translate}}

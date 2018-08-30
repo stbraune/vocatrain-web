@@ -1,0 +1,74 @@
+<div class="panel">
+  <div class="form">
+    <div class="flex">
+      <mat-form-field class="flex-col flex-col--1">
+        <input matInput type="number"
+          placeholder="{{'search-options.max-distance-in-days' | translate}}"
+          [(ngModel)]="maxDistanceInDays"
+          (ngModelChange)="onMaxDistanceInDaysChanged()"
+          (keydown)="onKeyDown($event)">
+      </mat-form-field>
+      <mat-form-field class="flex-col flex-col--1">
+        <input matInput type="number"
+          placeholder="{{'search-options.mod' | translate}}"
+          [(ngModel)]="searchOptions.mod"
+          (ngModelChange)="onModChanged()"
+          (keydown)="onKeyDown($event)">
+      </mat-form-field>
+    </div>
+    
+    <div class="flex flex--row">
+      <mat-form-field class="flex-col flex-col--1 language-select">
+        <mat-select #typeSelect
+          placeholder="{{'search-options.source-language' | translate}}"
+          [(ngModel)]="searchOptions.sourceLanguage"
+          (ngModelChange)="onPropertyChanged()"
+          (keydown)="onKeyDown($event)">
+          <mat-option
+            *ngFor="let supportedLanguage of supportedLanguages"
+            [value]="supportedLanguage">
+            {{supportedLanguage | translate}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+  
+      <button mat-button (click)="toggleLanguageDirection()" class="flex-col">
+        <mat-icon *ngIf="searchOptions.searchLanguagesDirection === 'both' || searchOptions.searchLanguagesDirection === 'tts'">keyboard_arrow_left</mat-icon>
+        <mat-icon *ngIf="searchOptions.searchLanguagesDirection === 'both' || searchOptions.searchLanguagesDirection === 'stt'">keyboard_arrow_right</mat-icon>
+      </button>
+        
+      <mat-form-field class="flex-col flex-col--1 language-select">
+        <mat-select #typeSelect
+          placeholder="{{'search-options.target-language' | translate}}"
+          [(ngModel)]="searchOptions.targetLanguage"
+          (ngModelChange)="onPropertyChanged()"
+          (keydown)="onKeyDown($event)">
+          <mat-option
+            *ngFor="let supportedLanguage of supportedLanguages"
+            [value]="supportedLanguage">
+            {{supportedLanguage | translate}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="flex flex--row flex--align-center">
+      <mat-checkbox class="flex-col" [(ngModel)]="searchOptions.searchLevelEnabled" (ngModelChange)="onPropertyChanged()"></mat-checkbox>
+      <mat-form-field class="flex-col flex-col--1 level-select">
+        <input matInput type="number"
+          [placeholder]="'search-options.min-level' | translate"
+          [(ngModel)]="searchOptions.searchLevelMinimum"
+          (ngModelChange)="onPropertyChanged()"
+          (keydown)="onKeyDown($event)">
+      </mat-form-field>
+  
+      <mat-form-field class="flex-col flex-col--1 level-select">
+        <input matInput type="number"
+          [placeholder]="'search-options.max-level' | translate"
+          [(ngModel)]="searchOptions.searchLevelMaximum"
+          (ngModelChange)="onPropertyChanged()"
+          (keydown)="onKeyDown($event)">
+      </mat-form-field>
+    </div>
+  </div>
+</div>

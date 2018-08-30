@@ -36,6 +36,7 @@ import { GameLogEntityService } from './game-log';
 import { GameService } from './game';
 import { LoadingIndicatorService } from './loading-indicator';
 import { SettingsService } from './settings';
+import { DialogTextGameService, DialogTextSearchOptionsComponent } from './dialog-text-game';
 
 @NgModule({
   imports: [
@@ -68,6 +69,7 @@ import { SettingsService } from './settings';
     ChipsComponent,
     KeyComponent,
     SearchOptionsComponent,
+    DialogTextSearchOptionsComponent,
     WordEditComponent,
     WordsEditorComponent
   ],
@@ -78,6 +80,7 @@ import { SettingsService } from './settings';
     ChipsComponent,
     KeyComponent,
     SearchOptionsComponent,
+    DialogTextSearchOptionsComponent,
     WordEditComponent,
     WordsEditorComponent
   ]
@@ -93,6 +96,7 @@ export class SharedModule {
         WordEntityService,
         GameService,
         GameLogEntityService,
+        DialogTextGameService,
         LoadingIndicatorService,
         SettingsService
       ]

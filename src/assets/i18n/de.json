@@ -22,6 +22,9 @@
     "words": {
       "title": "Vokabeln"
     },
+    "dialog-texts": {
+      "title": "Dialoge"
+    },
     "statistics": {
       "title": "Statistiken"
     },
@@ -52,7 +55,8 @@
       "guess": "Raten",
       "type": "Tippen",
       "watch": "Schauen",
-      "dupes": "Duplikate"
+      "dupes": "Duplikate",
+      "dialog-text-type-free": "Freies Tippen"
     },
     "total-duration": "Gesamtdauer",
     "correct-words": "Richtige Wörter",
@@ -120,6 +124,31 @@
     "stop": "Aufhören",
     "answer": "Antwort",
     "last-50-wrong-words": "Letzte 50 falsche Vokabeln"
+  },
+  "dialog-texts": {
+    "title": "Dialoge",
+    "start": "Starten!",
+    "duration": "Dauer",
+    "last-repeat": "Letzte Wiederholung",
+    "current-level": "Aktuelle Stufe",
+    "answer": "Antwort",
+    "test": "Testen",
+    "uncover": "Aufdecken",
+    "cover": "Zudecken",
+    "right": "Richtig",
+    "wrong": "Falsch",
+    "old-answer": "Vorherige Antwort",
+    "meta": "Hilfe",
+    "pause": "Pause",
+    "resume": "Fortsetzen",
+    "language": "Sprache",
+    "stop": "Aufhören",
+    "finished": "Fertig!",
+    "no-more-words": "Keine weiteren Dialogtexte vorhanden!",
+    "required-duration": "Benötigte Dauer"
+  },
+  "dialog-text-search-options": {
+    "dialog-text-type-free": "Freies Tippen"
   },
   "watch": {
     "title": "Schauen",
