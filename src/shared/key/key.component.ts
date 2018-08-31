@@ -12,6 +12,9 @@ export class KeyComponent {
   @Input()
   public noLabel = false;
 
+  @Input()
+  public noButton = false;
+
   @Output()
   public click = new EventEmitter<any>();
 

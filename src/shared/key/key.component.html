@@ -1,5 +1,5 @@
 <span class="inline-flex inline-flex--no-margin inline-flex--align-center stretch">
-  <button mat-button (click)="onClick($event)" class="stretch" [title]="label || ''" [class.tiny-button]="noLabel">
+  <button *ngIf="!noButton; else noButtonTemplate" mat-button (click)="onClick($event)" class="stretch" [title]="label || ''" [class.tiny-button]="noLabel">
     <span class="key">
       <ng-container *ngTemplateOutlet="iconContent"></ng-container>
     </span>
@@ -7,6 +7,14 @@
       {{label}}
     </span>
   </button>
+  <ng-template #noButtonTemplate>
+    <span class="key">
+      <ng-container *ngTemplateOutlet="iconContent"></ng-container>
+    </span>
+    <span *ngIf="!noLabel" class="margin--left sm-hide">
+      {{label}}
+    </span>
+  </ng-template>
 
   <ng-template #iconContent>
     <ng-content></ng-content>

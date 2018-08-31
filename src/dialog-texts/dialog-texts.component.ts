@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, QueryList, AfterViewInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { trigger, animate, state, style, transition } from '@angular/animations';
 
@@ -24,6 +24,7 @@ import {
 } from '../shared';
 
 import * as XRegExp from 'xregexp/xregexp-all';
+import { ViewChildren } from '@angular/core';
 
 @Component({
   selector: 'dialog-texts',
@@ -74,7 +75,8 @@ export class DialogTextsComponent implements OnInit {
   public answerStates: Array<'undefined' | 'correct' | 'partially-correct' | 'wrong'> = [];
   public uncoveredCurrentWord = false;
 
-  public _answerInputElement: ElementRef;
+  @ViewChildren('answerInputFormField')
+  public answerInputElements: QueryList<ElementRef>;
 
   public constructor(
     private loadingIndicatorService: LoadingIndicatorService,
@@ -107,6 +109,19 @@ export class DialogTextsComponent implements OnInit {
     //   this.startGame();
     // }, 2000);
   }
+
+  // public ngAfterViewInit() {
+  //   console.log('ql', this.answerInputElements);
+  //   this.answerInputElements.changes.subscribe((x) => {
+  //     console.log('x', x);
+
+  //     // this.answerInputElements.filter((elementRef) => parseInt(elementRef.nativeElement.dataset['answerIndex'], 10) > 42);
+  //     // this.answerInputElements.forEach((el: ElementRef) => {
+  //     //   console.log('el', el);
+  //     //   el.nativeElement.dataset['answerIndex'];
+  //     // });
+  //   });
+  // }
 
   public modeChanged() {
     this.dialogTextGameService.getMinimumLevel(this.mode).subscribe((minLevel) => {
@@ -273,7 +288,14 @@ export class DialogTextsComponent implements OnInit {
     if (this.uncoveredCurrentWord) {
       this.dialogTextGameService.solveWordCorrect(this.game, answerIndex, this.answers[answerIndex]).pipe(
         observeLoading(),
-        tap((game) => this.answerStates[answerIndex] = 'correct')
+        tap((game) => this.answerStates[answerIndex] = 'correct'),
+        tap(() => {
+          const nextAnswerInputElement = this.answerInputElements
+            .filter((elementRef) => parseInt(elementRef.nativeElement.dataset['answerIndex'], 10) > answerIndex)[0];
+          if (nextAnswerInputElement) {
+            nextAnswerInputElement.nativeElement.focus();
+          }
+        })
       ).subscribe();
     } else {
       this.dialogTextGameService.solveWordCorrect(this.game, answerIndex, this.answers[answerIndex]).pipe(
@@ -291,7 +313,14 @@ export class DialogTextsComponent implements OnInit {
     this.dialogTextGameService.solveWordWrong(this.game, answerIndex, this.answers[answerIndex]).pipe(
       tap((x) => console.log('solved wrong', answerIndex, this.answers[answerIndex])),
       observeLoading(),
-      tap((game) => this.answerStates[answerIndex] = 'wrong')
+      tap((game) => this.answerStates[answerIndex] = 'wrong'),
+      tap(() => {
+        const nextAnswerInputElement = this.answerInputElements
+          .filter((elementRef) => parseInt(elementRef.nativeElement.dataset['answerIndex'], 10) > answerIndex)[0];
+        if (nextAnswerInputElement) {
+          nextAnswerInputElement.nativeElement.focus();
+        }
+      })
     ).subscribe();
   }
 

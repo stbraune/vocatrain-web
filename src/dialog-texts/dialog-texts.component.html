@@ -63,7 +63,9 @@
                   floatLabel="always"
                   class="stretch mat-input--no-margin">
                   <input matInput
+                    #answerInputFormField
                     placeholder="{{'dialog-texts.answer' | translate}}"
+                    [attr.data-answer-index]="i"
                     [(ngModel)]="answers[i]"
                     (keypress)="onKeyPress($event, i)"
                     (keydown)="onKeyDown($event, i)"
@@ -82,7 +84,7 @@
                 </ng-container>
               </div>
               <ng-container *ngIf="!containsTag(game.word.key.tags[i], 'ignore')">
-                <key *ngIf="answerStates[i] === 'correct'" class="key-button flex-col flex-col--5 margin--left" [noLabel]="true">
+                <key *ngIf="answerStates[i] === 'correct'" class="key-button flex-col flex-col--5 margin--left" [noLabel]="true" [noButton]="true">
                   <mat-icon color="primary">check_circle</mat-icon>
                 </key>
                 <key *ngIf="answerStates[i] === 'wrong'" class="key-button flex-col flex-col--5 margin--left" [noLabel]="true">

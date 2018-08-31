@@ -273,8 +273,8 @@ export class DialogTextGameService {
       const answerLanguage = dialogTextGame.word.key.answerLanguage;
 
       wordEntity.games = wordEntity.games || {};
-      wordEntity.games[answerLanguage] = wordEntity.games[dialogTextGame.mode] || {};
-      wordEntity.games[answerLanguage][dialogTextGame.mode] = wordEntity.games[dialogTextGame.mode][answerLanguage] || {
+      wordEntity.games[answerLanguage] = wordEntity.games[answerLanguage] || {};
+      wordEntity.games[answerLanguage][dialogTextGame.mode] = wordEntity.games[answerLanguage][dialogTextGame.mode] || {
         date: new Date(),
         level: 0,
       };
@@ -288,6 +288,7 @@ export class DialogTextGameService {
         } else {
           wordEntity.games[answerLanguage][dialogTextGame.mode].level++;
         }
+        wordEntity.games[answerLanguage][dialogTextGame.mode].date = new Date();
       } else {
         wordEntity.games[answerLanguage][dialogTextGame.mode].level = 0;
         wordEntity.games[answerLanguage][dialogTextGame.mode].date = new Date();
