@@ -219,12 +219,12 @@ export class StatisticsService {
               const index = result.rows.findIndex((r) => r.key[0] === group.key && r.key[1] === level - 1);
               if (index === -1) {
                 result.rows.push({
-                  key: [group.key[0], level],
+                  key: [group.key, level],
                   value: 0
                 });
               } else {
                 result.rows.splice(index + 1, 0, {
-                  key: [group.key[0], level],
+                  key: [group.key, level],
                   value: 0
                 });
               }
