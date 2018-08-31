@@ -218,6 +218,14 @@ export class WordEntityService {
         return `function (doc) {
           if (doc._id.substr(0, 'word_'.length) === 'word_') {
             doc.texts.forEach(function (text) {
+              if (text.tags.indexOf('text') !== -1) {
+                return;
+              }
+
+              if (text.tags.indexOf('nodup') !== -1) {
+                return;
+              }
+
               Object.keys(text.words).forEach(function (lang) {
                 emit([lang, text.words[lang].value]);
               });
