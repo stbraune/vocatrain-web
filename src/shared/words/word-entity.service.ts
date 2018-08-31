@@ -92,6 +92,40 @@ export class WordEntityService {
     });
   }
 
+  private moveEverythingFromLevel0ToLevelMinus1() {
+    this.db.executeQuery<[number, string, string]>({
+      designDocument: 'words-tmp',
+      viewName: 'in-level-0',
+      mapFunction(emit) {
+        return function (doc) {
+          if (doc._id.substr(0, 'word_'.length) === 'word_') {
+            doc.texts.forEach(function (text, index) {
+              Object.keys(text.words).forEach(function (lang) {
+                if (!text.words[lang].games) {
+                  return;
+                }
+
+                Object.keys(text.words[lang].games).forEach(function (mode) {
+                  if (text.words[lang].games[mode].level === 0) {
+                    emit([index, lang, mode]);
+                  }
+                });
+              });
+            });
+          }
+        };
+      },
+      include_docs: true
+    }).pipe(
+      switchMap((result) => forkJoin(result.rows.map((row) => {
+        delete row.doc.texts[row.key[0]].words[row.key[1]].games[row.key[2]];
+        return this.db.putEntity(row.doc);
+      })))
+    ).subscribe((x) => {
+      console.log(x);
+    });
+  }
+
   public getDatabase(): Database<WordEntity> {
     return this.db;
   }
