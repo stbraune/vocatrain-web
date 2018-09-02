@@ -229,8 +229,14 @@ h3 {
     &--40 { flex-basis: 40%; }
     &--50 { flex-basis: 50%; }
 
-    &--10em { flex-basis: 10em; }
-    &--13em { flex-basis: 13em; }
+    @media(min-width: 600px) and (max-width: 1049px) {
+      &--10em-md { flex-basis: 10em; }
+      &--13em-md { flex-basis: 13em; }
+    }
+    @media(min-width: 1049px) {
+      &--10em-lg { flex-basis: 10em; }
+      &--13em-lg { flex-basis: 13em; }
+    }
   }
 
   &--no-margin {
@@ -242,6 +248,10 @@ h3 {
       margin-right: 0;
     }
   }
+}
+
+.mat-hint {
+  white-space: pre-line;
 }
 
 @media(min-width: 600px) {
