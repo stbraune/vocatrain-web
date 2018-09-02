@@ -92,8 +92,13 @@ export class WordsEditorComponent implements OnInit {
       return splittedWordEntities;
     }
 
+    const splittedWordsObservables = splitWords().map((w) => this.wordEntityService.putWordEntity(w));
+    if (splittedWordsObservables.length === 0) {
+      return;
+    }
+
     this.loadingIndicatorService.notifyLoading();
-    forkJoin(splitWords().map((w) => this.wordEntityService.putWordEntity(w)))
+    forkJoin(splittedWordsObservables)
       .subscribe((wordEntities) => {
         this.loadingIndicatorService.notifyFinished();
         this.snackBar.open('Saved!', null, {
