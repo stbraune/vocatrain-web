@@ -454,7 +454,8 @@ export class DialogTextGameService {
                   return text.tags;
                 });
                 const history = doc.texts.map(function(text) {
-                  if (text.words[answerLanguage]
+                  if (text.words
+                      && text.words[answerLanguage]
                       && text.words[answerLanguage].games
                       && text.words[answerLanguage].games[mode]) {
                     return {
@@ -466,6 +467,18 @@ export class DialogTextGameService {
                   return null;
                 });
                 const count = doc.texts.length;
+                const countNotIgnores = doc.texts.filter(function (text) {
+                  return text.tags && text.tags.indexOf('ignore') === -1;
+                }).length;
+                const corrects = doc.texts.filter(function (text) {
+                  return text.words
+                    && text.words[answerLanguage]
+                    && text.words[answerLanguage].games
+                    && text.words[answerLanguage].games[mode]
+                    && text.words[answerLanguage].games[mode].correct
+                    && text.tags
+                    && text.tags.indexOf('ignore') === -1;
+                }).length;
 
                 const requiredLanguage = getRequiredLanguage(answerLevel, mod, sourceLanguage, targetLanguage);
                 const requiredDistance = getRequiredDistance(answerLevel, mod);
@@ -475,6 +488,7 @@ export class DialogTextGameService {
 
                 const indexKey = {
                   reoccurAt: reoccurAt,
+                  success: corrects / countNotIgnores,
                   answerLevel: answerLevel,
                   answerLanguage: answerLanguage,
                   answers: answers,

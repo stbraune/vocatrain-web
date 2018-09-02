@@ -10,7 +10,14 @@
     </ng-container>
   </ng-container>
   <mat-form-field class="chip-input__input">
-    <input #input matInput [placeholder]="placeholder" (keydown)="onKeyDown($event)" (keyup)="onKeyUp($event)" [(ngModel)]="value" (ngModelChange)="emitValueChange()">
+    <textarea #input matInput
+      matTextareaAutosize
+      matAutosizeMinRows="1"
+      [placeholder]="placeholder"
+      (keydown)="onKeyDown($event)"
+      (keyup)="onKeyUp($event)"
+      [(ngModel)]="value"
+      (ngModelChange)="emitValueChange()"></textarea>
     <span matSuffix>
       <ng-content></ng-content>
     </span>

@@ -1,6 +1,7 @@
 export interface DialogTextSearchResultKey {
   searchLanguages: string[];
   reoccurAt: string | Date;
+  success: number;
   answerLevel: number;
   answerLanguage: string;
   answers: string[];

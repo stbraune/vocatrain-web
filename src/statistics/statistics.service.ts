@@ -23,6 +23,76 @@ export class StatisticsService {
     this.gameLogDatabase = this.gameLogEntityService.getDatabase();
   }
 
+  public countWords(): Observable<number> {
+    return this.wordEntityDatabase.executeQuery<[string, number], number, number>({
+      designDocument: 'counts',
+      viewName: 'words',
+      mapFunction(emit) {
+        return function (doc) {
+          if (doc._id.substr(0, 'word_'.length) === 'word_') {
+            doc.texts.forEach(function (text, index) {
+              if (text.tags.indexOf('ignore') === -1 && text.tags.indexOf('text') === -1) {
+                emit([doc._id, index]);
+              }
+            });
+          }
+        };
+      },
+      reduceFunction: () => '_count',
+      reduce: true
+    }).pipe(
+      map((result) => result.rows[0].value)
+    );
+  }
+
+  public countDialogTexts(): Observable<number> {
+    return this.wordEntityDatabase.executeQuery<string, number, number>({
+      designDocument: 'counts',
+      viewName: 'dialog-texts',
+      mapFunction(emit) {
+        return function (doc) {
+          if (doc._id.substr(0, 'word_'.length) === 'word_') {
+            if (doc.texts.every(function (text) {
+              return text.tags && text.tags.indexOf('text') !== -1;
+            })) {
+              emit(doc._id);
+            }
+          }
+        };
+      },
+      reduceFunction: () => '_count',
+      reduce: true
+    }).pipe(
+      map((result) => result.rows[0].value)
+    );
+  }
+
+  public countWordsByTag(): Observable<{ tag: string, amount: number }[]> {
+    return this.wordEntityDatabase.executeQuery<string, number, number>({
+      designDocument: 'counts',
+      viewName: 'by-tags',
+      mapFunction(emit) {
+        return `function (doc) {
+          if (doc._id.substr(0, 'word_'.length) === 'word_') {
+            doc.texts.forEach(function (text) {
+              text.tags.forEach(function (tag) {
+                emit(tag);
+              });
+            });
+          }
+        }`;
+      },
+      reduceFunction: () => '_count',
+      reduce: true,
+      group: true
+    }).pipe(
+      map((result) => result.rows.map((row) => ({
+        tag: row.key,
+        amount: row.value
+      })))
+    );
+  }
+
   public getTotals(options: {
     mode: string,
     startDate?: Date,
@@ -194,7 +264,9 @@ export class StatisticsService {
                       && text.words[lang].games
                       && text.words[lang].games[mode]
                       && text.words[lang].games[mode].level;
-                    emit([lang, level === undefined ? -1 : level]);
+                    if (level !== undefined) {
+                      emit([lang, level]);
+                    }
                   });
                 });
               }

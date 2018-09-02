@@ -10,6 +10,13 @@ import { tap, switchMap, catchError, map } from 'rxjs/operators';
 import { GameLogEntity, LoadingIndicatorService, startLoading, finishLoading, observeLoading } from '../shared';
 import { StatisticsService } from './statistics.service';
 
+declare interface WordsPerTag {
+  // tag
+  name: string;
+  // amount
+  value: number;
+}
+
 declare interface WordsPerLevel {
   // lang
   key: string;
@@ -52,6 +59,9 @@ declare interface Totals {
   styleUrls: ['./statistics.component.scss']
 })
 export class StatisticsComponent implements OnInit {
+  public countWords = 0;
+  public countDialogTexts = 0;
+
   public modes: string[] = [];
   public stats: {
     [mode: string]: {
@@ -62,6 +72,8 @@ export class StatisticsComponent implements OnInit {
     }
   } = {};
 
+  public wordsPerTags: WordsPerTag[] = [];
+
   public constructor(
     private loadingIndicatorService: LoadingIndicatorService,
     private translateService: TranslateService,
@@ -70,6 +82,23 @@ export class StatisticsComponent implements OnInit {
   }
 
   public ngOnInit(): void {
+    this.statisticsService.countWords().subscribe((countWords) => {
+      this.countWords = countWords;
+    });
+
+    this.statisticsService.countDialogTexts().subscribe((countDialogTexts) => {
+      this.countDialogTexts = countDialogTexts;
+    });
+
+    this.statisticsService.countWordsByTag().subscribe((wordsPerTags) => {
+      this.wordsPerTags = wordsPerTags
+        .sort((a, b) => b.amount - a.amount)
+        .map((wordsPerTag) => ({
+          name: wordsPerTag.tag,
+          value: wordsPerTag.amount
+        }));
+    });
+
     this.statisticsService.queryAllGameModes().pipe(
       startLoading(),
       tap((modes) => this.modes = modes),

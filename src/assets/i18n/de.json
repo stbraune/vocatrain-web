@@ -49,6 +49,9 @@
   },
   "statistics": {
     "title": "Statistiken",
+    "general": "Allgemein",
+    "count-words": "Vokabeln",
+    "count-dialog-texts": "Dialogtexte",
     "totals": "Gesamt",
     "last30": "Letzte 30 Tage",
     "mode": {
