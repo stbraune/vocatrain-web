@@ -12,7 +12,7 @@
       <chip *ngFor="let tag of availableTags" [chip]="tag" mode="read" (chipClicked)="onChipClicked($event)">
       </chip>
     </div>
-    <div class="max-height-scroll--40">
+    <div class="max-height-scroll--70">
       <div *ngFor="let text of editedWordEntity.texts; let w=index" class="flex flex--wrap flex--no-margin flex--align-center">
         <div *ngIf="supportMultipleTexts" class="flex-col sm-hide">
           <button mat-icon-button (click)="onDeleteText(text)">
@@ -55,7 +55,7 @@
           </chip-input>
         </div>
 
-        <div class="flex-col flex-col--25 align--center margin--bottom">
+        <div class="flex-col flex-col--13em align--center margin--bottom">
           <chips [(chips)]="text.tags" (chipsChange)="onChipsChange($event)"></chips>
         </div>
       </div>

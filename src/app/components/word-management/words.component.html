@@ -53,7 +53,7 @@
             <mat-icon *ngIf="sorting.property === lang && sorting.descending">arrow_downward</mat-icon>
           </div>
         </ng-container>
-        <div class="flex-col flex-col--17 align--center overflow--hidden word-wrap--break-word white-space--normal flex flex--no-margin flex--align-center flex--justify-center sm-hide"
+        <div class="flex-col flex-col--10em align--center overflow--hidden word-wrap--break-word white-space--normal flex flex--no-margin flex--align-center flex--justify-center sm-hide"
           [class.cursor--pointer]="query === '' && !duplicatesFiltered"
           (click)="sortBy('tags')">
           <span>
