@@ -171,10 +171,18 @@ export class ChipInputComponent {
         this.addChips(...result.chips);
         this.setValue(result.value);
         $event.preventDefault();
-      } else if ($event.which === 13) {
-        this.enterPressed.emit();
-        $event.preventDefault();
       }
+    }
+  }
+
+  public onKeyPress($event: KeyboardEvent) {
+    if ($event.which === 13) {
+      this.enterPressed.emit();
+      $event.preventDefault();
+    }
+
+    if (($event.which === 10 || $event.which === 13) && ($event.ctrlKey || $event.metaKey)) {
+      this.setValue(this.value + '\n');
     }
   }
 
