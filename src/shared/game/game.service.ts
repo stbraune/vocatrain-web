@@ -234,7 +234,7 @@ export class GameService {
       translatedWord.games[game.mode].date = new Date();
 
       if (game.nextWords && game.nextWords.indexOf(game.word) === -1) {
-        game.word.key.reoccurAt = new Date(game.word.key.reoccurAt as string);
+        game.word.key.reoccurAt = new Date();
         game.word.key.reoccurAt.setSeconds(game.word.key.reoccurAt.getSeconds() + 30 + Math.random() * 90);
         game.nextWords.push(game.word);
       }
