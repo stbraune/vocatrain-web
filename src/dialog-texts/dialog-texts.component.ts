@@ -73,7 +73,19 @@ export class DialogTextsComponent implements OnInit {
 
   public answers: string[] = [];
   public answerStates: Array<'undefined' | 'correct' | 'partially-correct' | 'wrong'> = [];
-  public uncoveredCurrentWord = false;
+  public answerTests: Array<{
+    errors: number,
+    diff: {
+      count: number,
+      value: string,
+      added: boolean,
+      removed: boolean
+    }[]
+  }> = [];
+
+  public get totalErrors(): number {
+    return this.answerTests.reduce((prev, cur) => prev + (cur ? cur.errors : 0), 0);
+  }
 
   @ViewChildren('answerInputFormField')
   public answerInputElements: QueryList<ElementRef>;
@@ -145,6 +157,7 @@ export class DialogTextsComponent implements OnInit {
       tap((game) => {
         this.answers = game.word && game.word.key.answers.map((answer) => '') || [];
         this.answerStates = game.word && game.word.key.answers.map((answer) => 'undefined' as 'undefined') || [];
+        this.answerTests = game.word && game.word.key.answers.map((answer) => undefined) || [];
       })
     ).subscribe();
   }
@@ -280,36 +293,31 @@ export class DialogTextsComponent implements OnInit {
   }
 
   public uncoverWord(answerIndex: number) {
-    this.uncoveredCurrentWord = true;
     this.dialogTextGameService.uncoverWord(this.game, answerIndex).pipe(observeLoading()).subscribe();
   }
 
   public solveCorrect(answerIndex: number) {
-    if (this.uncoveredCurrentWord) {
-      this.dialogTextGameService.solveWordCorrect(this.game, answerIndex, this.answers[answerIndex]).pipe(
-        observeLoading(),
-        tap((game) => this.answerStates[answerIndex] = 'correct'),
-        tap(() => {
-          const nextAnswerInputElement = this.answerInputElements
-            .filter((elementRef) => parseInt(elementRef.nativeElement.dataset['answerIndex'], 10) > answerIndex)[0];
-          if (nextAnswerInputElement) {
-            nextAnswerInputElement.nativeElement.focus();
-          }
-        })
-      ).subscribe();
-    } else {
-      this.dialogTextGameService.solveWordCorrect(this.game, answerIndex, this.answers[answerIndex]).pipe(
-        observeLoading(),
-        tap((game) => this.answerStates[answerIndex] = 'partially-correct')
-      ).subscribe();
-    }
+    this.answerTests[answerIndex] = this.dialogTextGameService.testAnswer(this.game, answerIndex, this.answers[answerIndex]);
+    this.dialogTextGameService.solveWordCorrect(this.game, answerIndex, this.answers[answerIndex]).pipe(
+      observeLoading(),
+      tap((game) => this.answerStates[answerIndex] = 'correct'),
+      tap(() => {
+        const nextAnswerInputElement = this.answerInputElements
+          .filter((elementRef) => parseInt(elementRef.nativeElement.dataset['answerIndex'], 10) > answerIndex)[0];
+        if (nextAnswerInputElement) {
+          nextAnswerInputElement.nativeElement.focus();
+        }
+      })
+    ).subscribe();
   }
 
   public solvePartiallyCorrect(answerIndex: number) {
+    this.answerTests[answerIndex] = this.dialogTextGameService.testAnswer(this.game, answerIndex, this.answers[answerIndex]);
     this.answerStates[answerIndex] = 'partially-correct';
   }
 
   public solveWrong(answerIndex: number) {
+    this.answerTests[answerIndex] = this.dialogTextGameService.testAnswer(this.game, answerIndex, this.answers[answerIndex]);
     this.dialogTextGameService.solveWordWrong(this.game, answerIndex, this.answers[answerIndex]).pipe(
       tap((x) => console.log('solved wrong', answerIndex, this.answers[answerIndex])),
       observeLoading(),

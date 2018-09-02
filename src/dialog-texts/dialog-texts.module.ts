@@ -9,7 +9,8 @@ import {
   MatIconModule,
   MatFormFieldModule,
   MatInputModule,
-  MatSelectModule
+  MatSelectModule,
+  MatBadgeModule
 } from '@angular/material';
 
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -29,6 +30,7 @@ import { SharedModule } from '../shared';
         useExisting: TranslateHttpLoader
       }
     }),
+    MatBadgeModule,
     MatButtonModule,
     MatCardModule,
     MatProgressSpinnerModule,

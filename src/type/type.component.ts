@@ -75,7 +75,6 @@ export class TypeComponent implements OnInit {
 
   public answer = '';
   public answerState: 'undefined' | 'correct' | 'partially-correct' | 'wrong' | 'totally-wrong' = 'undefined';
-  public uncoveredCurrentWord = false;
 
   public _answerInputElement: ElementRef;
 
@@ -307,22 +306,14 @@ export class TypeComponent implements OnInit {
   }
 
   public uncoverWord() {
-    this.uncoveredCurrentWord = true;
     this.gameService.uncoverWord(this.game).pipe(observeLoading()).subscribe();
   }
 
   public solveCorrect() {
-    if (this.uncoveredCurrentWord) {
-      this.gameService.solveWordCorrect(this.game).pipe(
-        observeLoading(),
-        tap((game) => this.answerState = 'correct')
-      ).subscribe();
-    } else {
-      this.gameService.solveWordCorrect(this.game).pipe(
-        observeLoading(),
-        tap((game) => this.answerState = 'partially-correct')
-      ).subscribe();
-    }
+    this.gameService.solveWordCorrect(this.game).pipe(
+      observeLoading(),
+      tap((game) => this.answerState = 'correct')
+    ).subscribe();
   }
 
   public solvePartiallyCorrect() {

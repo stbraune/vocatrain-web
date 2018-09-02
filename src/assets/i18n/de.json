@@ -134,6 +134,7 @@
     "duration": "Dauer",
     "last-repeat": "Letzte Wiederholung",
     "current-level": "Aktuelle Stufe",
+    "total-errors": "Gesamtfehlerzahl",
     "answer": "Antwort",
     "test": "Testen",
     "uncover": "Aufdecken",

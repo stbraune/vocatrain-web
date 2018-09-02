@@ -9,7 +9,8 @@ export interface Text {
           level: number,
           date: Date,
           answer?: string, // used for dialog texts
-          correct?: boolean
+          correct?: boolean,
+          errors?: number
         }
       }
     }

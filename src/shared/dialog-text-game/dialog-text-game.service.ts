@@ -12,7 +12,79 @@ import { GameLogEntityService, GameLogEntity } from '../game-log';
 import { DialogTextGame } from './dialog-text-game';
 import { DialogTextGameState } from './dialog-text-game-state';
 import { DialogTextWordState } from './dialog-text-word-state';
-import { preserveWhitespacesDefault } from '@angular/compiler';
+
+import * as XRegExp from 'xregexp/xregexp-all';
+import Diff from 'diff/lib/diff/base';
+import { generateOptions } from 'diff/lib/util/params';
+
+// copied and adapted from diff/lib/diff/word:
+// Based on https://en.wikipedia.org/wiki/Latin_script_in_Unicode
+//
+// Ranges and exceptions:
+// Latin-1 Supplement, 0080–00FF
+//  - U+00D7  × Multiplication sign
+//  - U+00F7  ÷ Division sign
+// Latin Extended-A, 0100–017F
+// Latin Extended-B, 0180–024F
+// IPA Extensions, 0250–02AF
+// Spacing Modifier Letters, 02B0–02FF
+//  - U+02C7  ˇ &#711;  Caron
+//  - U+02D8  ˘ &#728;  Breve
+//  - U+02D9  ˙ &#729;  Dot Above
+//  - U+02DA  ˚ &#730;  Ring Above
+//  - U+02DB  ˛ &#731;  Ogonek
+//  - U+02DC  ˜ &#732;  Small Tilde
+//  - U+02DD  ˝ &#733;  Double Acute Accent
+// Latin Extended Additional, 1E00–1EFF
+const extendedWordChars = /^[a-zA-Z\u{C0}-\u{FF}\u{D8}-\u{F6}\u{F8}-\u{2C6}\u{2C8}-\u{2D7}\u{2DE}-\u{2FF}\u{1E00}-\u{1EFF}]+$/u;
+const reWhitespace = /\S/;
+const wordDiff = Object.assign(new Diff(), {
+  equals(left, right) {
+    function sanitize(word) {
+      const regexp = XRegExp(`[^\\pL]`, 'g');
+      return XRegExp.replace(word, regexp, '', 'all');
+    }
+
+    if (this.options.ignoreCase) {
+      left = left.toLowerCase();
+      right = right.toLowerCase();
+    }
+
+    if (this.options.ignoreSpecialChars) {
+      left = sanitize(left);
+      right = sanitize(right);
+    }
+
+    // process.stdout.write('comparing "' + left + '" with "' + right + '"\n');
+    return left === right || (this.options.ignoreWhitespace && !reWhitespace.test(left) && !reWhitespace.test(right));
+  },
+
+  tokenize(value) {
+    const tokens = value.split(/(\s+|\b)/);
+
+    // Join the boundary splits that we do not consider to be boundaries. This is primarily the extended Latin character set.
+    for (let i = 0; i < tokens.length - 1; i++) {
+      // If we have an empty string in the next field and we have only word chars before and after, merge
+      if (!tokens[i + 1] && tokens[i + 2]
+        && extendedWordChars.test(tokens[i])
+        && extendedWordChars.test(tokens[i + 2])) {
+        tokens[i] += tokens[i + 2];
+        tokens.splice(i + 1, 2);
+        i--;
+      }
+    }
+
+    return tokens;
+  }
+});
+
+function diffWords(oldStr, newStr, options) {
+  return wordDiff.diff(oldStr, newStr, generateOptions(options, {
+    ignoreWhitespace: true,
+    ignoreCase: true,
+    ignoreSpecialChars: true
+  }));
+}
 
 @Injectable()
 export class DialogTextGameService {
@@ -134,6 +206,45 @@ export class DialogTextGameService {
     return throwError(`Cannot uncover a uncovered word or game not started`);
   }
 
+  public testAnswer(dialogTextGame: DialogTextGame, index: number, answer: string): {
+    errors: number,
+    diff: {
+      count: number,
+      value: string,
+      added: boolean,
+      removed: boolean
+    }[]
+  } {
+    if (dialogTextGame.gameState.state === 'started') {
+      const translatedWord = dialogTextGame.word.doc.texts[index].words[dialogTextGame.word.key.answerLanguage];
+
+      const actualAnswer = answer;
+      const expectedAnswer = translatedWord.value;
+
+      const diff = diffWords(actualAnswer, expectedAnswer, undefined);
+      const errors = diff
+        .map((part, i) => {
+          if (part.removed) {
+            return 1;
+          }
+
+          if (part.added) {
+            const prev = diff[i - 1];
+            return prev && prev.removed ? 0 : 1;
+          }
+
+          return 0;
+        })
+        .reduce((prev, cur) => prev + cur, 0);
+      return {
+        errors,
+        diff
+      };
+    }
+
+    throw new Error(`Cannot test answer without being in a started game`);
+  }
+
   public solveWordCorrect(dialogTextGame: DialogTextGame, index: number, answer: string): Observable<DialogTextGame> {
     if (dialogTextGame.gameState.state === 'started' && dialogTextGame.wordState[index].state === 'uncovered') {
       const translatedWord = dialogTextGame.word.doc.texts[index].words[dialogTextGame.word.key.answerLanguage];
@@ -152,6 +263,7 @@ export class DialogTextGameService {
       translatedWord.games[dialogTextGame.mode].date = new Date();
       translatedWord.games[dialogTextGame.mode].answer = answer;
       translatedWord.games[dialogTextGame.mode].correct = true;
+      translatedWord.games[dialogTextGame.mode].errors = this.testAnswer(dialogTextGame, index, answer).errors;
 
       const saveWord = () => {
         return this.db.putEntity(dialogTextGame.word.doc).pipe(
@@ -188,6 +300,7 @@ export class DialogTextGameService {
       translatedWord.games[dialogTextGame.mode].date = new Date();
       translatedWord.games[dialogTextGame.mode].answer = answer;
       translatedWord.games[dialogTextGame.mode].correct = false;
+      translatedWord.games[dialogTextGame.mode].errors = this.testAnswer(dialogTextGame, index, answer).errors;
 
       const saveWord = () => {
         return this.db.putEntity(dialogTextGame.word.doc).pipe(
@@ -380,7 +493,7 @@ export class DialogTextGameService {
           }
 
           function getRequiredDistance(level, mod) {
-            return level === -1 || level % mod === 0 ? 0 : Math.pow(2, (level % mod) - 1);
+            return level === -1 ? 0 : level % mod === 0 ? 1 : Math.pow(2, (level % mod) - 1);
           }
 
           function getRequiredLanguage(level, mod, sourceLanguage, targetLanguage) {
@@ -479,20 +592,40 @@ export class DialogTextGameService {
                     && text.tags
                     && text.tags.indexOf('ignore') === -1;
                 }).length;
+                const errorsNeg = -doc.texts
+                  .map(function (text) {
+                    if (text.words
+                        && text.words[answerLanguage]
+                        && text.words[answerLanguage].games
+                        && text.words[answerLanguage].games[mode]
+                        && text.tags
+                        && text.tags.indexOf('ignore') === -1) {
+                      return text.words[answerLanguage].games[mode].correct === false
+                        && text.words[answerLanguage].games[mode].errors === undefined
+                          ? 1
+                          : text.words[answerLanguage].games[mode].errors;
+                    }
+
+                    return 0;
+                  })
+                  .reduce(function(prev, cur) {
+                    return prev + cur;
+                  }, 0);
 
                 const requiredLanguage = getRequiredLanguage(answerLevel, mod, sourceLanguage, targetLanguage);
                 const requiredDistance = getRequiredDistance(answerLevel, mod);
 
-                const reoccurAt = new Date(normalizeDate(answerThen).getTime() + convertMillis(requiredDistance)
+                const reoccurAt = new Date(answerThen.getTime() + convertMillis(requiredDistance)
                   + Math.round(Math.random() * 2 * 86400000));
 
                 const indexKey = {
                   reoccurAt: reoccurAt,
                   success: corrects / countNotIgnores,
+                  errorsNeg: errorsNeg,
                   answerLevel: answerLevel,
                   answerLanguage: answerLanguage,
                   answers: answers,
-                  answerAt: answerThen,
+                  answerAt: answerLevel === -1 ? new Date(0) : answerThen,
                   questionLanguage: questionLanguage,
                   questions: questions,
                   tags: tags,

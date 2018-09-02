@@ -414,7 +414,7 @@ export class GameService {
           }
 
           function getRequiredDistance(level, mod) {
-            return level === -1 || level % mod === 0 ? 0 : Math.pow(2, (level % mod) - 1);
+            return level === -1 ? 0 : level % mod === 0 ? 1 : Math.pow(2, (level % mod) - 1);
           }
 
           function getRequiredLanguage(level, mod, sourceLanguage, targetLanguage) {
@@ -478,7 +478,7 @@ export class GameService {
                   const requiredLanguage = getRequiredLanguage(answerLevel, mod, sourceLanguage, targetLanguage);
                   const requiredDistance = getRequiredDistance(answerLevel, mod);
 ;
-                  const reoccurAt = new Date(normalizeDate(answerThen).getTime() + convertMillis(requiredDistance)
+                  const reoccurAt = new Date(answerThen.getTime() + convertMillis(requiredDistance)
                     + Math.round(Math.random() * 2 * 86400000));
 
                   const indexKey = {
