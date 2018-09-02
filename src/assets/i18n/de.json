@@ -133,6 +133,7 @@
     "start": "Starten!",
     "duration": "Dauer",
     "last-repeat": "Letzte Wiederholung",
+    "never": "Nie",
     "current-level": "Aktuelle Stufe",
     "total-errors": "Gesamtfehlerzahl",
     "answer": "Antwort",
