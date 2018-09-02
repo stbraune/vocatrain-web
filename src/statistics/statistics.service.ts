@@ -28,7 +28,7 @@ export class StatisticsService {
       designDocument: 'counts',
       viewName: 'words',
       mapFunction(emit) {
-        return function (doc) {
+        return `function (doc) {
           if (doc._id.substr(0, 'word_'.length) === 'word_') {
             doc.texts.forEach(function (text, index) {
               if (text.tags.indexOf('ignore') === -1 && text.tags.indexOf('text') === -1) {
@@ -36,7 +36,7 @@ export class StatisticsService {
               }
             });
           }
-        };
+        }`;
       },
       reduceFunction: () => '_count',
       reduce: true
@@ -50,7 +50,7 @@ export class StatisticsService {
       designDocument: 'counts',
       viewName: 'dialog-texts',
       mapFunction(emit) {
-        return function (doc) {
+        return `function (doc) {
           if (doc._id.substr(0, 'word_'.length) === 'word_') {
             if (doc.texts.every(function (text) {
               return text.tags && text.tags.indexOf('text') !== -1;
@@ -58,7 +58,7 @@ export class StatisticsService {
               emit(doc._id);
             }
           }
-        };
+        }`;
       },
       reduceFunction: () => '_count',
       reduce: true
