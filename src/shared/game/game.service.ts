@@ -234,6 +234,7 @@ export class GameService {
       translatedWord.games[game.mode].date = new Date();
 
       if (game.nextWords && game.nextWords.indexOf(game.word) === -1) {
+        game.word.key.answerAt = translatedWord.games[game.mode].date;
         game.word.key.reoccurAt = new Date();
         game.word.key.reoccurAt.setSeconds(game.word.key.reoccurAt.getSeconds() + 30 + Math.random() * 90);
         game.nextWords.push(game.word);
@@ -486,7 +487,7 @@ export class GameService {
                     answerHash: answerHash,
                     answerLevel: answerLevel,
                     answerLanguage: answerLanguage,
-                    answerAt: answerThen,
+                    answerAt: answerLevel === -1 ? new Date(0) : answerThen,
                     answer: answerWord.value,
                     questionLanguage: questionLanguage,
                     question: questionWord.value,
