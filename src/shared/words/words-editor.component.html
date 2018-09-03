@@ -6,7 +6,7 @@
           <ng-container *ngFor="let lang of supportedLanguages; let i=index">
             <div *ngIf="showLanguages === undefined || showLanguages.indexOf(lang) !== -1" class="flex-col flex-col--1 overflow--hidden word-wrap--break-word white-space--normal word" [class.sm-hide]="i > 0">
               {{wordEntity.texts[0].words[lang] && wordEntity.texts[0].words[lang].value}}
-              <chips *ngIf="i === 0 || showTagsAtLanguage === lang" [chips]="wordEntity.texts[0].tags" mode="read" class="lg-hide" [class.lg-hide]="showTagsAtLanguage === undefined"></chips>
+              <chips *ngIf="i === 0 || showTagsAtLanguage === lang" [chips]="wordEntity.texts[0].tags" mode="read" class="md-hide lg-hide" [class.lg-hide]="showTagsAtLanguage === undefined"></chips>
               <span class="buttons sm-hide">
                 <google-translate-button [from]="lang" [to]="supportedLanguages" [text]="wordEntity.texts[0].words[lang].value">
                 </google-translate-button>
@@ -16,7 +16,7 @@
               </span>
             </div>
           </ng-container>
-          <div *ngIf="showTags" class="flex-col flex-col--10em align--center overflow--hidden word-wrap--break-word white-space--normal sm-hide">
+          <div *ngIf="showTags" class="flex-col flex-col--10em-md flex-col--10em-lg align--center overflow--hidden word-wrap--break-word white-space--normal sm-hide">
             <chips [chips]="wordEntity.texts[0].tags" mode="read"></chips>
           </div>
         </ng-container>

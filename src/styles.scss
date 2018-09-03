@@ -229,6 +229,10 @@ h3 {
     &--40 { flex-basis: 40%; }
     &--50 { flex-basis: 50%; }
 
+    @media(max-width: 599px) {
+      &--10em-sm { flex-basis: 10em; }
+      &--13em-sm { flex-basis: 13em; }
+    }
     @media(min-width: 600px) and (max-width: 1049px) {
       &--10em-md { flex-basis: 10em; }
       &--13em-md { flex-basis: 13em; }
