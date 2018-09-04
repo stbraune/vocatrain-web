@@ -394,7 +394,10 @@ export class DialogTextGameService {
 
       const everythingCorrect = wordEntity.texts
         .filter((text) => text.tags.indexOf('ignore') === -1)
-        .every((text) => text.words[answerLanguage].games[dialogTextGame.mode].correct);
+        .every((text) => text.words[answerLanguage]
+          && text.words[answerLanguage].games
+          && text.words[answerLanguage].games[dialogTextGame.mode]
+          && text.words[answerLanguage].games[dialogTextGame.mode].correct);
       if (everythingCorrect) {
         if (dialogTextGame.word.key.answerLevel === -1) {
           wordEntity.games[answerLanguage][dialogTextGame.mode].level = 0;
