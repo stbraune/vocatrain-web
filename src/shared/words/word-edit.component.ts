@@ -19,6 +19,7 @@ import { GoogleTranslateAlternative } from '../google-translate';
 import { ChipInputComponent } from '../chip-input';
 import { WordEntity } from './word-entity';
 import { Text } from './text';
+import { TextEditComponent } from './text-edit.component';
 
 @Component({
   selector: 'word-edit',
@@ -52,8 +53,8 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   @ViewChild('typeSelect')
   public typeSelect: MatSelect;
 
-  @ViewChildren(ChipInputComponent)
-  public chipInputComponents: QueryList<ChipInputComponent>;
+  @ViewChildren(TextEditComponent)
+  public textEditComponents: QueryList<TextEditComponent>;
 
   public dialogText = false;
 
@@ -104,7 +105,7 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   }
 
   public ngAfterViewInit(): void {
-    this.chipInputComponents.changes.subscribe((x) => {
+    this.textEditComponents.changes.subscribe((x) => {
       if (this.deferredNavigate) {
         setTimeout(() => {
           this.navigateFrom(this.deferredNavigate.row, this.deferredNavigate.col, this.deferredNavigate.dir);
@@ -115,9 +116,9 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   }
 
   public onChipClicked(chip: string) {
-    const chipInputComponents = this.chipInputComponents.toArray();
-    if (chipInputComponents.length > 0) {
-      chipInputComponents[0].toggleChip(chip);
+    const textEditComponents = this.textEditComponents.toArray();
+    if (textEditComponents.length > 0) {
+      textEditComponents[0].toggleChip(chip);
     }
   }
 
@@ -161,10 +162,10 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
     this.editedWordEntity.texts[textIndex].words[alternative.language].value = alternative.text;
   }
 
-  public navigate(source: HTMLElement, direction: 'up' | 'right' | 'down' | 'left') {
-    const row = parseInt(source.dataset.row, 10);
-    const col = parseInt(source.dataset.col, 10);
-    this.navigateFrom(row, col, direction);
+  public navigate($event: { source: HTMLElement, direction: 'up' | 'right' | 'down' | 'left' }) {
+    const row = parseInt($event.source.dataset.row, 10);
+    const col = parseInt($event.source.dataset.col, 10);
+    this.navigateFrom(row, col, $event.direction);
   }
 
   private navigateFrom(row: number, col: number, direction: 'up' | 'right' | 'down' | 'left') {
@@ -199,7 +200,7 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
         break;
     }
 
-    this.chipInputComponents.toArray()[row * countCols + col].focus();
+    this.textEditComponents.toArray()[row].focusChipInput(col);
   }
 
   private countCols() {
@@ -207,14 +208,14 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
   }
 
   private countRows() {
-    return Math.ceil(this.chipInputComponents.length / this.countCols());
+    return this.textEditComponents.length;
   }
 
-  public onBackspacePressed(source: HTMLElement, text: Text) {
-    const row = parseInt(source.dataset.row, 10);
-    const col = parseInt(source.dataset.col, 10);
-    if (this.isEmpty(text) && this.supportMultipleTexts) {
-      const index = this.editedWordEntity.texts.indexOf(text);
+  public onBackspacePressed($event: { source: HTMLElement, text: Text }) {
+    const row = parseInt($event.source.dataset.row, 10);
+    const col = parseInt($event.source.dataset.col, 10);
+    if (this.isEmpty($event.text) && this.supportMultipleTexts) {
+      const index = this.editedWordEntity.texts.indexOf($event.text);
       if (index !== -1) {
         this.deferredNavigate = { row: row, col: 0, dir: 'left' };
         this.editedWordEntity.texts.splice(index, 1);
@@ -222,19 +223,19 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
     }
   }
 
-  public onEnterPressed(source: HTMLElement, text: Text) {
+  public onEnterPressed($event: { source: HTMLElement, text: Text }) {
     if (!this.supportMultipleTexts) {
       // no multiple texts supported, just save the word
       this.onSave();
       return;
     }
 
-    const row = parseInt(source.dataset.row, 10);
-    const col = parseInt(source.dataset.col, 10);
+    const row = parseInt($event.source.dataset.row, 10);
+    const col = parseInt($event.source.dataset.col, 10);
 
-    if (this.isEmpty(text)) {
+    if (this.isEmpty($event.text)) {
       // text is totally empty, remove it and save the word
-      const index = this.editedWordEntity.texts.indexOf(text);
+      const index = this.editedWordEntity.texts.indexOf($event.text);
       if (index !== -1) {
         this.editedWordEntity.texts.splice(index, 1);
       }

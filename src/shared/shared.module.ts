@@ -29,7 +29,7 @@ import { ChipInputComponent } from './chip-input';
 import { ChipsComponent, ChipComponent } from './chips';
 import { KeyComponent } from './key';
 
-import { WordEntityService, WordEditComponent, WordsEditorComponent } from './words';
+import { WordEntityService, WordEditComponent, WordsEditorComponent, TextEditComponent } from './words';
 
 import { SearchOptionsComponent } from './search-options';
 import { GameLogEntityService } from './game-log';
@@ -70,6 +70,7 @@ import { DialogTextGameService, DialogTextSearchOptionsComponent } from './dialo
     KeyComponent,
     SearchOptionsComponent,
     DialogTextSearchOptionsComponent,
+    TextEditComponent,
     WordEditComponent,
     WordsEditorComponent
   ],

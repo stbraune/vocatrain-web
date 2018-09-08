@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Observable, pipe, forkJoin } from 'rxjs';
+import { Observable, pipe, forkJoin, of } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 
 import * as uuidv4 from 'uuid/v4';
@@ -223,6 +223,23 @@ export class WordEntityService {
       endkey: options && options.descending ? '' : undefined,
       limit: options.limit,
       descending: options && options.descending,
+      include_docs: true
+    });
+  }
+
+  public findDuplicates(lang: string, value: string) {
+    if (value.length < 3) {
+      return of({
+        total_rows: 0,
+        offset: 0,
+        rows: []
+      } as DatabaseQueryResult<WordEntity, [string, string], number | {}>);
+    }
+
+    return this.getDuplicateWordEntitiesInternal({
+      reduce: false,
+      startkey: [lang, value],
+      endkey: [lang, `${value}\uffff`],
       include_docs: true
     });
   }

@@ -7,6 +7,7 @@ import { debounceTime } from 'rxjs/operators';
 import { LoadingIndicatorService } from '../loading-indicator';
 import { SettingsService } from '../settings';
 
+import { Text } from './text';
 import { WordEntity } from './word-entity';
 import { WordEntityService } from './word-entity.service';
 import { WordEditComponent } from './word-edit.component';
@@ -67,15 +68,32 @@ export class WordsEditorComponent implements OnInit {
   }
 
   public saveWordEntity(wordEntity: WordEntity) {
-    function splitWords() {
-      const isDialogText = wordEntity.texts.every((text) => text.tags.indexOf('text') === -1);
+    function isEmptyText(text: Text) {
+      return text.meta === ''
+        && (!text.tags || text.tags.length === 0)
+        && (Object.keys(text.words).length === 0 || Object.keys(text.words).every((k) => text.words[k].value === ''));
+    }
+
+    function removeEmptyTexts(wordEntity1: WordEntity) {
+      wordEntity1.texts.filter((text) => isEmptyText(text))
+        .forEach((text) => {
+          const index = wordEntity1.texts.indexOf(text);
+          if (index !== -1) {
+            wordEntity1.texts.splice(index, 1);
+          }
+        });
+      return wordEntity1;
+    }
+
+    function splitWords(wordEntity1: WordEntity) {
+      const isDialogText = wordEntity1.texts.every((text) => text.tags.indexOf('text') === -1);
       if (!isDialogText) {
-        wordEntity.texts.forEach((text) => {
+        wordEntity1.texts.forEach((text) => {
           if (text.tags.indexOf('text') === -1) {
             text.tags.push('text');
           }
         });
-        return [wordEntity];
+        return [wordEntity1];
       }
 
       const splittedWordEntities = wordEntity.texts.map((text) => Object.assign({}, wordEntity, {
@@ -92,7 +110,7 @@ export class WordsEditorComponent implements OnInit {
       return splittedWordEntities;
     }
 
-    const splittedWordsObservables = splitWords().map((w) => this.wordEntityService.putWordEntity(w));
+    const splittedWordsObservables = splitWords(removeEmptyTexts(wordEntity)).map((w) => this.wordEntityService.putWordEntity(w));
     if (splittedWordsObservables.length === 0) {
       return;
     }

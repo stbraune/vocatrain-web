@@ -1,0 +1,69 @@
+<div class="flex flex--wrap flex--no-margin flex--align-center">
+  <div *ngIf="supportMultipleTexts" class="flex-col flex-col--3em sm-hide">
+    <button mat-icon-button (click)="onDeleteText()">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+
+  <ng-container *ngFor="let lang of supportedLanguages; let l=index">
+    <div #chipInputWrapper
+      [attr.data-row]="textIndex"
+      [attr.data-col]="l"
+      class="flex-col flex-col--1 word-input">
+      <chip-input
+        [(value)]="text.words[lang].value"
+        (valueChange)="onValueChanged(lang, $event)"
+        [(chips)]="text.tags"
+        [hideChips]="true"
+        [placeholder]="lang | translate"
+        (chipsChange)="onChipsChange($event)"
+        (cursorPressed)="onCursorPressed(chipInputWrapper, $event)"
+        (backspacePressed)="onBackspacePressed(chipInputWrapper)"
+        (enterPressed)="onEnterPressed(chipInputWrapper)">
+        <google-translate-button [text]="text.words[lang].value" [from]="lang" [to]="supportedLanguages" (translationSelected)="onTranslationSelected(l, lang, $event)">
+        </google-translate-button>
+      </chip-input>
+    </div>
+  </ng-container>
+
+  <div #chipInputWrapper
+    [attr.data-row]="textIndex"
+    [attr.data-col]="supportedLanguages.length"
+    class="flex-col flex-col--1 flex-col--grow word-input">
+    <chip-input
+      [(value)]="text.meta"
+      [(chips)]="text.tags"
+      [hideChips]="true"
+      [placeholder]="'words.edit-word.meta' | translate"
+      (chipsChange)="onChipsChange($event)"
+      (cursorPressed)="onCursorPressed(chipInputWrapper, $event)"
+      (enterPressed)="onEnterPressed(chipInputWrapper)">
+    </chip-input>
+  </div>
+
+  <div class="flex-col flex-col--13em-md flex-col--13em-lg align--center margin--bottom">
+    <chips [(chips)]="text.tags" (chipsChange)="onChipsChange($event)"></chips>
+  </div>
+</div>
+
+<div *ngIf="duplicates.length > 0" class="margin--bottom-05">
+  <h4 class="margin--0 margin--bottom-05">{{'words.possible-duplicates' | translate}}</h4>
+  <div *ngFor="let duplicate of duplicates" class="flex flex--wrap flex--no-margin flex--align-center">
+    <div *ngIf="supportMultipleTexts" class="flex-col flex-col--3em sm-hide">
+    </div>
+
+    <ng-container *ngFor="let lang of supportedLanguages; let l=index">
+      <div class="flex-col flex-col--1 word-input">
+        {{duplicate.words[lang].value}}
+      </div>
+    </ng-container>
+
+    <div class="flex-col flex-col--1 flex-col--grow word-input">
+      {{duplicate.meta}}
+    </div>
+
+    <div class="flex-col flex-col--13em-md flex-col--13em-lg align--center margin--bottom">
+      <chips [(chips)]="duplicate.tags" mode="read"></chips>
+    </div>
+  </div>
+</div>  

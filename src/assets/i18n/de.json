@@ -45,7 +45,8 @@
       "is-text": "Dialogtext",
       "available-tags": "Verfügbare Tags",
       "meta": "Hilfe"
-    }
+    },
+    "possible-duplicates": "Mögliche Duplikate"
   },
   "statistics": {
     "title": "Statistiken",

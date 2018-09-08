@@ -12,53 +12,18 @@
       <chip *ngFor="let tag of availableTags" [chip]="tag" mode="read" (chipClicked)="onChipClicked($event)">
       </chip>
     </div>
-    <div class="max-height-scroll--70">
-      <div *ngFor="let text of editedWordEntity.texts; let w=index" class="flex flex--wrap flex--no-margin flex--align-center">
-        <div *ngIf="supportMultipleTexts" class="flex-col sm-hide">
-          <button mat-icon-button (click)="onDeleteText(text)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-        
-        <ng-container *ngFor="let lang of supportedLanguages; let l=index">
-          <div #chipInputWrapper
-            [attr.data-row]="w"
-            [attr.data-col]="l"
-            class="flex-col flex-col--1 word-input">
-            <chip-input
-              [(value)]="text.words[lang].value"
-              [(chips)]="text.tags"
-              [hideChips]="true"
-              [placeholder]="lang | translate"
-              (chipsChange)="onChipsChange($event)"
-              (cursorPressed)="navigate(chipInputWrapper, $event)"
-              (backspacePressed)="onBackspacePressed(chipInputWrapper, text)"
-              (enterPressed)="onEnterPressed(chipInputWrapper, text)">
-              <google-translate-button [text]="text.words[lang].value" [from]="lang" [to]="supportedLanguages" (translationSelected)="onTranslationSelected(w, l, lang, $event)">
-              </google-translate-button>
-            </chip-input>
-          </div>
-        </ng-container>
-
-        <div #chipInputWrapper
-          [attr.data-row]="w"
-          [attr.data-col]="supportedLanguages.length"
-          class="flex-col flex-col--1 flex-col--grow word-input">
-          <chip-input
-            [(value)]="text.meta"
-            [(chips)]="text.tags"
-            [hideChips]="true"
-            [placeholder]="'words.edit-word.meta' | translate"
-            (chipsChange)="onChipsChange($event)"
-            (cursorPressed)="navigate(chipInputWrapper, $event)"
-            (enterPressed)="onEnterPressed(chipInputWrapper, text)">
-          </chip-input>
-        </div>
-
-        <div class="flex-col flex-col--13em-md flex-col--13em-lg align--center margin--bottom">
-          <chips [(chips)]="text.tags" (chipsChange)="onChipsChange($event)"></chips>
-        </div>
-      </div>
+    <div class="max-height-scroll--65">
+      <text-edit
+        *ngFor="let text of editedWordEntity.texts; let w=index"
+        [text]="text"
+        [textIndex]="w"
+        [supportMultipleTexts]="supportMultipleTexts"
+        [supportedLanguages]="supportedLanguages"
+        (cursorPressed)="navigate($event)"
+        (backspacePressed)="onBackspacePressed($event)"
+        (enterPressed)="onEnterPressed($event)"
+        (deleteText)="onDeleteText($event)">
+      </text-edit>
     </div>
 
     <button *ngIf="supportMultipleTexts" mat-button (click)="onAddText()" class="sm-hide">
