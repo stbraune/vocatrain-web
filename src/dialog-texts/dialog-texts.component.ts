@@ -83,6 +83,16 @@ export class DialogTextsComponent implements OnInit {
     }[]
   }> = [];
 
+  public historyTests: Array<{
+    errors: number,
+    diff: {
+      count: number,
+      value: string,
+      added: boolean,
+      removed: boolean
+    }[]
+  }> = [];
+
   public get totalErrors(): number {
     return this.answerTests.reduce((prev, cur) => prev + (cur ? cur.errors : 0), 0);
   }
@@ -158,6 +168,17 @@ export class DialogTextsComponent implements OnInit {
         this.answers = game.word && game.word.key.answers.map((answer) => '') || [];
         this.answerStates = game.word && game.word.key.answers.map((answer) => 'undefined' as 'undefined') || [];
         this.answerTests = game.word && game.word.key.answers.map((answer) => undefined) || [];
+        this.historyTests = game.word && game.word.key.history.map((history, index) => {
+          if (!history || !history.answer) {
+            return null;
+          }
+
+          const historyTest = this.dialogTextGameService.testAnswer(game, index, history.answer);
+          if (history.correct) {
+            historyTest.errors = 0;
+          }
+          return historyTest;
+        });
       })
     ).subscribe();
   }
@@ -193,7 +214,7 @@ export class DialogTextsComponent implements OnInit {
       // totally correct
       this.uncoverWord(answerIndex);
       this.solveCorrect(answerIndex);
-    } else if (rate >= 0.75) {
+    } else if (rate >= 0.5) {
       // partially correct
       this.uncoverWord(answerIndex);
       this.solvePartiallyCorrect(answerIndex);
@@ -298,6 +319,7 @@ export class DialogTextsComponent implements OnInit {
 
   public solveCorrect(answerIndex: number) {
     this.answerTests[answerIndex] = this.dialogTextGameService.testAnswer(this.game, answerIndex, this.answers[answerIndex]);
+    this.answerTests[answerIndex].errors = 0;
     this.dialogTextGameService.solveWordCorrect(this.game, answerIndex, this.answers[answerIndex]).pipe(
       observeLoading(),
       tap((game) => this.answerStates[answerIndex] = 'correct'),

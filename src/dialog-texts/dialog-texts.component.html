@@ -130,24 +130,38 @@
               </div>
             </div>
             <ng-container *ngIf="(game.wordState[i].state === 'uncovered' || containsTag(game.word.key.tags[i], 'ignore')) || answerStates[i] !== 'undefined'">
-              <span *ngIf="answerTests[i]; else noAnswerTest"
-                [matBadge]="answerTests[i].errors"
-                [matBadgeHidden]="answerTests[i].errors === 0"
-                matBadgeOverlap="false"
-                matBadgeColor="warn">
-                <span *ngFor="let part of answerTests[i].diff"
-                  [class.primary]="part.added"
-                  [class.warn]="part.removed">{{part.value}}</span>
-              </span>
+              <p *ngIf="answerTests[i]; else noAnswerTest">
+                <em>{{'dialog-texts.current-answer' | translate}}: </em>
+                <span
+                  [matBadge]="answerTests[i].errors"
+                  [matBadgeHidden]="answerTests[i].errors === 0"
+                  matBadgeOverlap="false"
+                  matBadgeColor="warn">
+                  <span *ngFor="let part of answerTests[i].diff"
+                    [class.primary]="part.added"
+                    [class.warn]="part.removed">{{part.value}}</span>
+                </span>
+              </p>
               <ng-template #noAnswerTest>
                 <p>
                   {{game.word.key.answers[i]}}
                 </p>
               </ng-template>
               <p *ngIf="game.word.key.history[i] && !containsTag(game.word.key.tags[i], 'ignore')">
-                <em>{{'dialog-texts.old-answer' | translate}}:</em>
-                {{game.word.key.history[i].answer}}
-                ({{(game.word.key.history[i].correct ? 'dialog-texts.right' : 'dialog-texts.wrong') | translate}})
+                <em>{{'dialog-texts.old-answer' | translate}}: </em>
+                <span *ngIf="historyTests[i]; else noHistoryTest"
+                  [matBadge]="historyTests[i].errors"
+                  [matBadgeHidden]="historyTests[i].errors === 0"
+                  matBadgeOverlap="false"
+                  matBadgeColor="warn">
+                  <span *ngFor="let part of historyTests[i].diff"
+                    [class.primary]="part.added"
+                    [class.warn]="part.removed">{{part.value}}</span>
+                </span>
+                <ng-template #noHistoryTest>
+                  {{game.word.key.history[i].answer}}
+                  ({{(game.word.key.history[i].correct ? 'dialog-texts.right' : 'dialog-texts.wrong') | translate}})
+                </ng-template>
               </p>
             </ng-container>
           </div>

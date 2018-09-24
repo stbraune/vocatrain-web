@@ -143,6 +143,7 @@
     "cover": "Zudecken",
     "right": "Richtig",
     "wrong": "Falsch",
+    "current-answer": "Antwort",
     "old-answer": "Vorherige Antwort",
     "meta": "Hilfe",
     "pause": "Pause",

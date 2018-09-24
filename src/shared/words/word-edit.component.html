@@ -15,6 +15,7 @@
     <div class="max-height-scroll--65">
       <text-edit
         *ngFor="let text of editedWordEntity.texts; let w=index"
+        [wordEntity]="editedWordEntity"
         [text]="text"
         [textIndex]="w"
         [supportMultipleTexts]="supportMultipleTexts"

@@ -263,7 +263,7 @@ export class DialogTextGameService {
       translatedWord.games[dialogTextGame.mode].date = new Date();
       translatedWord.games[dialogTextGame.mode].answer = answer;
       translatedWord.games[dialogTextGame.mode].correct = true;
-      translatedWord.games[dialogTextGame.mode].errors = this.testAnswer(dialogTextGame, index, answer).errors;
+      translatedWord.games[dialogTextGame.mode].errors = 0; // this.testAnswer(dialogTextGame, index, answer).errors;
 
       const saveWord = () => {
         return this.db.putEntity(dialogTextGame.word.doc).pipe(

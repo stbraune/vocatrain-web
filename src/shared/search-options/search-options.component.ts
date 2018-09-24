@@ -26,7 +26,7 @@ export class SearchOptionsComponent implements OnInit, OnChanges {
     searchLevelEnabled: false,
     searchLevelMinimum: 0,
     searchLevelMaximum: 100,
-    mod: 6
+    mod: 8
   };
 
   public maxDistanceInDays;
@@ -41,6 +41,7 @@ export class SearchOptionsComponent implements OnInit, OnChanges {
   }
 
   public ngOnInit(): void {
+    this.setSearchLanguages();
   }
 
   public ngOnChanges(changes: SimpleChanges) {
@@ -54,18 +55,31 @@ export class SearchOptionsComponent implements OnInit, OnChanges {
     switch (this.searchOptions.searchLanguagesDirection) {
       case 'stt':
         this.searchOptions.searchLanguagesDirection = 'both';
-        this.searchOptions.searchLanguages = [this.searchOptions.sourceLanguage, this.searchOptions.targetLanguage];
-        this.onPropertyChanged();
         break;
       case 'both':
         this.searchOptions.searchLanguagesDirection = 'tts';
-        this.searchOptions.searchLanguages = [this.searchOptions.sourceLanguage];
-        this.onPropertyChanged();
         break;
       case 'tts':
         this.searchOptions.searchLanguagesDirection = 'stt';
+        break;
+      default:
+        throw new Error(`Unsupported language direction ${this.searchOptions.searchLanguagesDirection}`);
+    }
+
+    this.setSearchLanguages();
+    this.onPropertyChanged();
+  }
+
+  private setSearchLanguages() {
+    switch (this.searchOptions.searchLanguagesDirection) {
+      case 'stt':
         this.searchOptions.searchLanguages = [this.searchOptions.targetLanguage];
-        this.onPropertyChanged();
+        break;
+      case 'both':
+        this.searchOptions.searchLanguages = [this.searchOptions.sourceLanguage, this.searchOptions.targetLanguage];
+        break;
+      case 'tts':
+        this.searchOptions.searchLanguages = [this.searchOptions.sourceLanguage];
         break;
       default:
         throw new Error(`Unsupported language direction ${this.searchOptions.searchLanguagesDirection}`);
@@ -95,6 +109,7 @@ export class SearchOptionsComponent implements OnInit, OnChanges {
   }
 
   public onPropertyChanged() {
+    console.log(this.searchOptions);
     this.searchOptionsChange.emit(this.searchOptions);
   }
 

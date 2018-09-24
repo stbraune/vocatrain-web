@@ -7,6 +7,7 @@ import { GoogleTranslateAlternative } from '../google-translate';
 import { ChipInputComponent } from '../chip-input';
 
 import { Text } from './text';
+import { WordEntity } from './word-entity';
 import { WordEntityService } from './word-entity.service';
 
 @Component({
@@ -15,6 +16,9 @@ import { WordEntityService } from './word-entity.service';
   styleUrls: ['./text-edit.component.scss']
 })
 export class TextEditComponent implements OnInit {
+  @Input()
+  public wordEntity: WordEntity;
+
   @Input()
   public text: Text;
 
@@ -74,6 +78,7 @@ export class TextEditComponent implements OnInit {
       )
       .subscribe((duplicates) => {
         this.duplicates = duplicates.rows
+          .filter((row) => row.doc._id !== this.wordEntity._id)
           .map((row) => row.doc.texts.filter((text) => text.words[row.key[0]].value === row.key[1]))
           .reduce((prev, cur) => prev.concat(cur), [] as Text[]);
       });
