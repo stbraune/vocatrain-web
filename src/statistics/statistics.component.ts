@@ -147,7 +147,7 @@ export class StatisticsComponent implements OnInit {
   private loadLast30DaysTotals(mode: string) {
     const now = new Date();
     const then = new Date(now);
-    then.setDate(then.getDate() - 30);
+    then.setUTCDate(then.getUTCDate() - 30);
     return this.statisticsService.getTotals({ mode: mode, startDate: then, endDate: now }).pipe(
       tap((result) => this.stats[mode].last30.push(...result))
     );
@@ -185,7 +185,7 @@ export class StatisticsComponent implements OnInit {
     now.setUTCMinutes(0);
     now.setUTCHours(0);
     const then = new Date(now);
-    then.setDate(then.getDate() - 7);
+    then.setUTCDate(then.getUTCDate() - 7);
 
     return forkJoin(
       this.translateService.get(['statistics.date-format', 'statistics.correct', 'statistics.wrong', 'statistics.total']),

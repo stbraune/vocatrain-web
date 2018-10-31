@@ -112,8 +112,8 @@ export class StatisticsService {
       group_level: 2
     })).pipe(
       map((result) => {
-        const minDate = options.startDate;
-        const maxDate = options.endDate;
+        const minDate = new Date(options.startDate);
+        const maxDate = new Date(options.endDate);
         const anyKey = result[0];
         if (!anyKey) {
           return result;
@@ -136,8 +136,9 @@ export class StatisticsService {
             filledResult.push(result[index]);
           }
 
-          minDate.setDate(minDate.getDate() + 1);
+          minDate.setUTCDate(minDate.getUTCDate() + 1);
         }
+        console.log(options, result, filledResult);
         return filledResult;
       })
     );

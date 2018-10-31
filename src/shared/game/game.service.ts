@@ -237,7 +237,7 @@ export class GameService {
       if (game.nextWords && game.nextWords.indexOf(game.word) === -1) {
         game.word.key.answerAt = translatedWord.games[game.mode].date;
         game.word.key.reoccurAt = new Date();
-        game.word.key.reoccurAt.setSeconds(game.word.key.reoccurAt.getSeconds() + 30 + Math.random() * 90);
+        game.word.key.reoccurAt.setUTCSeconds(game.word.key.reoccurAt.getUTCSeconds() + 30 + Math.random() * 90);
         game.nextWords.push(game.word);
       }
 
