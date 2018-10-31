@@ -82,6 +82,7 @@ import { DialogTextGameService, DialogTextSearchOptionsComponent } from './dialo
     KeyComponent,
     SearchOptionsComponent,
     DialogTextSearchOptionsComponent,
+    TextEditComponent,
     WordEditComponent,
     WordsEditorComponent
   ]

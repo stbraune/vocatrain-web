@@ -143,6 +143,7 @@
     "cover": "Zudecken",
     "right": "Richtig",
     "wrong": "Falsch",
+    "current-question": "Frage",
     "current-answer": "Antwort",
     "old-answer": "Vorherige Antwort",
     "meta": "Hilfe",
@@ -152,7 +153,8 @@
     "stop": "Aufhören",
     "finished": "Fertig!",
     "no-more-words": "Keine weiteren Dialogtexte vorhanden!",
-    "required-duration": "Benötigte Dauer"
+    "required-duration": "Benötigte Dauer",
+    "edit-word": "Wort bearbeiten"
   },
   "dialog-text-search-options": {
     "dialog-text-type-free": "Freies Tippen"

@@ -245,6 +245,13 @@ export class DialogTextGameService {
     throw new Error(`Cannot test answer without being in a started game`);
   }
 
+  public saveWord(dialogTextGame: DialogTextGame): Observable<DialogTextGame> {
+    return this.db.putEntity(dialogTextGame.word.doc).pipe(
+      tap((word) => dialogTextGame.word.doc._rev = word._rev),
+      map((word) => dialogTextGame)
+    );
+  }
+
   public solveWordCorrect(dialogTextGame: DialogTextGame, index: number, answer: string): Observable<DialogTextGame> {
     if (dialogTextGame.gameState.state === 'started' && dialogTextGame.wordState[index].state === 'uncovered') {
       const translatedWord = dialogTextGame.word.doc.texts[index].words[dialogTextGame.word.key.answerLanguage];

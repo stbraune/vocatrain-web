@@ -93,6 +93,8 @@ export class DialogTextsComponent implements OnInit {
     }[]
   }> = [];
 
+  public visibleTextEdits: Array<boolean> = [];
+
   public get totalErrors(): number {
     return this.answerTests.reduce((prev, cur) => prev + (cur ? cur.errors : 0), 0);
   }
@@ -179,8 +181,13 @@ export class DialogTextsComponent implements OnInit {
           }
           return historyTest;
         });
+        this.visibleTextEdits = game.word && game.word.key.answers.map((answer) => false);
       })
     ).subscribe();
+  }
+
+  public toggleTextEdit(answerIndex: number) {
+    this.visibleTextEdits[answerIndex] = !this.visibleTextEdits[answerIndex];
   }
 
   public pauseGame() {
@@ -307,6 +314,21 @@ export class DialogTextsComponent implements OnInit {
       // down, page down
       this.coverWord(answerIndex);
     }
+  }
+
+  public saveWord(answerIndex: number) {
+    this.dialogTextGameService.saveWord(this.game).pipe(observeLoading())
+      .subscribe(() => {
+        this.snackBar.open('Saved!', null, {
+          duration: 3000
+        });
+      }, (error) => {
+        console.error(error);
+        this.snackBar.open('Error!', 'Ok', {
+          panelClass: 'error'
+        });
+      });
+    this.toggleTextEdit(answerIndex);
   }
 
   public coverWord(answerIndex: number) {
