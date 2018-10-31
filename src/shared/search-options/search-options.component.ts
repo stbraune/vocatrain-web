@@ -46,7 +46,7 @@ export class SearchOptionsComponent implements OnInit, OnChanges {
 
   public ngOnChanges(changes: SimpleChanges) {
     if (changes.searchOptions && this.searchOptions) {
-      this.searchOptions.mod = this.searchOptions.mod || 6;
+      this.searchOptions.mod = this.searchOptions.mod || 8;
       this.onModChanged();
     }
   }
