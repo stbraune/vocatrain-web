@@ -9,15 +9,18 @@ import {
   ViewChildren,
   QueryList,
   AfterViewInit,
-  OnInit
+  OnInit,
+  OnDestroy
 } from '@angular/core';
 import { MatSnackBar, MatSelect } from '@angular/material';
 
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 
 import { GoogleTranslateAlternative } from '../google-translate';
 import { ChipInputComponent } from '../chip-input';
+
 import { WordEntity } from './word-entity';
+import { WordEntityService } from './word-entity.service';
 import { Text } from './text';
 import { TextEditComponent } from './text-edit.component';
 
@@ -26,7 +29,7 @@ import { TextEditComponent } from './text-edit.component';
   templateUrl: './word-edit.component.html',
   styleUrls: ['./word-edit.component.scss']
 })
-export class WordEditComponent implements AfterViewInit, OnChanges {
+export class WordEditComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
   @Input()
   public wordEntity: WordEntity;
 
@@ -60,30 +63,65 @@ export class WordEditComponent implements AfterViewInit, OnChanges {
 
   private deferredNavigate: { row: number, col: number, dir: 'up' | 'right' | 'down' | 'left' };
 
-  public constructor() {
+  private wordSavedSubscription: Subscription;
+  private wordDeletedSubscription: Subscription;
+
+  public constructor(
+    private wordEntityService: WordEntityService
+  ) {
+  }
+
+  public ngOnInit(): void {
+    this.wordSavedSubscription = this.wordEntityService.wordSaved.subscribe((savedWordEntity) => {
+      if (this.wordEntity._id === savedWordEntity._id) {
+        this.wordEntity = savedWordEntity;
+        this.wordEntityChanged(this.wordEntity);
+      }
+    });
+
+    this.wordDeletedSubscription = this.wordEntityService.wordDeleted.subscribe((deletedWordEntity) => {
+      if (this.wordEntity._id === deletedWordEntity._id) {
+        this.wordEntity = undefined;
+        this.wordEntityChanged(this.wordEntity);
+      }
+    });
+  }
+
+  public ngOnDestroy() {
+    this.wordSavedSubscription.unsubscribe();
+    this.wordDeletedSubscription.unsubscribe();
   }
 
   public ngOnChanges(changes: SimpleChanges) {
     if (changes.wordEntity) {
-      this.editedWordEntity = JSON.parse(JSON.stringify(this.wordEntity));
-      this.editedWordEntity.texts = this.editedWordEntity.texts || [];
-      this.editedWordEntity.texts.forEach((text) => {
-        this.supportedLanguages.forEach((lang) => {
-          if (typeof text.words[lang] === 'string') {
-            text.words[lang] = {
-              value: <any>text.words[lang],
-              games: {}
-            };
-          }
+      this.wordEntityChanged(this.wordEntity);
+    }
+  }
 
-          text.words[lang] = text.words[lang] || {
-            value: '',
+  private wordEntityChanged(wordEntity: WordEntity) {
+    if (!wordEntity) {
+      this.editedWordEntity = undefined;
+      return;
+    }
+
+    this.editedWordEntity = JSON.parse(JSON.stringify(wordEntity));
+    this.editedWordEntity.texts = this.editedWordEntity.texts || [];
+    this.editedWordEntity.texts.forEach((text) => {
+      this.supportedLanguages.forEach((lang) => {
+        if (typeof text.words[lang] === 'string') {
+          text.words[lang] = {
+            value: <any>text.words[lang],
             games: {}
           };
-        });
+        }
+
+        text.words[lang] = text.words[lang] || {
+          value: '',
+          games: {}
+        };
       });
-      this.dialogText = this.editedWordEntity.texts.some((text) => text.tags.indexOf('text') !== -1);
-    }
+    });
+    this.dialogText = this.editedWordEntity.texts.some((text) => text.tags.indexOf('text') !== -1);
   }
 
   public dialogTextChanged() {

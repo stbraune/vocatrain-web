@@ -1,4 +1,4 @@
-<div class="flex flex--no-margin flex--column">
+<div *ngIf="editedWordEntity" class="flex flex--no-margin flex--column">
   <ng-container>
     <div class="margin--bottom">
       <mat-checkbox class="flex-col" [(ngModel)]="dialogText" (ngModelChange)="dialogTextChanged()">

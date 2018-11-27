@@ -17,7 +17,7 @@ import { WordEditComponent } from './word-edit.component';
   templateUrl: './words-editor.component.html',
   styleUrls: ['./words-editor.component.scss']
 })
-export class WordsEditorComponent implements OnInit {
+export class WordsEditorComponent implements OnInit, OnDestroy {
   @Input()
   public wordEntities: WordEntity[] = [];
 
@@ -88,6 +88,11 @@ export class WordsEditorComponent implements OnInit {
         this.closeWordEntityDetails();
       }
     });
+  }
+
+  public ngOnDestroy() {
+    this.wordSavedSubscription.unsubscribe();
+    this.wordDeletedSubscription.unsubscribe();
   }
 
   public saveWordEntity(wordEntity: WordEntity) {
