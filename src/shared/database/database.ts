@@ -123,7 +123,11 @@ export class Database<TEntity extends DatabaseEntity> {
     return observable.pipe(map((item: TEntity) => this.deserializeEntity(item)));
   }
 
-  public postEntity(item: TEntity, id?: string): Observable<TEntity> {
+  public postEntity(
+    item: TEntity,
+    id?: string,
+    reconcileItem?: (conflictingItem: TEntity, winningItem: TEntity) => TEntity
+  ): Observable<TEntity> {
     const now = new Date();
     const transient = item.transient;
     item._id = `${this._options.name}_${id || now.toJSON()}`;
@@ -131,13 +135,17 @@ export class Database<TEntity extends DatabaseEntity> {
     item.updatedAt = item.createdAt = now;
 
     return this.putDocument(this.serializeEntity(item)).pipe(
-      this.handleConflict(item),
+      this.handleConflict(item, reconcileItem || this._options.reconcileItem),
       tap((persistedItem) => persistedItem.transient = transient),
       tap((persistedItem) => this.entitySaved.emit(persistedItem))
     );
   }
 
-  public putEntity(item: TEntity, id?: string): Observable<TEntity> {
+  public putEntity(
+    item: TEntity,
+    id?: string,
+    reconcileItem?: (conflictingItem: TEntity, winningItem: TEntity) => TEntity
+  ): Observable<TEntity> {
     const now = new Date();
     const transient = item.transient;
     item._id = item._id || `${this._options.name}_${id || now.toJSON()}`;
@@ -146,16 +154,16 @@ export class Database<TEntity extends DatabaseEntity> {
     item.createdAt = item.createdAt || item.updatedAt;
 
     return this.putDocument(this.serializeEntity(item)).pipe(
-      this.handleConflict(item),
+      this.handleConflict(item, reconcileItem || this._options.reconcileItem),
       tap((persistedItem) => persistedItem.transient = transient),
       tap((persistedItem) => this.entitySaved.emit(persistedItem)),
     );
   }
 
-  private handleConflict(item: TEntity) {
-    return <T>(source: Observable<T>) => source.pipe(catchError((error) => (error.status === 409 && this._options.reconcileItem)
+  private handleConflict(item: TEntity, reconcileItem: (conflictingItem: TEntity, winningItem: TEntity) => TEntity) {
+    return <T>(source: Observable<T>) => source.pipe(catchError((error) => (error.status === 409 && reconcileItem)
       ? this.getEntityById(item._id).pipe(
-        map((winningItem) => ({ winningItem, mergedItem: this._options.reconcileItem(item, winningItem) })),
+        map((winningItem) => ({ winningItem, mergedItem: reconcileItem(item, winningItem) })),
         tap((result) => result.mergedItem._rev = result.winningItem._rev),
         switchMap((result) => this.putEntity(result.mergedItem))
       ) : throwError(error)));

@@ -1,7 +1,7 @@
-import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
-import { MatSnackBar, MatDialog } from '@angular/material';
+import { Component, OnInit, OnDestroy, Input, ViewChild, TemplateRef } from '@angular/core';
+import { MatSnackBar, MatDialog, MatDialogRef } from '@angular/material';
 
-import { Observable, Subject, forkJoin } from 'rxjs';
+import { Observable, Subject, forkJoin, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 import { LoadingIndicatorService } from '../loading-indicator';
@@ -51,6 +51,11 @@ export class WordsEditorComponent implements OnInit {
   @ViewChild('wordDetailsDialogContentTemplate')
   public wordDetailsDialogContentTemplate: TemplateRef<void>;
 
+  private wordDetailsDialogRef: MatDialogRef<void, any>;
+
+  private wordSavedSubscription: Subscription;
+  private wordDeletedSubscription: Subscription;
+
   public constructor(
     private loadingIndicatorService: LoadingIndicatorService,
     private settingsService: SettingsService,
@@ -64,6 +69,24 @@ export class WordsEditorComponent implements OnInit {
     this.settingsService.appSettingsChanged.subscribe((appSettings) => {
       this.supportedLanguages = appSettings.userLanguages.filter((userLanguage) => userLanguage.enabled)
         .map((userLanguage) => userLanguage.iso);
+    });
+
+    this.wordSavedSubscription = this.wordEntityService.wordSaved.subscribe((savedWordEntity) => {
+      const index = this.wordEntities.findIndex((w) => w._id === savedWordEntity._id);
+      if (index !== -1) {
+        this.wordEntities[index] = Object.assign(this.wordEntities[index], savedWordEntity);
+      }
+    });
+
+    this.wordDeletedSubscription = this.wordEntityService.wordDeleted.subscribe((deletedWordEntity) => {
+      const index = this.wordEntities.findIndex((w) => w._id === deletedWordEntity._id);
+      if (index !== -1) {
+        this.wordEntities.splice(index, 1);
+      }
+
+      if (this.wordEntityDetails._id === deletedWordEntity._id) {
+        this.closeWordEntityDetails();
+      }
     });
   }
 
@@ -110,7 +133,8 @@ export class WordsEditorComponent implements OnInit {
       return splittedWordEntities;
     }
 
-    const splittedWordsObservables = splitWords(removeEmptyTexts(wordEntity)).map((w) => this.wordEntityService.putWordEntity(w));
+    const splittedWordsObservables = splitWords(removeEmptyTexts(wordEntity))
+      .map((w) => this.wordEntityService.putWordEntity(w, this.wordEntityService.reconcileItemTakeConflictingTexts));
     if (splittedWordsObservables.length === 0) {
       return;
     }
@@ -159,6 +183,13 @@ export class WordsEditorComponent implements OnInit {
   public openWordEntityDetails($event: MouseEvent, wordEntity: WordEntity) {
     $event.stopPropagation();
     this.wordEntityDetails = wordEntity;
-    this.dialog.open(this.wordDetailsDialogContentTemplate);
+    this.wordDetailsDialogRef = this.dialog.open(this.wordDetailsDialogContentTemplate);
+  }
+
+  public closeWordEntityDetails() {
+    if (this.wordDetailsDialogRef) {
+      this.wordDetailsDialogRef.close();
+      this.wordDetailsDialogRef = undefined;
+    }
   }
 }

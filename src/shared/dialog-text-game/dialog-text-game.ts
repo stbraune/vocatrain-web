@@ -1,4 +1,4 @@
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 
 import { GameLogEntity } from '../game-log';
 
@@ -23,4 +23,7 @@ export interface DialogTextGame {
   word: DialogTextSearchResult;
   wordState: DialogTextWordState[];
   wordStateChanged: Subject<{ previous: DialogTextWordState[], current: DialogTextWordState[] }>;
+
+  wordSavedSubscription: Subscription;
+  wordDeletedSubscription: Subscription;
 }

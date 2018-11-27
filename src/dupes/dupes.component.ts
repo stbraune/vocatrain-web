@@ -223,7 +223,7 @@ export class DupesComponent implements OnInit {
 
   public saveWordEntity(wordEntity: WordEntity) {
     this.loadingIndicatorService.notifyLoading();
-    this.wordEntityService.putWordEntity(wordEntity).subscribe((wordEntities) => {
+    this.wordEntityService.putWordEntity(wordEntity, this.wordEntityService.reconcileItemTakeConflictingTexts).subscribe((wordEntities) => {
       this.loadingIndicatorService.notifyFinished();
       this.snackBar.open('Saved!', null, {
         duration: 3000

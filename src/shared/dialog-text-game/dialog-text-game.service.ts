@@ -117,7 +117,25 @@ export class DialogTextGameService {
       }),
       durationReferenceDate: new Date(),
       duration: 0,
-      durationInterval: undefined
+      durationInterval: undefined,
+      wordSavedSubscription: this.wordEntityService.wordSaved.subscribe((savedWordEntity) => {
+        if (!dialogTextGame) {
+          return;
+        }
+
+        if (dialogTextGame.word.id === savedWordEntity._id) {
+          dialogTextGame.word.doc = savedWordEntity;
+        }
+      }),
+      wordDeletedSubscription: this.wordEntityService.wordDeleted.subscribe((deletedWordEntity) => {
+        if (!dialogTextGame) {
+          return;
+        }
+
+        if (dialogTextGame.word.id === deletedWordEntity._id) {
+          this.stopGame(dialogTextGame, 'no-more-words');
+        }
+      })
     };
 
     dialogTextGame.gameStateChanged.next({
@@ -246,7 +264,7 @@ export class DialogTextGameService {
   }
 
   public saveWord(dialogTextGame: DialogTextGame): Observable<DialogTextGame> {
-    return this.db.putEntity(dialogTextGame.word.doc).pipe(
+    return this.wordEntityService.putWordEntity(dialogTextGame.word.doc).pipe(
       tap((word) => dialogTextGame.word.doc._rev = word._rev),
       map((word) => dialogTextGame)
     );
@@ -273,7 +291,7 @@ export class DialogTextGameService {
       translatedWord.games[dialogTextGame.mode].errors = 0; // this.testAnswer(dialogTextGame, index, answer).errors;
 
       const saveWord = () => {
-        return this.db.putEntity(dialogTextGame.word.doc).pipe(
+        return this.wordEntityService.putWordEntity(dialogTextGame.word.doc).pipe(
           tap((word) => dialogTextGame.word.doc._rev = word._rev),
           switchMap(() => this.gameLogEntityService.incrementCorrect(dialogTextGame.gameLogEntity, dialogTextGame.durationReferenceDate)),
           tap((gameLogEntity) => dialogTextGame.gameLogEntity = gameLogEntity)
@@ -310,7 +328,7 @@ export class DialogTextGameService {
       translatedWord.games[dialogTextGame.mode].errors = this.testAnswer(dialogTextGame, index, answer).errors;
 
       const saveWord = () => {
-        return this.db.putEntity(dialogTextGame.word.doc).pipe(
+        return this.wordEntityService.putWordEntity(dialogTextGame.word.doc).pipe(
           tap((word) => dialogTextGame.word.doc._rev = word._rev),
           switchMap(() => this.gameLogEntityService.incrementWrong(dialogTextGame.gameLogEntity, dialogTextGame.durationReferenceDate)),
           tap((gameLogEntity) => dialogTextGame.gameLogEntity = gameLogEntity)
@@ -388,6 +406,14 @@ export class DialogTextGameService {
       clearInterval(dialogTextGame.durationInterval);
     }
 
+    if (dialogTextGame.wordSavedSubscription) {
+      dialogTextGame.wordSavedSubscription.unsubscribe();
+    }
+
+    if (dialogTextGame.wordDeletedSubscription) {
+      dialogTextGame.wordDeletedSubscription.unsubscribe();
+    }
+
     if (dialogTextGame.word) {
       const wordEntity = dialogTextGame.word.doc;
       const answerLanguage = dialogTextGame.word.key.answerLanguage;
@@ -419,7 +445,7 @@ export class DialogTextGameService {
     }
 
     const saveWord = () => {
-      return dialogTextGame.word ? this.db.putEntity(dialogTextGame.word.doc).pipe(
+      return dialogTextGame.word ? this.wordEntityService.putWordEntity(dialogTextGame.word.doc).pipe(
         tap((word) => dialogTextGame.word.doc._rev = word._rev)
       ) : of(null);
     };

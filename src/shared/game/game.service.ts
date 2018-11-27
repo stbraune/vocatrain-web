@@ -45,7 +45,31 @@ export class GameService {
       durationReferenceDate: new Date(),
       duration: 0,
       durationInterval: undefined,
-      amount: 0
+      amount: 0,
+      wordSavedSubscription: this.wordEntityService.wordSaved.subscribe((savedWordEntity) => {
+        if (!game) {
+          return;
+        }
+
+        const index = game.nextWords.findIndex((searchResult) => searchResult.id === savedWordEntity._id);
+        if (index !== -1) {
+          game.nextWords[index].doc = savedWordEntity;
+        }
+      }),
+      wordDeletedSubscription: this.wordEntityService.wordDeleted.subscribe((deletedWordEntity) => {
+        if (!game) {
+          return;
+        }
+
+        const index = game.nextWords.findIndex((searchResult) => searchResult.id === deletedWordEntity._id);
+        if (index !== -1) {
+          game.nextWords.splice(index, 1);
+        }
+
+        if (game.word.id === deletedWordEntity._id) {
+          game.word.doc._deleted = true;
+        }
+      })
     };
 
     game.gameStateChanged.next({
@@ -194,18 +218,10 @@ export class GameService {
 
       translatedWord.games[game.mode].date = new Date();
 
-      const saveWord = () => {
-        const observable = this.db.putEntity(game.word.doc).pipe(
-          switchMap(() => this.gameLogEntityService.incrementCorrect(game.gameLogEntity, game.durationReferenceDate)),
-          tap((gameLogEntity) => game.gameLogEntity = gameLogEntity)
-        );
-        if (game.nextWord) {
-          observable.subscribe();
-          return of(game.gameLogEntity);
-        }
-
-        return observable;
-      };
+      const saveWord = () => (game.word.doc._deleted ? of({} as WordEntity) : this.wordEntityService.putWordEntity(game.word.doc)).pipe(
+        switchMap(() => this.gameLogEntityService.incrementCorrect(game.gameLogEntity, game.durationReferenceDate)),
+        tap((gameLogEntity) => game.gameLogEntity = gameLogEntity)
+      );
 
       return this.pauseGame(game).pipe(
         switchMap(() => saveWord()),
@@ -234,25 +250,17 @@ export class GameService {
       translatedWord.games[game.mode].level = 0;
       translatedWord.games[game.mode].date = new Date();
 
-      if (game.nextWords && game.nextWords.indexOf(game.word) === -1) {
+      if (game.nextWords && game.nextWords.indexOf(game.word) === -1 && !game.word.doc._deleted) {
         game.word.key.answerAt = translatedWord.games[game.mode].date;
         game.word.key.reoccurAt = new Date();
-        game.word.key.reoccurAt.setUTCSeconds(game.word.key.reoccurAt.getUTCSeconds() + 30 + Math.random() * 90);
+        game.word.key.reoccurAt.setUTCSeconds(game.word.key.reoccurAt.getUTCSeconds() + 15 + Math.random() * 45);
         game.nextWords.push(game.word);
       }
 
-      const saveWord = () => {
-        const observable = this.db.putEntity(game.word.doc).pipe(
-          switchMap(() => this.gameLogEntityService.incrementWrong(game.gameLogEntity, game.durationReferenceDate)),
-          tap((gameLogEntity) => game.gameLogEntity = gameLogEntity)
-        );
-        if (game.nextWord) {
-          observable.subscribe();
-          return of(game.gameLogEntity);
-        }
-
-        return observable;
-      };
+      const saveWord = () => (game.word.doc._deleted ? of({} as WordEntity) : this.wordEntityService.putWordEntity(game.word.doc)).pipe(
+        switchMap(() => this.gameLogEntityService.incrementWrong(game.gameLogEntity, game.durationReferenceDate)),
+        tap((gameLogEntity) => game.gameLogEntity = gameLogEntity)
+      );
 
       return this.pauseGame(game).pipe(
         switchMap(() => saveWord()),
@@ -337,6 +345,14 @@ export class GameService {
 
     if (game.durationInterval) {
       clearInterval(game.durationInterval);
+    }
+
+    if (game.wordSavedSubscription) {
+      game.wordSavedSubscription.unsubscribe();
+    }
+
+    if (game.wordDeletedSubscription) {
+      game.wordDeletedSubscription.unsubscribe();
     }
 
     return this.gameLogEntityService.finishGameLog(game.gameLogEntity, game.durationReferenceDate).pipe(

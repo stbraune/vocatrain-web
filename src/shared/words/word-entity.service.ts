@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Observable, pipe, forkJoin, of } from 'rxjs';
+import { Observable, Subject, pipe, forkJoin, of } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 
 import * as uuidv4 from 'uuid/v4';
@@ -18,6 +18,101 @@ declare const Document: any;
 @Injectable()
 export class WordEntityService {
   private db: Database<WordEntity>;
+
+  public wordSaved = new Subject<WordEntity>();
+  public wordDeleted = new Subject<WordEntity>();
+
+  public reconcileItemTakeWinningTexts = (conflictingItem: WordEntity, winningItem: WordEntity) => {
+    for (let textIndex = 0; textIndex < winningItem.texts.length; textIndex++) {
+      const winningText = winningItem.texts[textIndex];
+      const conflictingText = conflictingItem.texts[textIndex];
+
+      Object.keys(winningText.words).forEach((lang) => {
+        const winningWord = winningText.words[lang];
+        const conflictingWord = conflictingText.words[lang];
+        if (!conflictingWord) {
+          return;
+        }
+
+        if (!winningWord.games) {
+          // no game information yet in the winning word, so take everything from the conflicting word and return
+          winningWord.games = conflictingWord.games;
+          return;
+        }
+
+        if (!conflictingWord.games) {
+          // no game information to merge from the conflicting word
+          return;
+        }
+
+        // merge any game in the winning word with a maybe available one in the conflicting word
+        Object.keys(winningWord.games).forEach((mode) => {
+          const winningGame = winningWord.games[mode];
+          const conflictingGame = conflictingWord.games[mode];
+          if (!conflictingGame) {
+            return;
+          }
+
+          winningGame.date = winningGame.date.getTime() > conflictingGame.date.getTime() ? winningGame.date : conflictingGame.date;
+          winningGame.level = winningGame.date.getTime() > conflictingGame.date.getTime() ? winningGame.level : conflictingGame.level;
+        });
+
+        // add any game in the conflicting word, that we haven't yet in the winning word
+        Object.keys(conflictingWord.games).filter((mode) => !winningWord.games[mode]).forEach((mode) => {
+          winningWord.games[mode] = conflictingWord.games[mode];
+        });
+      });
+    }
+    return winningItem;
+  }
+
+  public reconcileItemTakeConflictingTexts = (conflictingItem: WordEntity, winningItem: WordEntity) => {
+    for (let textIndex = 0; textIndex < winningItem.texts.length; textIndex++) {
+      const winningText = winningItem.texts[textIndex];
+      const conflictingText = conflictingItem.texts[textIndex];
+      winningText.meta = conflictingText.meta;
+      winningText.tags = conflictingText.tags;
+
+      Object.keys(winningText.words).forEach((lang) => {
+        const winningWord = winningText.words[lang];
+        const conflictingWord = conflictingText.words[lang];
+        if (!conflictingWord) {
+          return;
+        }
+
+        winningWord.value = conflictingWord.value;
+
+        if (!winningWord.games) {
+          // no game information yet in the winning word, so take everything from the conflicting word and return
+          winningWord.games = conflictingWord.games;
+          return;
+        }
+
+        if (!conflictingWord.games) {
+          // no game information to merge from the conflicting word
+          return;
+        }
+
+        // merge any game in the winning word with a maybe available one in the conflicting word
+        Object.keys(winningWord.games).forEach((mode) => {
+          const winningGame = winningWord.games[mode];
+          const conflictingGame = conflictingWord.games[mode];
+          if (!conflictingGame) {
+            return;
+          }
+
+          winningGame.date = winningGame.date.getTime() > conflictingGame.date.getTime() ? winningGame.date : conflictingGame.date;
+          winningGame.level = winningGame.date.getTime() > conflictingGame.date.getTime() ? winningGame.level : conflictingGame.level;
+        });
+
+        // add any game in the conflicting word, that we haven't yet in the winning word
+        Object.keys(conflictingWord.games).filter((mode) => !winningWord.games[mode]).forEach((mode) => {
+          winningWord.games[mode] = conflictingWord.games[mode];
+        });
+      });
+    }
+    return winningItem;
+  }
 
   public constructor(
     private databaseService: DatabaseService,
@@ -41,54 +136,7 @@ export class WordEntityService {
         });
         return item;
       },
-      reconcileItem(conflictingItem, winningItem) {
-        const winningNewer = winningItem.updatedAt.getTime() > conflictingItem.updatedAt.getTime();
-        for (let textIndex = 0; textIndex < winningItem.texts.length; textIndex++) {
-          const winningText = winningItem.texts[textIndex];
-          const conflictingText = conflictingItem.texts[textIndex];
-          winningText.meta = winningNewer ? winningText.meta : conflictingText.meta;
-          winningText.tags = winningNewer ? winningText.tags : conflictingText.tags;
-
-          Object.keys(winningText.words).forEach((lang) => {
-            const winningWord = winningText.words[lang];
-            const conflictingWord = conflictingText.words[lang];
-            if (!conflictingWord) {
-              return;
-            }
-
-            winningWord.value = winningNewer ? winningWord.value : conflictingWord.value;
-
-            if (!winningWord.games) {
-              // no game information yet in the winning word, so take everything from the conflicting word and return
-              winningWord.games = conflictingWord.games;
-              return;
-            }
-
-            if (!conflictingWord.games) {
-              // no game information to merge from the conflicting word
-              return;
-            }
-
-            // merge any game in the winning word with a maybe available one in the conflicting word
-            Object.keys(winningWord.games).forEach((mode) => {
-              const winningGame = winningWord.games[mode];
-              const conflictingGame = conflictingWord.games[mode];
-              if (!conflictingGame) {
-                return;
-              }
-
-              winningGame.date = winningGame.date.getTime() > conflictingGame.date.getTime() ? winningGame.date : conflictingGame.date;
-              winningGame.level = winningGame.date.getTime() > conflictingGame.date.getTime() ? winningGame.level : conflictingGame.level;
-            });
-
-            // add any game in the conflicting word, that we haven't yet in the winning word
-            Object.keys(conflictingWord.games).filter((mode) => !winningWord.games[mode]).forEach((mode) => {
-              winningWord.games[mode] = conflictingWord.games[mode];
-            });
-          });
-        }
-        return winningItem;
-      }
+      reconcileItem: this.reconcileItemTakeWinningTexts
     });
   }
 
@@ -328,11 +376,22 @@ export class WordEntityService {
     }, options));
   }
 
-  public putWordEntity(wordEntity: WordEntity): Observable<WordEntity> {
-    return this.db.putEntity(wordEntity, `${new Date().toJSON()}_${uuidv4()}`);
+  public putWordEntity(
+    wordEntity: WordEntity,
+    reconcileItem?: (conflictingItem: WordEntity, winningItem: WordEntity) => WordEntity
+  ): Observable<WordEntity> {
+    if (wordEntity['type']) {
+      delete wordEntity['type'];
+    }
+
+    return this.db.putEntity(wordEntity, `${new Date().toJSON()}_${uuidv4()}`).pipe(
+      tap((persisted) => this.wordSaved.next(persisted))
+    );
   }
 
   public deleteWordEntity(wordEntity: WordEntity): Observable<WordEntity> {
-    return this.db.removeEntity(wordEntity);
+    return this.db.removeEntity(wordEntity).pipe(
+      tap((deleted) => this.wordDeleted.next(deleted))
+    );
   }
 }
