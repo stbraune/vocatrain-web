@@ -173,6 +173,7 @@ export class DupesComponent implements OnInit {
   private buildQuery(word: string, similarity: number) {
     return word.split(/\s+/g)
       .map((part) => this.sanitizeWord(part))
+      .filter((part) => !!part)
       .map((part) => `${part}~${similarity}`)
       .join(' ');
   }
