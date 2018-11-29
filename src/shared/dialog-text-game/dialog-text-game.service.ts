@@ -173,7 +173,7 @@ export class DialogTextGameService {
       //   current: game.wordState = { state: 'undefined', reason: 'next-word' }
       // });
 
-      return this.findWords(dialogTextGame.mode, dialogTextGame.searchOptions).pipe(
+      return this.nextWordInternal(dialogTextGame).pipe(
         switchMap((searchResults) => {
           if (searchResults.length === 0) {
             return ['started', 'paused'].indexOf(dialogTextGame.gameState.state) === -1
@@ -198,6 +198,46 @@ export class DialogTextGameService {
     }
 
     return throwError(`Cannot get next word in a not started game`);
+  }
+
+  private nextWordInternal(dialogTextGame: DialogTextGame): Observable<DialogTextSearchResult[]> {
+    return this.findWords(dialogTextGame.mode, dialogTextGame.searchOptions).pipe(
+      switchMap((searchResults) => {
+        const possibleWords = searchResults
+          .filter((searchResult) => new Date().getTime() - new Date(searchResult.key.reoccurAt as string).getTime() >= 0);
+        const levels = possibleWords
+          .map((searchResult) => searchResult.key.answerLevel)
+          .reduce((prev, cur) => prev.indexOf(cur) === -1 ? prev.concat([cur]) : prev, [])
+          .sort()
+          .reverse();
+        if (levels.length === 0) {
+          return of([]);
+        }
+
+        const levelsHigherThanNothing = possibleWords
+          .filter((searchResult) => searchResult.key.answerLevel >= 0)
+          .map((searchResult) => searchResult.key.answerLevel);
+        let nextWordLevel = levels[0];
+        if (levelsHigherThanNothing.length > 0) {
+          nextWordLevel = levelsHigherThanNothing[Math.max(Math.min(Math.round(Math.random() * (levelsHigherThanNothing.length - 1)),
+            levelsHigherThanNothing.length - 1), 0)];
+        }
+
+        const wordsByLevel = levels.map((level) => possibleWords.filter((searchResult) => searchResult.key.answerLevel === level));
+        const nextWords = possibleWords
+          .filter((searchResult) => searchResult.key.answerLevel === nextWordLevel)
+          .sort((a, b) => {
+            if (a.key.success > b.key.success) { return 1; }
+            if (a.key.success < b.key.success) { return -1; }
+            return 0;
+          });
+        if (!nextWords) {
+          return of([]);
+        }
+
+        return of(nextWords);
+      })
+    );
   }
 
   public coverWord(dialogTextGame: DialogTextGame, index: number): Observable<DialogTextGame> {

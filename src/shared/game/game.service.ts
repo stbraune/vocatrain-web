@@ -155,7 +155,7 @@ export class GameService {
           levelsHigherThanNothing.length - 1), 0)];
       }
 
-      const wordsByLevel = levels.map((level) => possibleWords.filter((searchResult) => searchResult.key.answerLevel === level));
+      // const wordsByLevel = levels.map((level) => possibleWords.filter((searchResult) => searchResult.key.answerLevel === level));
       const nextWord = possibleWords.find((searchResult) => searchResult.key.answerLevel === nextWordLevel);
       if (!nextWord) {
         return of([]);
