@@ -2,17 +2,15 @@ export function clone<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));
 }
 
+export function action(cond: () => boolean, then: () => any) {
+  return { if: cond, then: then };
+}
+
 export function any(...actions: {
   if: () => boolean,
   then: () => void
 }[]) {
-  return actions.reduce((result, action) => {
-    if (action.if()) {
-      action.then();
-      return true;
-    }
-    return result;
-  }, false);
+  return actions.reduce((result, action) => (action.if() && (action.then() || true)) || result, false);
 }
 
 // removes properties with undefined value from value and those with the given keys.
