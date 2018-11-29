@@ -138,7 +138,6 @@ export class StatisticsService {
 
           minDate.setUTCDate(minDate.getUTCDate() + 1);
         }
-        console.log(options, result, filledResult);
         return filledResult;
       })
     );

@@ -134,7 +134,6 @@ export class GameService {
   }
 
   private nextWordInternal(game: Game): Observable<SearchResult[]> {
-    console.log('loading new word');
     if (game.nextWords) {
       const possibleWords = game.nextWords
         .filter((searchResult) => new Date().getTime() - new Date(searchResult.key.reoccurAt as string).getTime() >= 0);
@@ -157,7 +156,6 @@ export class GameService {
       }
 
       const wordsByLevel = levels.map((level) => possibleWords.filter((searchResult) => searchResult.key.answerLevel === level));
-      console.log(wordsByLevel);
       const nextWord = possibleWords.find((searchResult) => searchResult.key.answerLevel === nextWordLevel);
       if (!nextWord) {
         return of([]);
@@ -389,7 +387,6 @@ export class GameService {
       return throwError(`Can't search for other languages than source language and/or target language`);
     }
 
-    console.log('search options', options);
     const langs = JSON.stringify([options.sourceLanguage, options.targetLanguage]);
     return this.db.executeQuery<SearchResultKey>({
       designDocument: 'words',

@@ -103,13 +103,11 @@ export class SearchOptionsComponent implements OnInit, OnChanges {
     const mod = Math.ceil(Math.log2(this.maxDistanceInDays)) + 2;
     if (mod !== this.searchOptions.mod) {
       this.searchOptions.mod = mod;
-      console.log('opts', this.searchOptions);
       this.onPropertyChanged();
     }
   }
 
   public onPropertyChanged() {
-    console.log(this.searchOptions);
     this.searchOptionsChange.emit(this.searchOptions);
   }
 

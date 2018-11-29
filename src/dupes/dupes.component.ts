@@ -203,7 +203,6 @@ export class DupesComponent implements OnInit {
       observeLoading(),
       tap((game) => this.game = game),
       tap((game) => this.wordStateSubscription = this.game.wordStateChanged.subscribe((change) => {
-        console.log('word state change', change);
         if (change.previous.state === 'undefined' && change.current.state === 'covered') {
           this.uncoverWord();
           this.buildAndRunQuestionQuery();
